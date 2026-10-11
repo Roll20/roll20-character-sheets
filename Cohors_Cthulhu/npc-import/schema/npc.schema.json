@@ -1,0 +1,448 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Seppun/roll20-character-sheets/Cohors_Cthulhu/npc-import/schema/npc.schema.json",
+  "title": "Cohors Cthulhu NPC",
+  "description": "One NPC, ready for import into the Cohors Cthulhu Roll20 sheet via the Cohors Cthulhu Companion API script (Cohors_Cthulhu_Companion in Roll20/roll20-api-scripts). See ../FORMAT.md for a full walkthrough. A file may contain either a single object matching this schema, or a JSON array of them for a batch of NPCs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "attributes"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The NPC's name - becomes the Roll20 character's name."
+    },
+    "npc_type": {
+      "type": "string",
+      "enum": [
+        "trooper",
+        "toughened",
+        "nemesis"
+      ],
+      "default": "toughened",
+      "description": "The profile's NPC type (the line under its name, e.g. \"TOUGHENED NPC\"). Trooper and Toughened use the sheet's compact combat layout; Nemesis gets the full sheet. Also sets the tier defaults for Max Stress (Troopers halve it) and injuries (1/2/3)."
+    },
+    "allegiance": {
+      "type": "string",
+      "enum": [
+        "adversary",
+        "ally"
+      ],
+      "default": "adversary",
+      "description": "Adversaries buy d20s with Threat and turn extra successes into Threat; allies use the party's Momentum like a PC. Can be switched on the sheet at any time."
+    },
+    "token": {
+      "description": "The NPC's token image, looked up by name in the game: a named token on a page called \"Token Library\", or a custom token marker. Matching ignores case, accents, punctuation, a file extension and a trailing \"standard\"/\"light\" variant. Omit it to look up the NPC's own name; false skips the token.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": false
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Token name to look up (default: the NPC's name)."
+            },
+            "variant": {
+              "enum": [
+                "standard",
+                "light"
+              ],
+              "description": "Preferred variant when both exist (default standard)."
+            },
+            "image": {
+              "type": "string",
+              "description": "A Roll20-uploaded image URL (files.d20.io/images/...), used instead of a lookup."
+            },
+            "size": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 10,
+              "description": "Token size in grid squares (default 1)."
+            }
+          }
+        }
+      ]
+    },
+    "truths": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      },
+      "description": "The profile's TRUTHS lines, one per entry (Troopers have one, Toughened one or two, Nemesis two)."
+    },
+    "archetype": {
+      "type": "string",
+      "description": "The sheet's Archetype dropdown: Mystic, Sage, Schemer, Scoundrel, Scout or Soldier. Other text is stored but not shown on the sheet."
+    },
+    "culture": {
+      "type": "string",
+      "description": "The sheet's Culture dropdown: Roman citizen, Germanic tribe, Ægyptus, Briton, Gaul, Greek, Foederati or Other. Case is ignored, and a leading word such as \"Roman\" also matches. Other text is stored but not shown on the sheet."
+    },
+    "caste": {
+      "type": "string",
+      "description": "The sheet's Caste dropdown: Outcast, Servant, Plebeian, Freedman or Noble. Other text is stored but not shown on the sheet."
+    },
+    "wealth": {
+      "type": "string"
+    },
+    "specialization": {
+      "type": "string",
+      "description": "One of the archetype's two specializations (Mystic: Lupercus, Staff Bearer; Sage: Engineer, Medicus; Schemer: Frumentarius, Magistrate; Scoundrel: Robber, Sicarius; Scout: Hunter, Veles; Soldier: Berserker, Legionary). With no archetype, the specialization sets it."
+    },
+    "background": {
+      "type": "string"
+    },
+    "characteristic": {
+      "type": "string"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Ratings for all seven Attributes (usual scale 6-16). Use null for an attribute the stat block shows as \"—\" (e.g. an animal's Gravitas); the sheet treats it as 0. Extraordinary bonuses shown in parentheses, like \"Brawn 13(2)\", go in special_rules, not here.",
+      "additionalProperties": false,
+      "required": [
+        "agility",
+        "brawn",
+        "coordination",
+        "gravitas",
+        "insight",
+        "reason",
+        "will"
+      ],
+      "properties": {
+        "agility": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "brawn": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "coordination": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "gravitas": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "insight": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "will": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "description": "Only list skills this NPC actually has ranks in - most NPCs (especially Minions/Toughened) only need a couple. Keys must be one of this game's twelve skill names.",
+      "additionalProperties": false,
+      "properties": {
+        "academia": {
+          "$ref": "#/definitions/skill"
+        },
+        "athletics": {
+          "$ref": "#/definitions/skill"
+        },
+        "crafting": {
+          "$ref": "#/definitions/skill"
+        },
+        "engineering": {
+          "$ref": "#/definitions/skill"
+        },
+        "fighting": {
+          "$ref": "#/definitions/skill"
+        },
+        "medicine": {
+          "$ref": "#/definitions/skill"
+        },
+        "observation": {
+          "$ref": "#/definitions/skill"
+        },
+        "persuasion": {
+          "$ref": "#/definitions/skill"
+        },
+        "resilience": {
+          "$ref": "#/definitions/skill"
+        },
+        "stealth": {
+          "$ref": "#/definitions/skill"
+        },
+        "survival": {
+          "$ref": "#/definitions/skill"
+        },
+        "tactics": {
+          "$ref": "#/definitions/skill"
+        }
+      }
+    },
+    "talents": {
+      "type": "array",
+      "description": "Either a name matching this game's talent list (source/data/talents.json) - Keywords and Requirements fill in automatically, same as picking it from the dropdown on a PC sheet - or a custom {name, description} pair for an NPC-only ability. A description is only written when given.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Omit to resolve name against the known talent list; include to define a custom ability instead."
+          }
+        }
+      }
+    },
+    "weapons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Any name. A name matching this sheet's Weapons suggestion list (see source/views/panels/_weapons_panel.pug) auto-fills the other fields unless overridden; anything else (Claws, Unnerving Stare) is a custom attack."
+          },
+          "focus": {
+            "type": "string"
+          },
+          "reach_range": {
+            "type": "string"
+          },
+          "damage_effects": {
+            "type": "string",
+            "description": "e.g. \"3, Vicious\" - damage in Challenge Dice followed by comma-separated Damage Effects. For NPCs, use the stat block's damage as is: it already includes attribute bonus damage, Brutal and Fearsome, so the sheet adds nothing on top."
+          },
+          "size": {
+            "type": "string"
+          },
+          "qualities": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "melee",
+              "ranged",
+              "mental"
+            ],
+            "description": "Attack type. \"mental\" for the profile's (Mental Attack) entries; omit for weapons to infer melee/ranged from focus."
+          }
+        }
+      },
+      "description": "The profile's ATTACKS or WEAPONS AND ARMOR entries, including mental attacks. Armor items go in armor, not here."
+    },
+    "armor": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Matching a name in this sheet's Armor dropdown (see source/views/panels/_armor_panel.pug) auto-fills resistance/qualities below unless overridden."
+          },
+          "resistance": {
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "qualities": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fatigue": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "stress": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Current Stress already marked, if this NPC should start partway hurt. The maximum goes in profile.stress."
+    },
+    "injuries": {
+      "type": "string",
+      "description": "Injuries already sustained (free text). The injury limit goes in profile.injuries."
+    },
+    "traits": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The stat block's totals (STRESS, INJURIES, ARMOR, COURAGE, Power). They already include every special rule's bonus, so they are written to the sheet as-is and win over the sheet's own formulas. Omit any the stat block doesn't give.",
+      "properties": {
+        "stress": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum stress."
+        },
+        "injuries": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Injuries before defeat (includes Tough X)."
+        },
+        "armor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Armor resistance, including worn armor and Natural Armor."
+        },
+        "courage": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Courage resistance, including Natural Courage."
+        },
+        "morale": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "power": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Power, for spellcasters."
+        }
+      }
+    },
+    "special_rules": {
+      "type": "array",
+      "description": "The profile's SPECIAL RULES. Give the rule's text in description if you want it on the sheet; X fills in from a trailing number in the name.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "As in the stat block, e.g. \"Fearsome 2\", \"Immune to Cold\", \"Extraordinary Brawn 2\"."
+          },
+          "x": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "The rule's X, if it has one. Optional when the name ends with the number."
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "spellcasting": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "For NPC spellcasters (\"uses Will to cast spells\").",
+      "properties": {
+        "attribute": {
+          "type": "string",
+          "enum": [
+            "insight",
+            "reason",
+            "will"
+          ]
+        },
+        "tradition": {
+          "type": "string",
+          "enum": [
+            "runic",
+            "oracular",
+            "celtic",
+            "cthulhu",
+            "mormo",
+            "nyarlathotep",
+            "yog_sothoth"
+          ],
+          "description": "Spellbook the spells come from. The Mythos tomes are cthulhu (Tome of Cthulhu), mormo (Compendium of Mormo), nyarlathotep (Grimoire of Nyarlathotep) and yog_sothoth (Spellbook of Yog-Sothoth)."
+        }
+      }
+    },
+    "spells": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Spell names from spellcasting.tradition, spelled as in source/data/spells.json. Skill, Difficulty, Cost, Duration, Category and (attack spells) Damage & Effects fill in when the sheet is first opened."
+    },
+    "rituals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ritual names the profile lists. Rituals aren't battlefield spells, so they're recorded in the NPC's notes."
+    },
+    "escalation_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The profile's ESCALATION OPTIONS, one entry each, written out in full (e.g. \"Weighted Net: (Ranged), Close, 2, Stun\"). Also add an escalation weapon to weapons as \"<Name> (Escalation)\" so it can be rolled."
+    }
+  },
+  "definitions": {
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ranks"
+      ],
+      "properties": {
+        "ranks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "focuses": {
+          "type": "array",
+          "description": "Focus names this NPC knows for this skill, exactly as spelled in that skill's Focus list (see source/views/panels/_skills_panel.pug) - e.g. [\"Melee Weapons\"] for fighting.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

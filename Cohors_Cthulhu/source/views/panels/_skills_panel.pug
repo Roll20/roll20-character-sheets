@@ -1,0 +1,289 @@
+//- views/panels/_skills_panel.pug
+//- Skills (+skill, source/components/_skill.pug) in two columns, each row a
+//- skill's roll button, Ranks and learned Focuses. Edit Focuses shows every
+//- Focus with its checkbox, one skill per row. Resilience's extraAffects
+//- reruns the Max Stress calculations.
+.cc-panel.cc-skills
+  //- Edit mode marker (1 while editing), set by the Edit Focuses button. The
+  //- header and grid below follow it with ~ selectors.
+  +checkbox({name: 'skills edit', value: 1}).cc-skills-edit-marker
+  .cc-skills-header
+    .cc-banner Skills
+    +action({
+      name: 'skills edit toggle',
+      class: 'cc-skills-edit-toggle',
+      trigger: {triggeredFuncs: ['ccToggleSkillsEdit']}
+    })
+      span.cc-skills-edit-off Edit Focuses
+      span.cc-skills-edit-on Done
+  .cc-skills-grid
+    +skill('academia', ['Finance', 'History', 'Linguistics', 'Philosophy', 'Religion'])
+    +skill('athletics', ['Climbing', 'Lifting', 'Physical Training', 'Running', 'Swimming'])
+    +skill('crafting', ['Armorsmithing', 'Cooking', 'Tailoring', 'Weaponsmithing'])
+    +skill('engineering', ['Architecture', 'Defenses', 'Demolition', 'Infrastructure', 'Siege Engines'])
+    +skill('fighting', ['Archery', 'Melee Weapons', 'Thrown Weapons', 'Unarmed', 'War Magic'])
+    +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
+    +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
+    +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
+    +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'])
+    +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
+    +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
+    +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
+
++scss.
+  .cc-character {
+    .cc-skills-edit-marker {
+      display: none;
+    }
+
+    .cc-skills-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    // Same chip as Ignore Fatigue: light when off, maroon while editing.
+    .cc-skills-edit-toggle {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.05rem 0.4rem;
+      font-family: var(--cc-body-font);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      .cc-skills-edit-on {
+        display: none;
+      }
+    }
+
+    .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+
+      .cc-skills-edit-off {
+        display: none;
+      }
+
+      .cc-skills-edit-on {
+        display: inline;
+      }
+    }
+
+    // Two columns, filled top to bottom (Academia-Medicine, then
+    // Observation-Tactics).
+    .cc-skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(6, auto);
+      grid-auto-flow: column;
+      column-gap: 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    // Editing: one skill per row, so every Focus has room.
+    .cc-skills-edit-marker:checked ~ .cc-skills-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-auto-flow: row;
+    }
+
+    .cc-skill-row {
+      display: grid;
+      grid-template-columns: 7.5rem 2.2rem 1fr;
+      align-items: center;
+      column-gap: 0.4rem;
+      min-height: 1.6rem;
+      padding: 0.1rem 0;
+      border-bottom: 1px solid var(--cc-rule-soft);
+    }
+
+    // Maroon chip with the d20 glyph, at a fixed width that fits the longest
+    // skill name.
+    .cc-skill-name-roll {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.3rem;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border: 1px solid var(--cc-banner);
+      border-radius: 4px;
+      padding: 0 0.4rem;
+      font-family: var(--cc-body-font);
+      font-weight: bold;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--cc-parchment);
+        color: var(--cc-ink);
+      }
+
+      // '0' is the d20 glyph in Roll20's dicefontd20 font.
+      &:before {
+        content: '0';
+        font-size: 1.3em;
+      }
+    }
+
+    // Always player-entered.
+    .cc-skill-ranks {
+      width: 100%;
+      box-sizing: border-box;
+      height: 1.3rem;
+      text-align: center;
+      background: var(--cc-editable-fill);
+      border: 1px solid var(--cc-rule);
+      color: var(--cc-ink);
+    }
+
+    // Spacing is a margin on each Focus rather than a flex gap, so hidden
+    // (unlearned) Focuses leave no gaps.
+    .cc-skill-focuses {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      row-gap: 0.15rem;
+    }
+
+    // Not editing: only learned Focuses, without their checkboxes.
+    .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid {
+      .cc-focus-checkbox,
+      .cc-focus-checkbox:not(:checked) + .cc-focus-roll {
+        display: none !important;
+      }
+    }
+
+    .cc-focus-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.72rem;
+      white-space: nowrap;
+
+      // The spacing between Focuses (see .cc-skill-focuses).
+      .cc-focus-roll {
+        margin-right: 0.35rem;
+      }
+
+      // k-scaffold's checkbox border doesn't apply; set it here.
+      .cc-focus-checkbox {
+        margin: 0;
+        width: 0.8rem !important;
+        height: 0.8rem !important;
+        min-width: 0.8rem !important;
+        min-height: 0.8rem !important;
+        border: 1px solid var(--cc-rule) !important;
+        // Same light fill as the ratings, ranks and tracker boxes.
+        background-color: var(--cc-editable-fill) !important;
+      }
+
+      // Stone-block pill (see --cc-stone-* in scss/_variables.scss), smaller
+      // than the skill button. The flecks are radial-gradient dots, not an
+      // image.
+      .cc-focus-roll {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background-image:
+          radial-gradient(circle at 41% 31%, rgba(74, 53, 30, 0.6) 0%, transparent 5%),
+          radial-gradient(circle at 85% 56%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 54% 41%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 56% 71%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 79% 45%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 21% 67%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 63% 59%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 76% 11%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 81% 26%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 71% 19%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 16% 85%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 93% 12%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          radial-gradient(circle at 61% 59%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          radial-gradient(circle at 85% 79%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        border: 1px solid var(--cc-stone-bezel);
+        border-radius: 4px;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.45),
+          0 1px 1px rgba(0, 0, 0, 0.2);
+        padding: 0 0.3rem;
+        color: var(--cc-ink);
+        font-size: inherit;
+        font-family: inherit;
+        cursor: pointer;
+
+        // Flat maroon fill on hover.
+        &:hover {
+          background-image: none;
+          background-color: var(--cc-banner);
+          border-color: var(--cc-banner);
+          color: var(--cc-banner-text);
+        }
+
+        &:before {
+          content: '0';
+          font-size: 1.4em;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+
++module.
+  // The rules don't fix which attribute goes with a skill, so both rolls ask
+  // via ccAttributeQuery.
+  //
+  // Plain skill roll: crit only on a natural 1.
+  const initiateSkillRoll = async ({trigger, attributes}) => {
+    const skill = ccNormalizeName(trigger.name).replace(/_skill_(roll|action)$/, '');
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      attributes,
+      skillLabel: ccCapitalize(skill),
+      focusLabel: '',
+      attributeExpr: ccAttributeQuery(attributes),
+      skillRanks,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateSkillRoll});
+
+  // Focus roll: crit on a die <= the skill's ranks; a natural 1 always
+  // crits, even with 0 ranks.
+  const initiateFocusRoll = async ({trigger, attributes}) => {
+    const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_(?:roll|action)$/);
+    if (!match) { return; }
+    const [, skill, focusSlug] = match;
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      attributes,
+      skillLabel: ccCapitalize(skill),
+      focusLabel: ccCapitalize(focusSlug),
+      attributeExpr: ccAttributeQuery(attributes),
+      skillRanks,
+      critMax: Math.max(1, skillRanks),
+    });
+  };
+  k.registerFuncs({initiateFocusRoll});
+
+  // Edit Focuses / Done: switches the skills_edit marker.
+  const ccToggleSkillsEdit = ({attributes}) => {
+    attributes.skills_edit = Number(attributes.skills_edit) === 1 ? 0 : 1;
+  };
+  k.registerFuncs({ccToggleSkillsEdit});

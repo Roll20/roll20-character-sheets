@@ -1,0 +1,245 @@
+//- views/panels/_talents_panel.pug
+//- Talents repeating section. Profiles (common talents by skill, archetype
+//- and specialization trees, Caste and Culture talents) load from
+//- source/data/talents.json via generate.js's `require` local: keywords and
+//- requirements only; the description is typed by the player. Talents
+//- sharing a name across specializations are listed as "NAME
+//- (SPECIALIZATION)".
+-
+  const ccTalentProfiles = require('./source/data/talents.json');
+  const ccTalentNames = Object.keys(ccTalentProfiles).sort();
+
+  // Requirements, parsed at build time into AND-ed clauses of OR-ed atoms:
+  // [type, value, minimum]. A talent with a specialization keyword (Lupercus,
+  // Legionary...) also needs that specialization. Unrecognised requirement
+  // text stops the build, so new data can't silently skip the filter.
+  const ccSpecNames = Object.values(ccSpecializations).flat();
+  const ccSkillNames = ['academia', 'athletics', 'crafting', 'engineering', 'fighting', 'medicine', 'observation', 'persuasion', 'resilience', 'stealth', 'survival', 'tactics'];
+  const ccCultureMatch = {'roman citizen': ['Roman citizen'], 'germanic tribe': ['Germanic tribe'], 'ægyptus': ['Ægyptus'], 'briton': ['Briton'], 'gaul': ['Gaul'], 'greek': ['Greek'], 'other culture / foederati': ['Foederati', 'Other']};
+  const ccFail = (talent, text) => { throw new Error(`talents.json "${talent}": can't parse requirement "${text}"`); };
+  // "Scotopia" in the Robber tree means "Scotopia (Robber)".
+  const ccResolveTalent = (talent, name, spec) => {
+    if (spec && ccTalentProfiles[`${name} (${spec})`]) { return `${name} (${spec})`; }
+    if (ccTalentProfiles[name]) { return name; }
+    const variants = ccTalentNames.filter((n) => n.startsWith(`${name} (`));
+    return variants.length === 1 ? variants[0] : ccFail(talent, name);
+  };
+  const ccParseRequirements = (talent, profile) => {
+    const keywords = String(profile.keywords || '').split(',').map((k) => k.trim());
+    const spec = ccSpecNames.find((s) => keywords.includes(s));
+    const clauses = spec ? [[['spec', spec]]] : [];
+    String(profile.requirements || '').split(/[;,]/).map((c) => c.trim().replace(/^plus /, '')).filter(Boolean).forEach((clause) => {
+      let m;
+      // "Advanced" has no condition the sheet can check.
+      if (clause === 'Advanced') { return; }
+      if ((m = clause.match(/^(Mystic|Sage|Schemer|Scoundrel|Scout|Soldier)( archetype)?$/))) {
+        clauses.push([['archetype', m[1]]]);
+      } else if (clause === "can't already have a Spellcaster-keyword talent") {
+        clauses.push([['noKeyword', 'Spellcaster']]);
+      } else if ((m = clause.match(/^(.+) culture$/))) {
+        clauses.push((ccCultureMatch[m[1].toLowerCase()] || ccFail(talent, clause)).map((c) => ['culture', c]));
+      } else if ((m = clause.match(/^(\w+) caste$/))) {
+        clauses.push([['caste', ccCastes.includes(m[1]) ? m[1] : ccFail(talent, clause)]]);
+      } else if ((m = clause.match(/^(\d+)\+ ranks in (\w+)$/))) {
+        clauses.push([['skill', m[2].toLowerCase(), Number(m[1])]]);
+      } else if ((m = clause.match(/^(.+) (\d+)\+$/))) {
+        clauses.push(m[1].split(' or ').map((s) => {
+          const skill = s.trim().toLowerCase();
+          return ccSkillNames.includes(skill) ? ['skill', skill, Number(m[2])] : ccFail(talent, clause);
+        }));
+      } else {
+        clauses.push(clause.split(' or ').map((s) => ['talent', ccResolveTalent(talent, s.trim().replace(/ talent$/, ''), spec)]));
+      }
+    });
+    return clauses;
+  };
+  // Talents with the same requirements share one filter flag.
+  const ccTalentGroups = [];
+  const ccTalentGroupOf = {};
+  ccTalentNames.forEach((talent) => {
+    const clauses = ccParseRequirements(talent, ccTalentProfiles[talent]);
+    if (!clauses.length) { return; }
+    const key = JSON.stringify(clauses);
+    let index = ccTalentGroups.findIndex((g) => JSON.stringify(g) === key);
+    if (index === -1) { index = ccTalentGroups.push(clauses) - 1; }
+    ccTalentGroupOf[talent] = index;
+  });
+  const ccEscapeHtml = (text) => String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const ccTalentOptionsHtml = ['<option value="">Select Talent</option>'].concat(ccTalentNames.map((talent) => {
+    const group = ccTalentGroupOf[talent];
+    const cls = group === undefined ? '' : ` class="cc-talent-req-${group}"`;
+    return `<option value="${ccEscapeHtml(talent)}"${cls}>${ccEscapeHtml(talent)}</option>`;
+  })).join('');
+  const ccTalentFilterCss = ccTalentGroups.map((g, i) =>
+    `.cc-talent-flag-${i}:not(:checked) ~ .cc-talents .cc-talent-name-select option.cc-talent-req-${i} { display: none; }`).join('\n');
+
+//- Hidden flags, one per distinct requirement, set by ccUpdateTalentFilter.
+//- Siblings of the Talents panel, so CSS can hide the player-character
+//- dropdown's options for talents whose requirements aren't met.
+each group, index in ccTalentGroups
+  +checkbox({name: `talent filter ${index}`, value: 1})(class=`cc-talent-flag cc-talent-flag-${index}`)
+
+.cc-panel.cc-talents
+  .cc-banner Talents
+  .cc-rep-table.cc-rep-talents
+    .cc-rep-header
+      span
+      span Name
+      span Keywords
+      span Requirements
+      span Description
+    //- Rerun Max Stress when a row is deleted (e.g. Unyielding), as in the
+    //- Armor panel.
+    +fieldset({name: 'talent', trigger: {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'], triggeredFuncs: ['ccUpdateTalentFilter']}})
+      //- The apply button fills the row at once; the NPC Name trigger only
+      //- fires on blur.
+      +action({
+        name: 'talent apply',
+        class: 'cc-talent-apply',
+        trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
+      })
+      //- Name is rendered twice on one attribute; CSS shows one per Character
+      //- Type. NPCs get free text with a <datalist> of every talent; player
+      //- characters get a dropdown that only shows talents whose
+      //- requirements they meet (browsers can't hide datalist entries).
+      //- Recalculate Max Stress in case the talent is Unyielding.
+      +text({
+        name: 'name',
+        list: 'cc-talent-options',
+        trigger: {triggeredFuncs: ['ccApplyTalentPreset', 'ccUpdateTalentFilter'], affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}
+      }).cc-talent-name-text
+      //- A plain select: k-scaffold's +select drops generated options, and the
+      //- text field above already registers this attribute's triggers.
+      select.cc-talent-name-select(name='attr_name' title='@{repeating_talent_$X_name}') !{ccTalentOptionsHtml}
+      +text({name: 'keywords'}).cc-talent-keywords
+      +text({name: 'requirements'}).cc-talent-requirements
+      +textarea({name: 'description'}).cc-talent-description
+  datalist#cc-talent-options
+    each talentName in ccTalentNames
+      option(value=talentName)
+
++scss.
+  .cc-character {
+    .cc-rep-talents {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1.4fr 1fr 1.4fr 3fr;
+        align-items: center;
+      }
+
+      .cc-talent-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      // Tight single-line spacing in every field.
+      input,
+      textarea {
+        line-height: 1.2;
+        padding: 0.15rem 0.3rem;
+      }
+
+      // Restate padding-right after the shorthand to keep room for the
+      // datalist chevron.
+      input[list] {
+        padding-right: 1.3rem;
+      }
+
+      // Player characters: the filtered dropdown.
+      .cc-talent-name-text {
+        display: none;
+      }
+
+      // Smaller font for the reference fields; Name stays full-size.
+      .cc-talent-keywords,
+      .cc-talent-requirements,
+      .cc-talent-description {
+        font-size: 0.7rem;
+      }
+
+      textarea {
+        min-height: 3rem;
+      }
+    }
+  }
+
++scss.
+  .cc-character {
+    .cc-talent-flag {
+      display: none;
+    }
+
+    !{ccTalentFilterCss}
+
+    // NPC tiers: free text with every talent.
+    #cc-character-type-trooper:checked,
+    #cc-character-type-toughened:checked,
+    #cc-character-type-nemesis:checked {
+      ~ .cc-talents .cc-rep-talents {
+        .cc-talent-name-text {
+          display: block;
+        }
+
+        .cc-talent-name-select {
+          display: none;
+        }
+      }
+    }
+  }
+
++module.
+  // Fills the row from a known talent, for both the Name trigger and the
+  // apply button, so the name is read via the row prefix. Unknown names leave
+  // the row untouched.
+  const ccTalentProfiles = !{JSON.stringify(ccTalentProfiles)};
+  const ccApplyTalentPreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const profile = ccTalentProfiles[attributes[`${prefix}name`]];
+    if (!profile) { return; }
+    Object.keys(profile).forEach((field) => {
+      attributes[`${prefix}${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyTalentPreset});
+
+  // Sets one flag per distinct talent requirement (see ccParseRequirements):
+  // 1 when the character meets it. Reruns when archetype, specialization,
+  // culture, caste, skill ranks or talents change, and on sheet open.
+  const ccTalentRequirements = !{JSON.stringify(ccTalentGroups)};
+  const ccUpdateTalentFilter = ({attributes, sections}) => {
+    const owned = (sections.repeating_talent || [])
+      .map((rowID) => attributes[`repeating_talent_${rowID}_name`])
+      .filter(Boolean);
+    const ownedKeywords = owned.flatMap((talent) =>
+      String((ccTalentProfiles[talent] || {}).keywords || '').split(',').map((k) => k.trim()));
+    const met = ([type, value, minimum]) => {
+      if (type === 'archetype') { return attributes.archetype === value; }
+      if (type === 'spec') { return attributes.specialization === value; }
+      if (type === 'culture') { return attributes.culture === value; }
+      if (type === 'caste') { return attributes.caste === value; }
+      if (type === 'skill') { return (Number(attributes[`${value}_ranks`]) || 0) >= minimum; }
+      if (type === 'talent') { return owned.includes(value); }
+      if (type === 'noKeyword') { return !ownedKeywords.includes(value); }
+      return false;
+    };
+    ccTalentRequirements.forEach((clauses, index) => {
+      attributes[`talent_filter_${index}`] = clauses.every((anyOf) => anyOf.some(met)) ? 1 : 0;
+    });
+  };
+  k.registerFuncs({ccUpdateTalentFilter});
