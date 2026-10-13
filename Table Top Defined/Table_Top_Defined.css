@@ -622,7 +622,8 @@
     text-align: center;
 }
 
-.ui-dialog .charsheet input[readonly]{
+.ui-dialog .charsheet input[readonly],
+.ui-dialog .charsheet input[name="attr_hd_type"] {
     background-color: #5A5A5A;
     color: #FFFFFF;
     text-align: center;
@@ -861,7 +862,7 @@
 .character-info-block{
     width: 800px;
     display: grid;
-    grid-template-columns: repeat(7,1fr);
+    grid-template-columns: repeat(8,1fr);
 }
 
 .character-info-block > span{
@@ -880,7 +881,8 @@
 #species-name {grid-column: 4;}
 #more-speed {grid-column: 5;}
 #religion-name {grid-column: 6;}
-#hd-and-size {grid-column: 7;}
+#hd-and-climb {grid-column: 7;}
+#hd-type-and-size {grid-column: 8;}
 
 #player-name > div,
 #age-and-height > div,
@@ -888,7 +890,8 @@
 #species-name > div,
 #more-speed > div,
 #religion-name > div,
-#hd-and-size > div{
+#hd-and-climb > div,
+#hd-type-and-size > div{
     background-color: #000000;
     color: #FFFFFF;
     font-weight: bold;
@@ -1386,6 +1389,11 @@
 .definition-manual-grid label span { flex: 1; }
 .definition-manual-grid input[type="number"] { width: 5ch; }
 .definition-manual-bonuses { margin: 8px; }
+.definition-manual-header { display: flex; align-items: center; gap: 6px; font-weight: bold; }
+.definition-manual-body { margin-top: 6px; }
+.definition-manual-toggle[value="1"] ~ .definition-manual-body { display: none; }
+.ui-dialog .charsheet .definition-manual-toggle[value="1"]
+    ~ .definition-manual-header .Small-Button::after { transform: rotate(-90deg); }
 .sheet-definitions{
     width: 800px;
     border-radius: 12px;
@@ -1708,6 +1716,10 @@
 
 .sheet-abilities .ggrid .grr4.ggridc .feats-toggle[value="0"] ~ div.feats_description{
     display: none;
+}
+
+.ui-dialog .charsheet .sheet-abilities .resource-name-field {
+    text-align: center;
 }
 
 .ui-dialog .charsheet .sheet-abilities .resourceName,
@@ -2789,7 +2801,8 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     content: none;
 }
 
-.ui-dialog .charsheet .advancedAttackButton button{
+.ui-dialog .charsheet .advancedAttackButton button,
+.ui-dialog .charsheet button[type=action].character-import-button {
     background-color: #ffffff;
     color: #000000;
     border: solid 1px black;
@@ -2804,16 +2817,41 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     height: 16px;
 }
 
-.ui-dialog .charsheet .advancedAttackButton button:hover{
+.ui-dialog .charsheet .advancedAttackButton button:hover,
+.ui-dialog .charsheet button[type=action].character-import-button:hover {
     background-color: #323232;
     color: #FFFFFF;
 }
 
-.ui-dialog .charsheet .advancedAttackButton button:active{
+.ui-dialog .charsheet .advancedAttackButton button:active,
+.ui-dialog .charsheet button[type=action].character-import-button:active {
     background-color: #000000;
     color: #db1c1c;
     box-shadow: 0 0;
     transform: translateY(2px);
+}
+
+.grant-sort-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.ui-dialog .charsheet .grant-sort-controls button {
+    height: auto;
+    padding: 3px 10px;
+    margin: 0;
+    background-image: none;
+    text-shadow: none;
+    font-weight: bold;
+}
+
+.grant-sort-status {
+    font-size: 11px;
+    font-weight: normal;
 }
 
 .sheet-gear .grr7{
@@ -3277,6 +3315,10 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     color: #000000;
 }
 
+.ui-dialog .charsheet .settings-value select[name="attr_hd_type_override"] {
+    width: 100px;
+}
+
 .character-importer {
     width: 100%;
     border-top: 1px solid #000000;
@@ -3331,8 +3373,11 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
 
 .ui-dialog .charsheet button[type=action].character-import-button {
     min-width: 125px;
+    height: auto;
     margin: 0;
     padding: 3px 10px;
+    background-image: none;
+    text-shadow: none;
     font-weight: bold;
 }
 
@@ -3420,12 +3465,21 @@ input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
 .sheet-dark-mode-toggle[value="1"] ~ div input[readonly],
 
 .ui-dialog .charsheet
+.sheet-dark-mode-toggle[value="1"] ~ div input[name="attr_hd_type"],
+
+.ui-dialog .charsheet
 .sheet-dark-mode-toggle[value="1"] ~ div textarea[readonly],
 
 .ui-dialog .charsheet
 .sheet-dark-mode-toggle[value="1"] ~ div select[disabled] {
     background-color: var(--ttd-dark-readonly);
     color: #FFFFFF;
+}
+
+.ui-dialog .charsheet .sheet-dark-mode-toggle[value="1"] ~ div input[name="attr_character_name"],
+.ui-dialog .charsheet .sheet-dark-mode-toggle[value="1"] ~ div input[name="attr_hd_type"] {
+    background-color: var(--ttd-dark-readonly) !important;
+    color: #FFFFFF !important;
 }
 
 .ui-dialog .charsheet
@@ -3472,7 +3526,10 @@ input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
 .sheet-dark-mode-toggle[value="1"] ~ div .repcontrol button,
 
 .ui-dialog .charsheet
-.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button {
+.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button,
+
+.ui-dialog .charsheet
+.sheet-dark-mode-toggle[value="1"] ~ div button[type=action].character-import-button {
     background-color: var(--ttd-dark-control);
     color: var(--ttd-dark-text);
     border-color: var(--ttd-dark-border);
@@ -3504,7 +3561,10 @@ input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
 .sheet-dark-mode-toggle[value="1"] ~ div .repcontrol button:hover,
 
 .ui-dialog .charsheet
-.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button:hover {
+.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button:hover,
+
+.ui-dialog .charsheet
+.sheet-dark-mode-toggle[value="1"] ~ div button[type=action].character-import-button:hover {
     background-color: var(--ttd-dark-control-hover);
     color: #FFFFFF;
 }
@@ -3528,7 +3588,10 @@ input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
 .sheet-dark-mode-toggle[value="1"] ~ div .repcontrol button:active,
 
 .ui-dialog .charsheet
-.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button:active {
+.sheet-dark-mode-toggle[value="1"] ~ div .advancedAttackButton button:active,
+
+.ui-dialog .charsheet
+.sheet-dark-mode-toggle[value="1"] ~ div button[type=action].character-import-button:active {
     background-color: #080808;
     color: #FF5555;
     box-shadow: none;
