@@ -1,4 +1,15 @@
-# 2026-09-21
+# 2026-09-15
+
+Add {Acid|Mana|Void} {Ball|Bolt} to weapon attacks.
+    Probably not helpful unless you own Arcane
+Add bone & other as item materials
+
+
+# 2026-08-??
+
+Fix RR Popup @snowdragon
+
+# 2026-08-21
 
 Fix an issue causing creature DB to be trashed.  Simple fix while I rewrite all
 the DBs.

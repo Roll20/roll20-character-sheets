@@ -294,6 +294,16 @@ input[type=radio].npc-button:checked + span {
   display: block;
 }
 
+/* Platform override. The `.hidden` class collides with a Bootstrap-style rule bundled
+   by the Roll20 CSE platform carrying display:none !important, so the plain rule above
+   (specificity 0,3,0, no !important) never wins and the toggle sections could never be
+   revealed. Roll20's own OGL sheet carries the same .charsheet-prefixed override for
+   the same reason. Governs the five global modifier fields and the Custom AC row. */
+.charsheet .toggleflag[value="1"] + .hidden,
+.charsheet .toggleflag[value="1"] + :is(.sheet-row, .row).hidden {
+  display: block !important;
+}
+
 .npc_toggle[value="1"] + .npcspellcastingflag[value="1"] ~ .pc {
   display: block;
   visibility: hidden;
@@ -3374,7 +3384,8 @@ button[type=roll] * {
 
 /* ---- Attacks section redesign ---- */
 .attacks .global-dmg > span.label,
-.attacks > span.label {
+.attacks > span.label,
+.globalattack > span.label {
   font-family: 'Oxanium', sans-serif;
   color: var(--eg-blue);
   letter-spacing: 1px;
@@ -7713,6 +7724,67 @@ body:not(:-moz-handler-blocked) .charmancer .bottombar {
   display: flex;
   align-items: center;
 }
+
+/* Unify the five global-modifier rows. Only .global-dmg used to get the flex
+   treatment, so `align-self: center` on .active-flag had no flex container in
+   the save / skill / attack / AC rows and the checkbox sat top-aligned. */
+.pc .globalattack .global-mod {
+  display: flex;
+  align-items: center;
+}
+.pc .globalattack .global-mod > :is(.sheet-display, .display),
+.pc .globalattack .global-mod > div.globaldisplay,
+.pc .globalattack .global-mod > :is(.sheet-options, .options) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Global-modifier row contents. The shared label rule
+   (".attacks span, .globalattack span, ...") pins every span to 9px, centred, with
+   margin-top:5px, which outranks anything inherited from the container. Override it
+   here so the values read at 11px like the attacks damage cell (.atk-dmg-cell). */
+.pc .globalattack .global-mod div.globaldisplay,
+.pc .globalattack .global-mod div.globaldisplay span,
+.pc .globalattack .global-mod :is(.sheet-display, .display) .title,
+.pc .globalattack .global-mod :is(.sheet-display, .display) .title span {
+  font-size: 11px;
+  line-height: 16px;
+  text-align: left;
+  width: auto;
+  margin-top: 0;
+}
+/* ".globalattack input[type=checkbox]" adds margin-top:10px, which shoves the
+   enable checkbox below centre even though align-self:center is already applied. */
+.pc .globalattack .global-mod .active-flag {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Header underline ran past the box edge: the shared span rule sets width:100% on
+   every .globalattack span, and the header style adds 8px of side padding, which
+   under the PC core's content-box sizing adds 16px on top of the full width. */
+.pc .globalattack > span.label {
+  width: auto;
+}
+
+/* Click target for the gear on global-modifier rows. The target starts 15px above the
+   icon (inline "top: -15px") and is only 18px tall, so on Save / Skill / AC it covered
+   just the top 3px of the icon. Attack and Damage already work because they sit inside
+   ".attacks", which enlarges the target to 22x32. Use the same proven size everywhere -
+   the icon and every positioning anchor stay exactly where they are. */
+.pc .globalattack .global-mod > .options-flag {
+  width: 22px;
+  height: 32px;
+}
+
+/* The gear icon draws at the top-right of each modifier row, and Roll20's add/lock
+   control row followed immediately underneath, so the two collided. Push the control
+   row down to clear it. Follows the same approach as ".resources .repcontrol".
+   The icon, its click target and every positioning anchor are left alone. */
+.pc .globalattack .repcontrol {
+  margin-top: 10px;
+}
+
 .pc div.global-dmg div:is(.sheet-display, .display) {
   flex: 1;
   min-width: 0;
@@ -7733,19 +7805,16 @@ body:not(:-moz-handler-blocked) .charmancer .bottombar {
 
 /* Customizations for the PC's global damage area */
 div.globaldisplay {
-  width: 80%;
-  background-color: var(--eg-bg-alt);
-  border-bottom-right-radius: 5px;
-  border-top-left-radius: 5px;
-  display: inline-block;
-  font-size: 9px;
+  background-color: transparent;
+  display: block;
+  font-size: 11px;
   font-weight: bold;
+  color: var(--eg-text);
   line-height: 16px;
-  padding-bottom: 3px;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 3px;
+  padding: 0;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 div.globaldisplay span {

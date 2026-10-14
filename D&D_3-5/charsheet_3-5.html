@@ -9,6 +9,19 @@
 <div class="content-sheet">
     <input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="8.0"/>
     <input type="hidden" name="attr_code_version" title="code_version" value="0"/>
+    <input type="hidden" name="attr_sheet_schema_version" title="sheet_schema_version" value="0"/>
+    <input type="hidden" name="attr_initiativetokenmacro" value="@{initmacro}"/>
+
+    <!-- Keep the retired section registered so getSectionIDs can discover rows created before v2.7.9. -->
+    <div class="legacy-repeating-spells-migration" style="display: none;" aria-hidden="true">
+        <fieldset class="repeating_spells">
+            <input type="hidden" name="attr_spellused11"/>
+            <input type="hidden" name="attr_spellprep11"/>
+            <input type="hidden" name="attr_spellname11"/>
+            <input type="hidden" name="attr_spelllevel11"/>
+            <input type="hidden" name="attr_spellmacro11"/>
+        </fieldset>
+    </div>
 
     <input type="radio" class="switch-pc-show switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;" data-i18n="pc" >PC </span><span> &nbsp; &nbsp; &nbsp; &nbsp;</span>
     <input type="radio" class="switch-npc-show switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;" data-i18n="npc">NPC</span>
@@ -95,9 +108,23 @@
             <span style="text-align: left; font-weight: bold;" data-i18n="hit-diceTotal-i">HD Total</span>:<input type="text" name="attr_hitdie" title="hitdie" style="width: 43px;">
             <span style="text-align: left; font-weight: bold;" data-i18n="hit-pointsTotal-i">HP Totla</span>:<input type="text" name="attr_hitpoint" title="hitpoint" style="width: 43px;">
             <input type="checkbox" style="width: auto;" name="attr_autoCalcHP" title="autoCalcHP" value="1" />&nbsp;<span style="text-align: left;" data-i18n="autoCalc">Auto Calculate</span>
-
-
             <div class="pc-charclasses">
+                <div style="float: left; width: 100%; margin-bottom: 4px;">
+                    <span style="font-weight: bold;" data-i18n="first-level-skill-points-class">Apply ×4 first-level skill points to class</span>:
+                    <select name="attr_firstLevelClass" title="Select the class row whose first Hit Die receives ×4 skill points. Existing sheets remain unchanged while this stays at None; choosing None later removes the ×4 calculation." style="width: 75px;">
+                        <option value="0" data-i18n="none" selected>None</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
                 <div style="float: left">
                     <table>
                         <tbody>
@@ -419,7 +446,7 @@
                                                                 <textarea rows="1" cols="40" style="width: 40px; height: 20px;" title="initmacro (modify to modify initiative roll macro)" name="attr_initmacro">&{template:DnD35Initiative} {{name=@{selected|character_name} }} {{check=Initiative:}} {{checkroll= [[ 1d20 + [[ @{selected|init} ]] + ( [[ (@{selected|init}) ]] /100) &{tracker} ]] }}</textarea>
                                                             </td>
                                                             <td>
-                                                                <button class="tokenaction" type="roll" name="roll_initiative" title="initiative" value="@{initmacro}"></button>
+                                                                <button class="tokenaction" type="roll" name="roll_initiative" title="initiative" value="@{initiativetokenmacro}"></button>
                                                                 <br>
                                                                 <div style="font-size: 0.5em;"> &nbsp; </div>
                                                             </td>
@@ -3621,6 +3648,8 @@
                             <td colspan="9" class="statlabel-big" style="width: 790px;">
                                 <span data-i18n="totSkillPoint">Skill Point Total</span>:
                                 <input type="text" name="attr_totSkillPoint" title="totSkillPoint" class="inputbox inputboxWhite" style="width: 40px;" value="0"> -
+                                <span data-i18n="unspent-skill-points">Unspent Skill Points</span>:
+                                <input type="text" name="attr_unspentSkillPoints" title="Total skill points minus ranks purchased. Class-skill ranks cost 1 point; cross-class ranks cost 2 points." class="inputbox inputboxWhite" style="width: 40px;" value="0" readonly> -
                                 <span data-i18n="skill-points-per-level-a">skill points/lvl</span>:
                                 <input type="text" name="attr_skillpoints" title="skillpoints" value="@{skillpointsint}+@{skillpointsclass}" class="inputAsLabel" style="width: 40px;" disabled>
                                 =(<input type="text" name="attr_skillpointsint" value="(floor((@{int-base}) / 2) - 5)[base int bonus]" title="skillpointsint (Skill points/lvl from base int.)" class="inputAsLabel" style="width: 35px;" disabled>+
@@ -6675,7 +6704,7 @@
                         <button type="action" name="act_grantManeuver" class="btn-action"><span style="text-align: right;" data-i18n="grant-maneuvers" >Grant Maneuver</span></button>
                         <button type="action" name="act_resetUsedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-used" >Reset Used</span></button>
                         <button type="action" name="act_resetGrantedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-granted" >Reset Granted</span></button>
-                        <button type="action" name="act_resetReadiedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-readied" >Grang Readied</span></button>
+                        <button type="action" name="act_resetReadiedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-readied" >Reset Readied</span></button>
                     </div>
                     <hr style="margin: 0; border: none;"/>
 
@@ -9330,11 +9359,19 @@
                             </table>
                         </div>
                         <script type="text/worker">
+const sumSummonNumberedAttributes = (values, prefix, count = 10) => {
+	return Array.from({length: count}, (unused, index) => index + 1)
+		.reduce((total, row) => {
+			const number = Number(values[`${prefix}${row}`]);
+			return total + (Number.isFinite(number) ? number : 0);
+		}, 0);
+};
+
 on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonslevel1 change:repeating_summons:summonslevel2 change:repeating_summons:summonslevel3 change:repeating_summons:summonslevel4 change:repeating_summons:summonslevel5 change:repeating_summons:summonslevel6 change:repeating_summons:summonslevel7 change:repeating_summons:summonslevel8 change:repeating_summons:summonslevel9 change:repeating_summons:summonslevel10", eventInfo => {
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonslevel1", "repeating_summons_summonslevel2", "repeating_summons_summonslevel3", "repeating_summons_summonslevel4", "repeating_summons_summonslevel5", "repeating_summons_summonslevel6", "repeating_summons_summonslevel7", "repeating_summons_summonslevel8", "repeating_summons_summonslevel9", "repeating_summons_summonslevel10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonslevel : parseInt(values.repeating_summons_summonslevel1, 10) + parseInt(values.repeating_summons_summonslevel2, 10) + parseInt(values.repeating_summons_summonslevel3, 10) + parseInt(values.repeating_summons_summonslevel4, 10) + parseInt(values.repeating_summons_summonslevel5, 10) + parseInt(values.repeating_summons_summonslevel6, 10) + parseInt(values.repeating_summons_summonslevel7, 10) + parseInt(values.repeating_summons_summonslevel8, 10) + parseInt(values.repeating_summons_summonslevel9, 10) + parseInt(values.repeating_summons_summonslevel10, 10)
+				repeating_summons_summonslevel : sumSummonNumberedAttributes(values, "repeating_summons_summonslevel")
 			});
 		}
    	});
@@ -9344,7 +9381,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonshitdie1", "repeating_summons_summonshitdie2", "repeating_summons_summonshitdie3", "repeating_summons_summonshitdie4", "repeating_summons_summonshitdie5", "repeating_summons_summonshitdie6", "repeating_summons_summonshitdie7", "repeating_summons_summonshitdie8", "repeating_summons_summonshitdie9", "repeating_summons_summonshitdie10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonshitdie : parseInt(values.repeating_summons_summonshitdie1, 10) + parseInt(values.repeating_summons_summonshitdie2, 10) + parseInt(values.repeating_summons_summonshitdie3, 10) + parseInt(values.repeating_summons_summonshitdie4, 10) + parseInt(values.repeating_summons_summonshitdie5, 10) + parseInt(values.repeating_summons_summonshitdie6, 10) + parseInt(values.repeating_summons_summonshitdie7, 10) + parseInt(values.repeating_summons_summonshitdie8, 10) + parseInt(values.repeating_summons_summonshitdie9, 10) + parseInt(values.repeating_summons_summonshitdie10, 10)
+				repeating_summons_summonshitdie : sumSummonNumberedAttributes(values, "repeating_summons_summonshitdie")
 			});
 		}
    	});
@@ -9354,7 +9391,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonshitpoint1", "repeating_summons_summonshitpoint2", "repeating_summons_summonshitpoint3", "repeating_summons_summonshitpoint4", "repeating_summons_summonshitpoint5", "repeating_summons_summonshitpoint6", "repeating_summons_summonshitpoint7", "repeating_summons_summonshitpoint8", "repeating_summons_summonshitpoint9", "repeating_summons_summonshitpoint10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonshitpoint : parseInt(values.repeating_summons_summonshitpoint1, 10) + parseInt(values.repeating_summons_summonshitpoint2, 10) + parseInt(values.repeating_summons_summonshitpoint3, 10) + parseInt(values.repeating_summons_summonshitpoint4, 10) + parseInt(values.repeating_summons_summonshitpoint5, 10) + parseInt(values.repeating_summons_summonshitpoint6, 10) + parseInt(values.repeating_summons_summonshitpoint7, 10) + parseInt(values.repeating_summons_summonshitpoint8, 10) + parseInt(values.repeating_summons_summonshitpoint9, 10) + parseInt(values.repeating_summons_summonshitpoint10, 10)
+				repeating_summons_summonshitpoint : sumSummonNumberedAttributes(values, "repeating_summons_summonshitpoint")
 			});
 		}
    	});
@@ -9568,7 +9605,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
                                         <span class="table-sheet-data-center">
 										<input class="inputbox" style="width: 25px; height: 24px; text-align: center;" type="text" name="attr_initactionmod" title="initactionmod" value="(@{conditionsBonusEnabled}*@{deafenedEnabled})" disabled/>
 									</span>
-                                        <button type="roll" name="roll_initiative" title="initiative" value="@{initmacro}""></button>
+                                        <button type="roll" name="roll_initiative" title="initiative" value="@{initiativetokenmacro}"></button>
                                     </div>
                                 </td>
                             </tr>
@@ -13447,6 +13484,16 @@ var TAS = TAS || (function(){
 
 /* ---- END: TheAaronSheet.js ---- */
 
+const updateInitiativeTokenMacro = function() {
+    getAttrs(["npc-show", "initmacro", "npcinitmacro"], function(values) {
+        setAttrs({
+            initiativetokenmacro: values["npc-show"] === "2" ? values.npcinitmacro : values.initmacro
+        });
+    });
+};
+
+on("sheet:opened change:npc-show change:initmacro change:npcinitmacro", updateInitiativeTokenMacro);
+
 on('change:repeating_equipment', function(){
     TAS.repeating('equipment')
         .attrs('totalequipmentweight','totalequipmentcost','summary')
@@ -13608,12 +13655,27 @@ on("change:npcstr", function() {
 	});
   });
 });
-on("change:npcdex", function() {
-  getAttrs(["npcdex", "npcdex-mod"], function(values) {
+const updateNpcDexterity = function(useDexForDefaultInitiative) {
+  getAttrs(["npcdex", "npcdex-mod", "npcinit"], function(values) {
+	const previousDexModifier = parseInt(values["npcdex-mod"], 10) || 0;
+	const dexScore = parseInt(values.npcdex, 10);
+	const dexModifier = isNaN(dexScore) ? 0 : Math.floor((dexScore / 2) - 5);
+	const initiative = parseInt(values.npcinit, 10) || 0;
+	const updatedInitiative = useDexForDefaultInitiative
+		? (initiative === 0 ? dexModifier : initiative)
+		: initiative + dexModifier - previousDexModifier;
+
 	setAttrs({
-	  "npcdex-mod": Math.floor((parseInt(values.npcdex,10) / 2) - 5)
+	  "npcdex-mod": dexModifier,
+	  npcinit: updatedInitiative
 	});
   });
+};
+on("sheet:opened", function() {
+  updateNpcDexterity(true);
+});
+on("change:npcdex", function() {
+  updateNpcDexterity(false);
 });
 on("change:npccon", function() {
   getAttrs(["npccon", "npccon-mod"], function(values) {
@@ -13657,176 +13719,265 @@ on("change:totalequipmentweight change:equipmentweightcopy", function() {
 /*  ======================================
             VERSION MANAGEMENT
     ====================================== */
+const CURRENT_SHEET_SCHEMA_VERSION = 1;
+const LEGACY_SPELLS_SCHEMA_VERSION = 1;
+
 on('sheet:opened', () => {
-    getAttrs(['code_version'], function (v) {
-        let code_version = parseFloat(v['code_version']) || 0;
-        console.log('Current sheet code version:' + code_version);
-        versionator(code_version);
-    });
+	getAttrs(['sheet_schema_version', 'code_version'], values => {
+		const storedSchemaVersion = parseSheetSchemaVersion(values.sheet_schema_version);
+		const legacyCodeVersion = parseFloat(values.code_version) || 0;
+		const initialSchemaVersion = storedSchemaVersion > 0
+			? storedSchemaVersion
+			: (legacyCodeVersion >= 0.1 ? LEGACY_SPELLS_SCHEMA_VERSION : 0);
+
+		if(initialSchemaVersion !== storedSchemaVersion){
+			setAttrs({sheet_schema_version: initialSchemaVersion}, {silent: true}, () => {
+				runSheetMigrations(initialSchemaVersion);
+			});
+		}else{
+			runSheetMigrations(initialSchemaVersion);
+		}
+	});
 });
-const versionator = (code_version) => {
-    if (code_version < 0.1) {
-        repSpellsFix(0.1);
-    } else {
-        console.log('Current sheet code version:' + code_version);
-    }
+
+const parseSheetSchemaVersion = value => {
+	const version = Number(value);
+	return Number.isInteger(version) && version >= 0 ? version : 0;
 };
 
-const repSpellsFix = function (code_version) {
-    // copy repeating_spells to repeating_spells11
-    const fields = ['spellused11','spellprep11', 'spellname11', 'spelllevel11', 'spellmacro11'];
-    const getRepeatingName = (section, id, field) => `repeating_${section}_${id}_${field}`;
-    getSectionIDs('repeating_spells', function (idarray) { //Get oldSectionID
-        const fieldnames = idarray.reduce((arr, id) => {
-            fields.forEach(field => arr.push(getRepeatingName('spells', id, field)));
-            return arr;
-        }, []);
-        getAttrs([...fieldnames], function (v) {
-            const update = {};
-            idarray.forEach(id => {
-                const rowid = generateRowID();
-                fields.forEach(field => {
-					const fieldvalue = v[getRepeatingName('spells', id, field)];
-					console.log(`${getRepeatingName('spells', id, field)} = ${fieldvalue}`);
-                    if (typeof fieldvalue !== 'undefined') update[getRepeatingName('spells11', rowid, field)] = fieldvalue;
-                });
-            });
-			update.code_version = code_version;
-			console.log(JSON.stringify(update));
-            setAttrs(update, {
-                silent: true
-            }, versionator(code_version));
-        });
-    });
+const runSheetMigrations = (schemaVersion, targetSchemaVersion = CURRENT_SHEET_SCHEMA_VERSION, migrations = SHEET_MIGRATIONS) => {
+	if(schemaVersion >= targetSchemaVersion){
+		console.log('Current sheet schema version: ' + schemaVersion);
+		return;
+	}
+
+	const nextSchemaVersion = schemaVersion + 1;
+	const migration = migrations.get(nextSchemaVersion);
+	if(!migration){
+		console.error('Missing D&D 3.5 sheet migration for schema version ' + nextSchemaVersion);
+		return;
+	}
+
+	let migrationCompleted = false;
+	const completeMigration = error => {
+		if(migrationCompleted){
+			return;
+		}
+		migrationCompleted = true;
+
+		if(error){
+			console.error('D&D 3.5 sheet migration to schema version ' + nextSchemaVersion + ' failed: ' + error);
+			return;
+		}
+
+		const versionUpdate = {sheet_schema_version: nextSchemaVersion};
+		if(nextSchemaVersion === LEGACY_SPELLS_SCHEMA_VERSION){
+			versionUpdate.code_version = 0.1;
+		}
+		setAttrs(versionUpdate, {silent: true}, () => {
+			runSheetMigrations(nextSchemaVersion, targetSchemaVersion, migrations);
+		});
+	};
+
+	try{
+		migration(completeMigration);
+	}catch(error){
+		completeMigration(error);
+	}
 };
+
+const migrateLegacyRepeatingSpells = done => {
+	const fields = ['spellused11','spellprep11', 'spellname11', 'spelllevel11', 'spellmacro11'];
+	const getRepeatingName = (section, id, field) => `repeating_${section}_${id}_${field}`;
+
+	getSectionIDs('repeating_spells', idarray => {
+		if(idarray.length === 0){
+			done();
+			return;
+		}
+
+		getSectionIDs('repeating_spells11', targetIdArray => {
+			const targetIds = new Set(targetIdArray.map(id => id.toLowerCase()));
+			const idsToMigrate = idarray.filter(id => !targetIds.has(id.toLowerCase()));
+			if(idsToMigrate.length === 0){
+				done();
+				return;
+			}
+
+			const fieldnames = [];
+			idsToMigrate.forEach(id => {
+				fields.forEach(field => {
+					fieldnames.push(getRepeatingName('spells', id, field));
+				});
+			});
+
+			getAttrs(fieldnames, values => {
+				const update = {};
+				idsToMigrate.forEach(id => {
+					fields.forEach(field => {
+						const sourceName = getRepeatingName('spells', id, field);
+						const sourceValue = values[sourceName];
+						if(typeof sourceValue !== 'undefined' && sourceValue !== ''){
+							update[getRepeatingName('spells11', id, field)] = sourceValue;
+						}
+					});
+				});
+
+				if(Object.keys(update).length > 0){
+					setAttrs(update, {silent: true}, done);
+				}else{
+					done();
+				}
+			});
+		});
+	});
+};
+
+const SHEET_MIGRATIONS = new Map([
+	[LEGACY_SPELLS_SCHEMA_VERSION, migrateLegacyRepeatingSpells]
+]);
 // ======================================
 
+const toNumber = (value, fallback = 0) => {
+	const number = Number(value);
+	return Number.isFinite(number) ? number : fallback;
+};
+
+const sumNumberedAttributes = (values, prefix, count = 10) => {
+	return Array.from({length: count}, (unused, index) => index + 1)
+		.reduce((total, row) => total + toNumber(values[`${prefix}${row}`]), 0);
+};
+
 on("change:autoCalcHP change:level1 change:level2 change:level3 change:level4 change:level5 change:level6 change:level7 change:level8 change:level9 change:level10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "level1", "level2", "level3", "level4", "level5", "level6", "level7", "level8", "level9", "level10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				level : parseInt(values.level1, 10) + parseInt(values.level2, 10) + parseInt(values.level3, 10) + parseInt(values.level4, 10) + parseInt(values.level5, 10) + parseInt(values.level6, 10) + parseInt(values.level7, 10) + parseInt(values.level8, 10) + parseInt(values.level9, 10) + parseInt(values.level10, 10)
+				level : sumNumberedAttributes(values, "level")
 			});
 		}
    	});
 });
 
 on("change:autoCalcHP change:hitdie1  change:hitdie2  change:hitdie3  change:hitdie4  change:hitdie5 change:hitdie6 change:hitdie7 change:hitdie8 change:hitdie9 change:hitdie10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "hitdie1", "hitdie2", "hitdie3", "hitdie4", "hitdie5", "hitdie6", "hitdie7", "hitdie8", "hitdie9", "hitdie10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				hitdie : parseInt(values.hitdie1, 10) + parseInt(values.hitdie2, 10) + parseInt(values.hitdie3, 10) + parseInt(values.hitdie4, 10) + parseInt(values.hitdie5, 10) + parseInt(values.hitdie6, 10) + parseInt(values.hitdie7, 10) + parseInt(values.hitdie8, 10) + parseInt(values.hitdie9, 10) + parseInt(values.hitdie10, 10)
+				hitdie : sumNumberedAttributes(values, "hitdie")
 			});
 		}
    	});
 });
 
 on("change:autoCalcHP change:hitpoint1  change:hitpoint2  change:hitpoint3  change:hitpoint4  change:hitpoint5 change:hitpoint6 change:hitpoint7 change:hitpoint8 change:hitpoint9 change:hitpoint10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "hitpoint1", "hitpoint2", "hitpoint3", "hitpoint4", "hitpoint5", "hitpoint6", "hitpoint7", "hitpoint8", "hitpoint9", "hitpoint10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				hitpoint : parseInt(values.hitpoint1, 10) + parseInt(values.hitpoint2, 10) + parseInt(values.hitpoint3, 10) + parseInt(values.hitpoint4, 10) + parseInt(values.hitpoint5, 10) + parseInt(values.hitpoint6, 10) + parseInt(values.hitpoint7, 10) + parseInt(values.hitpoint8, 10) + parseInt(values.hitpoint9, 10) + parseInt(values.hitpoint10, 10)
+				hitpoint : sumNumberedAttributes(values, "hitpoint")
 			});
 		}
    	});
 });
 
-on("change:hitdie1 change:skillPointLiv1 change:skillPointBonus1", eventInfo => {
-	getAttrs(["hitdie1", "skillPointLiv1", "skillPointBonus1"], values => {
-		setAttrs({
-			totSkillPoint1 : parseInt(values.hitdie1, 10) * (parseInt(values.skillPointLiv1, 10) + parseInt(values.skillPointBonus1, 10))
+const classSkillPointRows = Array.from({length: 10}, (unused, index) => index + 1);
+const classSkillPointFields = classSkillPointRows.reduce((fields, row) => {
+	fields.push(`hitdie${row}`, `skillPointLiv${row}`, `skillPointBonus${row}`);
+	return fields;
+}, ["firstLevelClass"]);
+const calculateClassSkillPoints = (row, values) => {
+	const firstLevelClass = parseInt(values.firstLevelClass, 10) || 0;
+	const hitDice = parseInt(values[`hitdie${row}`], 10) || 0;
+	const skillPointsPerLevel = parseInt(values[`skillPointLiv${row}`], 10) || 0;
+	const skillPointBonus = parseInt(values[`skillPointBonus${row}`], 10) || 0;
+	const firstLevelExtra = row === firstLevelClass && hitDice > 0 ? 3 : 0;
+	return (hitDice + firstLevelExtra) * (skillPointsPerLevel + skillPointBonus);
+};
+
+classSkillPointRows.forEach(row => {
+	const rowFields = [`hitdie${row}`, `skillPointLiv${row}`, `skillPointBonus${row}`];
+	const rowEvents = rowFields.map(field => `change:${field}`).join(" ");
+
+	on(rowEvents, eventInfo => {
+		getAttrs(["firstLevelClass", ...rowFields], values => {
+			setAttrs({[`totSkillPoint${row}`]: calculateClassSkillPoints(row, values)});
 		});
-   	});
+	});
 });
 
-on("change:hitdie2 change:skillPointLiv2 change:skillPointBonus2", eventInfo => {
-	getAttrs(["hitdie2", "skillPointLiv2", "skillPointBonus2"], values => {
-		setAttrs({
-			totSkillPoint2 : parseInt(values.hitdie2, 10) * (parseInt(values.skillPointLiv2, 10) + parseInt(values.skillPointBonus2, 10))
+on("change:firstLevelClass", eventInfo => {
+	getAttrs(classSkillPointFields, values => {
+		const firstLevelClass = parseInt(values.firstLevelClass, 10) || 0;
+		if (firstLevelClass === 0 && eventInfo.sourceType !== "player") return;
+		const updates = {};
+		classSkillPointRows.forEach(row => {
+			updates[`totSkillPoint${row}`] = calculateClassSkillPoints(row, values);
 		});
-   	});
-});
-
-on("change:hitdie3 change:skillPointLiv3 change:skillPointBonus3", eventInfo => {
-	getAttrs(["hitdie3", "skillPointLiv3", "skillPointBonus3"], values => {
-		setAttrs({
-			totSkillPoint3 : parseInt(values.hitdie3, 10) * (parseInt(values.skillPointLiv3, 10) + parseInt(values.skillPointBonus3, 10))
-		});
-   	});
-});
-
-on("change:hitdie4 change:skillPointLiv4 change:skillPointBonus4", eventInfo => {
-	getAttrs(["hitdie4", "skillPointLiv4", "skillPointBonus4"], values => {
-		setAttrs({
-			totSkillPoint4 : parseInt(values.hitdie4, 10) * (parseInt(values.skillPointLiv4, 10) + parseInt(values.skillPointBonus4, 10))
-		});
-   	});
-});
-
-on("change:hitdie5 change:skillPointLiv5 change:skillPointBonus5", eventInfo => {
-	getAttrs(["hitdie5", "skillPointLiv5", "skillPointBonus5"], values => {
-		setAttrs({
-			totSkillPoint5 : parseInt(values.hitdie5, 10) * (parseInt(values.skillPointLiv5, 10) + parseInt(values.skillPointBonus5, 10))
-		});
-   	});
-});
-
-on("change:hitdie6 change:skillPointLiv6 change:skillPointBonus6", eventInfo => {
-	getAttrs(["hitdie6", "skillPointLiv6", "skillPointBonus6"], values => {
-		setAttrs({
-			totSkillPoint6 : parseInt(values.hitdie6, 10) * (parseInt(values.skillPointLiv6, 10) + parseInt(values.skillPointBonus6, 10))
-		});
-   	});
-});
-
-on("change:hitdie7 change:skillPointLiv7 change:skillPointBonus7", eventInfo => {
-	getAttrs(["hitdie7", "skillPointLiv7", "skillPointBonus7"], values => {
-		setAttrs({
-			totSkillPoint7 : parseInt(values.hitdie7, 10) * (parseInt(values.skillPointLiv7, 10) + parseInt(values.skillPointBonus7, 10))
-		});
-   	});
-});
-
-on("change:hitdie8 change:skillPointLiv8 change:skillPointBonus8", eventInfo => {
-	getAttrs(["hitdie8", "skillPointLiv8", "skillPointBonus8"], values => {
-		setAttrs({
-			totSkillPoint8 : parseInt(values.hitdie8, 10) * (parseInt(values.skillPointLiv8, 10) + parseInt(values.skillPointBonus8, 10))
-		});
-   	});
-});
-
-on("change:hitdie9 change:skillPointLiv9 change:skillPointBonus9", eventInfo => {
-	getAttrs(["hitdie9", "skillPointLiv9", "skillPointBonus9"], values => {
-		setAttrs({
-			totSkillPoint9 : parseInt(values.hitdie9, 10) * (parseInt(values.skillPointLiv9, 10) + parseInt(values.skillPointBonus9, 10))
-		});
-   	});
-});
-
-on("change:hitdie10 change:skillPointLiv10 change:skillPointBonus10", eventInfo => {
-	getAttrs(["hitdie10", "skillPointLiv10", "skillPointBonus10"], values => {
-		setAttrs({
-			totSkillPoint10 : parseInt(values.hitdie10, 10) * (parseInt(values.skillPointLiv10, 10) + parseInt(values.skillPointBonus10, 10))
-		});
-   	});
+		setAttrs(updates);
+	});
 });
 
 on("change:totSkillPoint1 change:totSkillPoint2 change:totSkillPoint3 change:totSkillPoint4 change:totSkillPoint5 change:totSkillPoint6 change:totSkillPoint7 change:totSkillPoint8 change:totSkillPoint9 change:totSkillPoint10", eventInfo => {
 	getAttrs(["totSkillPoint1", "totSkillPoint2", "totSkillPoint3", "totSkillPoint4", "totSkillPoint5", "totSkillPoint6", "totSkillPoint7", "totSkillPoint8", "totSkillPoint9", "totSkillPoint10"], values => {
 		setAttrs({
-			totSkillPoint : parseInt(values.totSkillPoint1, 10) + parseInt(values.totSkillPoint2, 10) + parseInt(values.totSkillPoint3, 10) + parseInt(values.totSkillPoint4, 10) + parseInt(values.totSkillPoint5, 10) + parseInt(values.totSkillPoint6, 10) + parseInt(values.totSkillPoint7, 10) + parseInt(values.totSkillPoint8, 10) + parseInt(values.totSkillPoint9, 10) + parseInt(values.totSkillPoint10, 10)
+			totSkillPoint : sumNumberedAttributes(values, "totSkillPoint")
 		});
    	});
 });
+
+const trackedSkills = [
+	"appraise", "autohypnosis", "balance", "bluff", "climb", "concentration",
+	"craft1", "craft2", "craft3", "decipherscript", "diplomacy", "disabledevice",
+	"disguise", "escapeartist", "forgery", "gatherinformation", "handleanimal", "heal",
+	"hide", "intimidate", "iaijutsufocus", "jump", "knowarcana", "knowengineer",
+	"knowdungeon", "knowgeography", "knowhistory", "knowlocal", "knownature",
+	"knownobility", "knowpsionic", "knowreligion", "knowplanes", "listen", "martiallore",
+	"movesilent", "openlock", "perform1", "perform2", "perform3", "profession1",
+	"profession2", "profession3", "psicraft", "ride", "search", "sensemotive",
+	"sleightofhand", "spellcraft", "spot", "survival", "swim", "truespeak", "tumble",
+	"usemagicdevice", "usepsionicdevice", "userope"
+];
+const trackedSkillFields = trackedSkills.reduce((fields, skill) => {
+	fields.push(`${skill}ranks`, `${skill}classskill`);
+	return fields;
+}, ["totSkillPoint"]);
+const trackedSkillEvents = trackedSkillFields.map(field => `change:${field}`).join(" ");
+
+const updateUnspentSkillPoints = () => {
+	getSectionIDs("repeating_skills", skillRowIds => {
+		const repeatingSkillFields = skillRowIds.reduce((fields, rowId) => {
+			fields.push(`repeating_skills_${rowId}_otherskillranks`, `repeating_skills_${rowId}_otherskillskill`);
+			return fields;
+		}, []);
+
+		getAttrs([...trackedSkillFields, ...repeatingSkillFields], values => {
+			const skillPointCost = (ranksField, classSkillField) => {
+				const ranks = Math.max(0, parseFloat(values[ranksField]) || 0);
+				return ranks * (values[classSkillField] === "1" ? 1 : 2);
+			};
+			let spentSkillPoints = trackedSkills.reduce((total, skill) => {
+				return total + skillPointCost(`${skill}ranks`, `${skill}classskill`);
+			}, 0);
+
+			skillRowIds.forEach(rowId => {
+				spentSkillPoints += skillPointCost(
+					`repeating_skills_${rowId}_otherskillranks`,
+					`repeating_skills_${rowId}_otherskillskill`
+				);
+			});
+
+			const totalSkillPoints = parseFloat(values.totSkillPoint) || 0;
+			const unspentSkillPoints = Math.round((totalSkillPoints - spentSkillPoints) * 100) / 100;
+			setAttrs({unspentSkillPoints});
+		});
+	});
+};
+
+on(`sheet:opened ${trackedSkillEvents} change:repeating_skills:otherskillranks change:repeating_skills:otherskillskill remove:repeating_skills`, updateUnspentSkillPoints);
 
 on("change:npcautoCalcHP change:npclevel1 change:npclevel2 change:npclevel3 change:npclevel4 change:npclevel5 change:npclevel6 change:npclevel7 change:npclevel8 change:npclevel9 change:npclevel10", eventInfo => {
 	getAttrs(["npcautoCalcHP", "npclevel1", "npclevel2", "npclevel3", "npclevel4", "npclevel5", "npclevel6", "npclevel7", "npclevel8", "npclevel9", "npclevel10"], values => {
     	if(values.npcautoCalcHP == 1){
 			setAttrs({
-				npclevel : parseInt(values.npclevel1, 10) + parseInt(values.npclevel2, 10) + parseInt(values.npclevel3, 10) + parseInt(values.npclevel4, 10) + parseInt(values.npclevel5, 10) + parseInt(values.npclevel6, 10) + parseInt(values.npclevel7, 10) + parseInt(values.npclevel8, 10) + parseInt(values.npclevel9, 10) + parseInt(values.npclevel10, 10)
+				npclevel : sumNumberedAttributes(values, "npclevel")
 			});
 		}
    	});
@@ -13836,7 +13987,7 @@ on("change:npcautoCalcHP change:npchitdie1 change:npchitdie2 change:npchitdie3 c
 	getAttrs(["npcautoCalcHP", "npchitdie1", "npchitdie2", "npchitdie3", "npchitdie4", "npchitdie5", "npchitdie6", "npchitdie7", "npchitdie8", "npchitdie9", "npchitdie10"], values => {
     	if(values.npcautoCalcHP == 1){
 			setAttrs({
-				npchitdie : parseInt(values.npchitdie1, 10) + parseInt(values.npchitdie2, 10) + parseInt(values.npchitdie3, 10) + parseInt(values.npchitdie4, 10) + parseInt(values.npchitdie5, 10) + parseInt(values.npchitdie6, 10) + parseInt(values.npchitdie7, 10) + parseInt(values.npchitdie8, 10) + parseInt(values.npchitdie9, 10) + parseInt(values.npchitdie10, 10)
+				npchitdie : sumNumberedAttributes(values, "npchitdie")
 			});
 		}
    	});
@@ -13846,7 +13997,7 @@ on("change:npcautoCalcHP change:npchitpoint1 change:npchitpoint2 change:npchitpo
 	getAttrs(["npcautoCalcHP", "npchitpoint1", "npchitpoint2", "npchitpoint3", "npchitpoint4", "npchitpoint5", "npchitpoint6", "npchitpoint7", "npchitpoint8", "npchitpoint9", "npchitpoint10"], values => {
     	if(values.npcautoCalcHP == 1){
 			setAttrs({
-				npchitpoint : parseInt(values.npchitpoint1, 10) + parseInt(values.npchitpoint2, 10) + parseInt(values.npchitpoint3, 10) + parseInt(values.npchitpoint4, 10) + parseInt(values.npchitpoint5, 10) + parseInt(values.npchitpoint6, 10) + parseInt(values.npchitpoint7, 10) + parseInt(values.npchitpoint8, 10) + parseInt(values.npchitpoint9, 10) + parseInt(values.npchitpoint10, 10)
+				npchitpoint : sumNumberedAttributes(values, "npchitpoint")
 			});
 		}
    	});
@@ -14133,41 +14284,21 @@ var callManeuverTemplate = function (manuversGranted, manuversUsed, manuversGran
 	}
 
 	getAttrs(['maneuversreadied', 'maneuversreadied_init'] , values => {
-		var allNewGranted = [];
-		var allNewGrantedId = [];
-		var error = "";
-		//If all maneuvers readied are grantable then the number of maneuver to be graned is eaqual to the attribute maneuversreadied_init,
-		//otherwise only one maneuver is granted
-		if(allGranteable.length > 0){
-			if(values.maneuversreadied == allGranteable.length){
-				for(var i = 0; i < values.maneuversreadied_init; i++){
-					getRandomElementAndRemove(allGranteable, allGranteableId, allNewGranted, allNewGrantedId);
-				}
-			}else{
-				if(values.maneuversreadied < allNewGranted.length){
-					error = 'Too many maneuvers selected (' + allNewGranted.join() + '): select only ' + values.maneuversreadied + ' meneuvers';
-				}else{
-					getRandomElementAndRemove(allGranteable, allGranteableId, allNewGranted, allNewGrantedId);
-				}
-			}
-		}else{
-			if(values.maneuversreadied == allUsed.length){
-				error = 'All maneuvers are used, reset the usage';
-			}else{
-				error = 'No maneuvers readied avaiable';
-			}
-		}
+		var grantResult = selectGrantedManeuvers(allGranted, allUsed, allGranteable, allGranteableId,
+			values.maneuversreadied, values.maneuversreadied_init);
+		var grantedUpdates = {};
 
-		for(var i = 0; i < allNewGranted.length; i++){
-			setAttrs({
-				[allNewGrantedId[i]] : 1
-			});
+		for(var i = 0; i < grantResult.ids.length; i++){
+			grantedUpdates[grantResult.ids[i]] = 1;
+		}
+		if(grantResult.ids.length > 0){
+			setAttrs(grantedUpdates);
 		}
 
 		var rollTemplateStringHeader = "&{template:DnD35ManeuverRoll} {{name=@{character_name} }} {{[[1d1]]}}";
-		var rollTemplateStringError = " {{error=" + error + "}}";
+		var rollTemplateStringError = " {{error=" + grantResult.error + "}}";
 		var rollTemplateStringGranted = createRepeatableStringTemplate("granted", allGranted, " No maneuvers granted");
-		var rollTemplateStringNewGranted = createRepeatableStringTemplate("newgranted", allNewGranted, " No maneuvers grantable");
+		var rollTemplateStringNewGranted = createRepeatableStringTemplate("newgranted", grantResult.names, " No maneuvers grantable");
 		var rollTemplateStringUsed = createRepeatableStringTemplate("used", allUsed, " No maneuvers used");
 
 		callRollTemplate([rollTemplateStringHeader, rollTemplateStringError, rollTemplateStringGranted, rollTemplateStringNewGranted, rollTemplateStringUsed], null);
@@ -14175,12 +14306,69 @@ var callManeuverTemplate = function (manuversGranted, manuversUsed, manuversGran
 
 };
 
-var getRandomElementAndRemove = function(allGranteable, allGranteableId, allNewGranted, allNewGrantedId){
-	var pos = Math.floor(Math.random() * allGranteable.length);
+var parseManeuverCount = function(value){
+	if(value === undefined || value === null || String(value).trim() === ""){
+		return null;
+	}
+
+	var count = Number(value);
+	return Number.isInteger(count) && count >= 0 ? count : null;
+};
+
+var selectGrantedManeuvers = function(allGranted, allUsed, allGranteable, allGranteableId, maneuversReadiedValue, maneuversInitiallyGrantedValue, randomFunction){
+	var result = {
+		names: [],
+		ids: [],
+		error: ""
+	};
+	var maneuversReadied = parseManeuverCount(maneuversReadiedValue);
+	var maneuversInitiallyGranted = parseManeuverCount(maneuversInitiallyGrantedValue);
+	var actualReadied = allGranted.length + allUsed.length + allGranteable.length;
+
+	if(maneuversReadied === null || maneuversReadied < 1){
+		result.error = 'Enter the number of readied maneuvers';
+	}else if(maneuversInitiallyGranted === null || maneuversInitiallyGranted < 1){
+		result.error = 'Enter the number of initially granted maneuvers';
+	}else if(maneuversReadied !== actualReadied){
+		result.error = 'Readied maneuver count mismatch: ' + actualReadied + ' selected, but the Readied field is ' + maneuversReadied;
+	}else if(maneuversInitiallyGranted > maneuversReadied){
+		result.error = 'Initially granted maneuvers cannot exceed readied maneuvers';
+	}else if(allGranteable.length !== allGranteableId.length){
+		result.error = 'Unable to match readied maneuvers to their sheet rows';
+	}else if(allGranteable.length === 0){
+		if(allUsed.length === actualReadied){
+			result.error = 'All maneuvers are used, reset the usage';
+		}else{
+			result.error = 'No readied maneuvers available';
+		}
+	}else{
+		var numberToGrant = allGranted.length === 0 && allUsed.length === 0 ? maneuversInitiallyGranted : 1;
+		if(numberToGrant > allGranteable.length){
+			result.error = 'Not enough readied maneuvers are available to grant';
+		}else{
+			var grantable = [...allGranteable];
+			var grantableIds = [...allGranteableId];
+			for(var i = 0; i < numberToGrant; i++){
+				getRandomElementAndRemove(grantable, grantableIds, result.names, result.ids, randomFunction);
+			}
+		}
+	}
+
+	return result;
+};
+
+var getRandomElementAndRemove = function(allGranteable, allGranteableId, allNewGranted, allNewGrantedId, randomFunction){
+	if(allGranteable.length === 0 || allGranteable.length !== allGranteableId.length){
+		return false;
+	}
+
+	var random = randomFunction || Math.random;
+	var pos = Math.floor(random() * allGranteable.length);
 	allNewGranted.push(allGranteable[pos]);
 	allNewGrantedId.push(allGranteableId[pos]);
 	allGranteable.splice(pos, 1);
 	allGranteableId.splice(pos, 1);
+	return true;
 };
 
 var createRepeatableStringTemplate = function(key, values, defaultMsg){
@@ -14327,7 +14515,7 @@ on("sheet:opened", function() {
 	bonusAttackList.set("range increment", "@{rangeIncrement}[R. Inc.]");
 
 	bonusAttackList.set("primary hand", "@{twoWeaponsEnabled}*@{primaryHandAttackBonus}[Pr. Ha.]");
-	bonusAttackList.set("off hand", "@{twoWeaponsEnabled}*@{offHandAttackBonus}[Off Ha.]");
+	bonusAttackList.set("off hand", "@{twoWeaponsEnabled}*@{offyHandAttackBonus}[Off Ha.]");
 	bonusAttackList.set("flurry blows", "@{flurryBlowsEnabled}*@{flurryBlowsAttackBonus}[Flurry]");
 	bonusAttackList.set("rapid shot", "@{rapidShotEnabled}*@{rapidShotAttackBonus}[Rapis]");
 	bonusAttackList.set("manyshot", "@{manyShotEnabled}*@{manyShotAttackBonus}[Many]");
@@ -14664,8 +14852,8 @@ var calculateSecondaryAttack = function(newTemplate, attackMacroName, index, bab
 var calculateMacroAttack = function(prefix, index, criticMode, damageMode, values) {
 	var baseMacro = `1d20cs>@{${prefix}weapon${index}critmin} + @{bab}[BAB] + @{epicattackbonus}[Epic AB] + @{${prefix}weapon${index}stat}[Ability] + @{size}[size] + @{${prefix}weapon${index}enh}[Weapon Enh] + @{${prefix}weapon${index}focus}[Weapon Focus]`;
 
-	var weaponCategory = `weapon${index}category`;
-	var weaponHand = `weapon${index}hand`;
+	var weaponCategory = `${prefix}weapon${index}category`;
+	var weaponHand = `${prefix}weapon${index}hand`;
 
 	var commonBonus = [];
 	if(values["globalBonusEnabled"] == 1){
@@ -14798,20 +14986,20 @@ var calculateMacroAttack = function(prefix, index, criticMode, damageMode, value
 
 	var bonusByHand = [];
 	if(values[weaponCategory] != "ranged"){
-		switch(values["weaponHand"]) {
+		switch(values[weaponHand]) {
 		case "primary-hand":
 			if(values["twoWeaponsMultiattackBonusEnabled"] == 1){
-				bonusByHand.push("primary hand");
+				bonusByHand.push(bonusAttackList.get("primary hand"));
 			}
 			break;
 		case "off-hand":
 			if(values["twoWeaponsMultiattackBonusEnabled"] == 1){
-				bonusByHand.push("off hand");
+				bonusByHand.push(bonusAttackList.get("off hand"));
 			}
 			break;
 		case "secondary-weapon":
 			if(values["twoWeaponsMultiattackBonusEnabled"] == 1){
-				bonusByHand.push("multiattack");
+				bonusByHand.push(bonusAttackList.get("multiattack"));
 			}
 			break;
 		}
@@ -14828,8 +15016,8 @@ var calculateMacroDamage = function(prefix, index, criticMode, damageMode, value
 		baseMacro = `[[@{${prefix}weapon${index}dicenumber}]]d[[@{${prefix}weapon${index}dicetype}]] + @{${prefix}weapon${index}bonusdamage}[Dmg] + @{${prefix}weapon${index}damagestat}[Weapon Dmg Ability] + @{${prefix}weapon${index}enh}[Weapon Enh] + @{${prefix}weapon${index}specialize}[Weapon Spec] + @{${prefix}weapon${index}vardamage}[Var Dmg]`;
 	}
 
-	var weaponCategory = `weapon${index}category`;
-	var weaponHand = `weapon${index}hand`;
+	var weaponCategory = `${prefix}weapon${index}category`;
+	var weaponHand = `${prefix}weapon${index}hand`;
 
 	var commonBonus = populateCommonBonusDamage(true, weaponCategory, weaponHand, values);
 	var bonusByCategory = populateBonusByCategoryDamage(true, weaponCategory, weaponHand, values);
@@ -14956,8 +15144,8 @@ var populateBonusByCategoryDamage = function(isBaseDamage, weaponCategory, weapo
 		}
 		if(values["fightingDefensivelyCombatExpertiseBonusEnabled"] == 1){
 			if(isBaseDamage){
-				commonBonus.push(bonusDamageList.get("fighting defensively"));
-				commonBonus.push(bonusDamageList.get("combat expertiseEnabled"));
+				bonusByCategory.push(bonusDamageList.get("fighting defensively"));
+				bonusByCategory.push(bonusDamageList.get("combat expertiseEnabled"));
 			}
 		}
 		if(values["smiteEvilBonusEnabled"] == 1){
@@ -15009,14 +15197,14 @@ var populateBonusByHandDamage = function(isBaseDamage, weaponCategory, weaponHan
 		switch(values["weaponHand"]) {
 		case "primary-hand":
 			if(values["powerAttackBonusEnabled"] == 1 && values[weaponCategory] == "natural"){
-				bonusByCategory.push(bonusDamageList.get("power attack one hand"));
+				bonusByHand.push(bonusDamageList.get("power attack one hand"));
 			}
 			break;
 		case "off-hand":
 			break;
 		case "secondary-weapon":
 			if(values["powerAttackBonusEnabled"] == 1 && values[weaponCategory] == "natural"){
-				bonusByCategory.push(bonusDamageList.get("power attack light"));
+				bonusByHand.push(bonusDamageList.get("power attack light"));
 			}
 			break;
 		}
@@ -15270,5 +15458,3 @@ on("sheet:opened change:spellsBonusEnabled change:spellsChaBonus change:powersBo
 
 //console.log(JSON.stringify(object, null, 4));
 </script>
-
-

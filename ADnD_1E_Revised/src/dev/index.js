@@ -187,7 +187,7 @@ on('change:character_name', async (eventInfo) => {
 
 // Validate input for +/- adjustment
 on(
-  'change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_magic, change:hitpoints_1_class, change:hitpoints_2_class, change:hitpoints_3_class',
+  'change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_magic change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class',
   async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
@@ -1910,7 +1910,7 @@ versionator = async (current_version, final_version) => {
 on('sheet:opened', async () => {
   const final_version = 1.7; // must be >= last update versionator()
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
-  let current_version = parseFloat(v.sheet_version) || 0;
+  let current_version = float(v.sheet_version);
   // New Sheet?
   const isNewSheet = int(v.old_character) === 0 && current_version === 0;
   if (isNewSheet) {
@@ -3414,7 +3414,7 @@ const calcHP = async () => {
   const output = {};
   const isMonster = int(v.toggle_npc);
   let syncHpFlag = int(v.sync_hp_flag);
-  // if monster do not sync, otherwise follow user setting
+  // if monster do not sync, otherwise follow user settings
   syncHpFlag = isMonster ? 0 : syncHpFlag;
   const hitPointsMax = int(v.hitpoints_max);
   const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
@@ -3471,8 +3471,8 @@ const calcAC = async (recalc) => {
   const armorClass = int(v.armorclass);
   const isMonster = int(v.toggle_npc);
   let syncAcFlag = int(v.sync_ac_flag);
-  // if monster do not sync, otherwise follow user setting
-  syncAcFlag = isMonster ? 0 : 1;
+  // if monster do not sync, otherwise follow user settings
+  syncAcFlag = isMonster ? 0 : syncAcFlag;
   const armorRatingFlag = int(v.armor_rating_flag);
   const armorShield_mod = int(v.armorshield_mod) * -1;
   const armorOther_mod = int(v.armorother_mod) * -1;
@@ -3673,6 +3673,7 @@ on(
     // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
     const triggerEvent = eventInfo.triggerName;
     const recalc = triggerEvent === 'clicked:calcac' ? 1 : 0;
+    clog(`triggerEvent: ${triggerEvent} recalc:${recalc}`);
     await calcAC(recalc);
   },
 );
@@ -4261,7 +4262,7 @@ const hearnoiseCalc = async (migrate) => {
 const climbwallsCalc = async (migrate) => {
   const v = await getAttrsAsync(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic']);
   const output = {};
-  let baseClimbwalls = int(v.climbwalls_base);
+  let baseClimbwalls = float(v.climbwalls_base);
   baseClimbwalls = baseClimbwalls >= 99.1 ? baseClimbwalls.toFixed(1) : Math.floor(baseClimbwalls);
   const racialClimbwalls = int(v.climbwalls_racial_mod);
   const abilityClimbwalls = int(v.climbwalls_ability_mod);
@@ -4448,11 +4449,22 @@ on(
       const levels = [v.level, v.level_2, v.level_3];
       // clog(`classNames: ${classNames} levels: ${levels}`);
       const index = classLinked - 1; // match index position
-      const currentClassName = (classNames[index] || '').trim();
+      const currentClassName = (classNames[index] || '').trim().toLowerCase();
       const currentLevel = +levels[index] || 0;
       const classSelected = await matchClassName(currentClassName);
       levelSelected = currentLevel;
-      output.thief_level = classSelected === 4 ? levelSelected : 0; // 4 = thief matchClassName()
+      // 4 = thief
+      if (classSelected === 4) {
+        if (currentClassName === 'assassin') {
+          // thief skills @ 2 lvl below their assassin lvl
+          levelSelected = Math.max(levelSelected - 2, 0);
+          output.thief_level = levelSelected;
+        } else {
+          output.thief_level = levelSelected;
+        }
+      } else {
+        output.thief_level = 0;
+      }
     }
 
     // Clamp level between 0 and 17 for the table lookup
@@ -4463,7 +4475,8 @@ on(
     skillKeys.forEach((key, i) => {
       output[key] = statValues[i];
     });
-    await setAttrsAsync(output, {silent: true});
+    // await setAttrsAsync(output, {silent: true});
+    await setAttrsAsync(output);
   },
 );
 
