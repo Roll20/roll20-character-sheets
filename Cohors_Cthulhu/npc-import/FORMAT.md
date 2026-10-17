@@ -121,7 +121,7 @@ already sustained).
 
 `archetype`, `culture`, `caste`, `wealth`, `specialization`, `background`,
 `characteristic` - text matching the PC sheet's identity fields
-(`source/views/_character.pug`). Four of them are dropdowns on the sheet:
+(`source/views/_character.pug`). Five of them are dropdowns on the sheet:
 
 | Field | Values |
 | --- | --- |
@@ -129,11 +129,13 @@ already sustained).
 | specialization | Mystic: Lupercus, Staff Bearer; Sage: Engineer, Medicus; Schemer: Frumentarius, Magistrate; Scoundrel: Robber, Sicarius; Scout: Hunter, Veles; Soldier: Berserker, Legionary |
 | culture | Roman citizen, Germanic tribe, Ægyptus, Briton, Gaul, Greek, Foederati, Other |
 | caste | Outcast, Servant, Plebeian, Freedman, Noble |
+| characteristic | Atlantean Ancestry, Beloved of Valusia, Born of the Waters, Child of Greatness, Dreamwalker, Ghoulish Lineage, Glimpse Behind the Curtain, Sole Survivor, Touched by Shadow |
 
 The sheet matches these when it is first opened, ignoring case (and
 "Roman" matches "Roman citizen"); a specialization with no archetype also
 sets the archetype. Any other value is stored but doesn't show in the
-dropdown. Troopers and Toughened NPCs don't show these fields at all.
+dropdown. An imported characteristic starts out Secret. Troopers and
+Toughened NPCs don't show these fields at all.
 
 ### Attributes (required)
 

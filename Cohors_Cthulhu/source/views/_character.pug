@@ -15,9 +15,22 @@
 //- Identity choices. Each archetype has two specializations.
 - const ccCultures = ['Roman citizen', 'Germanic tribe', 'Ægyptus', 'Briton', 'Gaul', 'Greek', 'Foederati', 'Other']
 - const ccCastes = ['Outcast', 'Servant', 'Plebeian', 'Freedman', 'Noble']
+- const ccCharacteristicNames = require('./source/data/characteristics.json')
+- const ccAttributeNames = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
+- const ccSkillKeys = ['academia', 'athletics', 'crafting', 'engineering', 'fighting', 'medicine', 'observation', 'persuasion', 'resilience', 'stealth', 'survival', 'tactics']
+//- A characteristic changes ratings and ranks, so everything calculated from
+//- them reruns (and the talent filter, which reads skill ranks).
+- const ccCharacteristicTrigger = {triggeredFuncs: ['ccApplyCharacteristic', 'ccUpdateTalentFilter'], affects: ['brawn_bonus_damage', 'insight_bonus_damage', 'will_bonus_damage', 'base_armour', 'total_armor', 'courage', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'power_rating']}
 - const ccSpecializations = {Mystic: ['Lupercus', 'Staff Bearer'], Sage: ['Engineer', 'Medicus'], Schemer: ['Frumentarius', 'Magistrate'], Scoundrel: ['Robber', 'Sicarius'], Scout: ['Hunter', 'Veles'], Soldier: ['Berserker', 'Legionary']}
 
 include ./_global_sheetworker.pug
+
+//- An option generated in a loop. k-scaffold renders +option blocks after
+//- the loop ends, so a block that reads the loop variable would show its
+//- last value on every option; a mixin parameter keeps each one's own.
+mixin ccOption(value)
+  +option({value})
+    = value
 
 +tab({name: 'character', container: 'article', button: {content: 'Character'}})
   .cc-page.cc-character
@@ -169,9 +182,39 @@ include ./_global_sheetworker.pug
       .cc-field
         span Background
         +text({name: 'background'})
-      .cc-field
-        span Characteristic
-        +text({name: 'characteristic'})
+      //- Characteristic, with Secret (checked by default).
+      +radio({name: 'characteristic choices marker', value: 'none', checked: '', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-none
+      +radio({name: 'characteristic choices marker', value: 'skills', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-skills
+      +radio({name: 'characteristic choices marker', value: 'both', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-both
+      .cc-field.cc-characteristic
+        .cc-characteristic-label
+          span Characteristic
+          +checkbox({name: 'characteristic secret', value: 1, checked: '', id: 'cc-characteristic-secret', trigger: ccCharacteristicTrigger}).cc-characteristic-secret
+          label.cc-characteristic-secret-label(for='cc-characteristic-secret') Secret
+        +select({name: 'characteristic', trigger: Object.assign({}, ccCharacteristicTrigger, {affects: ccCharacteristicTrigger.affects.concat(['characteristic_choices_marker'])})})
+          +option({value: ''})
+            | Select One
+          each characteristicName in ccCharacteristicNames
+            +ccOption(characteristicName)
+        .cc-characteristic-choices
+          span.cc-characteristic-pick.cc-characteristic-pick-attribute
+            span +1
+            +select({name: 'characteristic attribute choice', trigger: ccCharacteristicTrigger})
+              +option({value: ''})
+                | Attribute
+              each attributeName in ccAttributeNames
+                +ccOption(attributeName)
+          each n in [1, 2]
+            span.cc-characteristic-pick
+              span +1
+              +select({name: `characteristic skill choice ${n}`, trigger: ccCharacteristicTrigger})
+                +option({value: ''})
+                  | Skill
+                each skillName in ccSkillKeys
+                  +ccOption(skillName)
+        //- What ccApplyCharacteristic added, as JSON, so exactly that is
+        //- taken off again.
+        +hidden({name: 'characteristic applied'})
 
     include ./panels/_npc_profile_panel.pug
     include ./panels/_truths_scars_panel.pug
@@ -213,6 +256,51 @@ include ./_global_sheetworker.pug
   const calcNpcSheet = ({attributes}) => (ccIsNpc(attributes) ? 1 : 0);
   k.registerFuncs({ccSetSheetMode, calcNpcSheet});
 
+  // Characteristic bonuses, by characteristic name (none in this sheet).
+  // While the characteristic is revealed (Secret unchecked) its attribute
+  // and skill bonuses, plus the player's chosen +1 attribute and +1 skills,
+  // are added to the ratings and ranks. characteristic_applied records what
+  // was added, so changing the characteristic or a choice, clearing it or
+  // checking Secret takes exactly that off again before adding the new
+  // bonuses. A chosen attribute or skill must differ from the fixed ones
+  // (and from each other) to count.
+  const ccCharacteristicNames = !{JSON.stringify(ccCharacteristicNames)};
+  const ccCharacteristics = {};
+  const ccCharacteristicBonuses = (attributes) => {
+    const profile = ccCharacteristics[attributes.characteristic];
+    if (!profile || Number(attributes.characteristic_secret) === 1) { return {}; }
+    const bonuses = {};
+    const add = (key) => (amount) => { bonuses[key] = (bonuses[key] || 0) + amount; };
+    Object.keys(profile.attributes).forEach((name) => add(`${name}_rating`)(profile.attributes[name]));
+    Object.keys(profile.skills).forEach((name) => add(`${name}_ranks`)(profile.skills[name]));
+    const attributeChoice = attributes.characteristic_attribute_choice;
+    if (profile.choose.attributes && attributeChoice && !profile.attributes[attributeChoice]) {
+      add(`${attributeChoice}_rating`)(1);
+    }
+    const skillChoices = [attributes.characteristic_skill_choice_1, attributes.characteristic_skill_choice_2]
+      .filter((name, i, all) => name && !profile.skills[name] && all.indexOf(name) === i)
+      .slice(0, profile.choose.skills);
+    skillChoices.forEach((name) => add(`${name}_ranks`)(1));
+    return bonuses;
+  };
+  const ccApplyCharacteristic = ({attributes}) => {
+    let applied = {};
+    try { applied = JSON.parse(attributes.characteristic_applied || '{}') || {}; } catch (err) { applied = {}; }
+    const wanted = ccCharacteristicBonuses(attributes);
+    new Set(Object.keys(applied).concat(Object.keys(wanted))).forEach((key) => {
+      const change = (wanted[key] || 0) - (Number(applied[key]) || 0);
+      if (change) { attributes[key] = Math.max(0, (Number(attributes[key]) || 0) + change); }
+    });
+    attributes.characteristic_applied = JSON.stringify(wanted);
+  };
+  // Which choice dropdowns the characteristic needs: none, skills or both.
+  const calcCharacteristicChoices = ({attributes}) => {
+    const profile = ccCharacteristics[attributes.characteristic];
+    if (!profile || !profile.choose.skills) { return 'none'; }
+    return profile.choose.attributes ? 'both' : 'skills';
+  };
+  k.registerFuncs({ccApplyCharacteristic, calcCharacteristicChoices});
+
   // Sync the archetype marker radios with Archetype.
   const calcArchetypeMarker = ({attributes}) => {
     const archetype = String(attributes.archetype || '').toLowerCase();
@@ -242,8 +330,8 @@ include ./_global_sheetworker.pug
       value;
   };
 
-  // Culture, Caste, Archetype and Specialization used to be free text; match
-  // old and imported values to the dropdowns on sheet open.
+  // Culture, Caste, Archetype, Specialization and Characteristic used to be
+  // free text; match old and imported values to the dropdowns on sheet open.
   const ccNormalizeIdentity = (attributes) => {
     const match = (field, options) => {
       const value = ccMatchOption(attributes[field], options);
@@ -253,6 +341,7 @@ include ./_global_sheetworker.pug
     match('caste', ccCastes);
     match('archetype', Object.keys(ccSpecializations));
     match('specialization', Object.values(ccSpecializations).flat());
+    match('characteristic', ccCharacteristicNames);
     // A known specialization with no archetype implies the archetype.
     if (!ccSpecializations[attributes.archetype]) {
       const owner = Object.keys(ccSpecializations)
@@ -260,6 +349,7 @@ include ./_global_sheetworker.pug
       if (owner && !attributes.archetype) { attributes.archetype = owner; }
     }
     attributes.archetype_marker = calcArchetypeMarker({attributes});
+    attributes.characteristic_choices_marker = calcCharacteristicChoices({attributes});
   };
 
 +scss.
@@ -386,6 +476,73 @@ include ./_global_sheetworker.pug
     .cc-archetype-marker-scout:checked ~ .cc-field .cc-specialization-scout,
     .cc-archetype-marker-soldier:checked ~ .cc-field .cc-specialization-soldier {
       display: block;
+    }
+
+    // Characteristic: the Secret checkbox sits beside the label, and the +1
+    // choice dropdowns below show only for characteristics that grant them.
+    // A steady width, so showing the choice dropdowns doesn't shift the
+    // fields beside it.
+    .cc-characteristic {
+      flex: 0 1 23rem;
+      min-width: 0;
+    }
+
+    // The label row matches the other fields' labels (.cc-field > span).
+    .cc-characteristic-label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+    }
+
+    .cc-characteristic-label > input[type='checkbox'].cc-characteristic-secret {
+      width: 0.8rem;
+      height: 0.8rem;
+      margin: 0 0 0 auto;
+      border: 1px solid var(--cc-rule);
+      background: var(--cc-editable-fill);
+    }
+
+    .cc-characteristic-secret-label {
+      font-size: 0.6rem;
+      cursor: pointer;
+    }
+
+    .cc-characteristic-choices-marker {
+      display: none;
+    }
+
+    .cc-characteristic-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem 0.5rem;
+      margin-top: 0.2rem;
+      font-size: 0.75rem;
+    }
+
+    .cc-characteristic-pick {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+
+      select {
+        width: auto;
+        max-width: 7.5rem;
+        font-size: 0.75rem;
+        text-transform: capitalize;
+        background-color: var(--cc-editable-fill);
+        border: none;
+        border-bottom: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+      }
+    }
+
+    .cc-characteristic-choices-none:checked ~ .cc-characteristic .cc-characteristic-choices,
+    .cc-characteristic-choices-skills:checked ~ .cc-characteristic .cc-characteristic-pick-attribute {
+      display: none;
     }
 
     // NPC-only panels are hidden for players.

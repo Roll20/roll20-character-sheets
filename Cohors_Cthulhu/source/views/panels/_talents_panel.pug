@@ -1,12 +1,14 @@
 //- views/panels/_talents_panel.pug
 //- Talents repeating section. Profiles (common talents by skill, archetype
 //- and specialization trees, Caste and Culture talents) load from
-//- source/data/talents.json via generate.js's `require` local: keywords and
-//- requirements only; the description is typed by the player. Talents
-//- sharing a name across specializations are listed as "NAME
+//- source/data/talents.json via generate.js's `require` local: keywords,
+//- requirements and bonuses; the description is typed by the player.
+//- Talents sharing a name across specializations are listed as "NAME
 //- (SPECIALIZATION)".
 -
   const ccTalentProfiles = require('./source/data/talents.json');
+  // The calculated values a talent's bonuses can change (ccTalentBonus).
+  const ccTalentBonusAffects = ['courage', 'injury_limit', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'];
   const ccTalentNames = Object.keys(ccTalentProfiles).sort();
 
   // Requirements, parsed at build time into AND-ed clauses of OR-ed atoms:
@@ -88,9 +90,9 @@ each group, index in ccTalentGroups
       span Keywords
       span Requirements
       span Description
-    //- Rerun Max Stress when a row is deleted (e.g. Unyielding), as in the
-    //- Armor panel.
-    +fieldset({name: 'talent', trigger: {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'], triggeredFuncs: ['ccUpdateTalentFilter']}})
+    //- Rerun the values talent bonuses change when a row is deleted, as in
+    //- the Armor panel.
+    +fieldset({name: 'talent', trigger: {affects: ccTalentBonusAffects, triggeredFuncs: ['ccUpdateTalentFilter']}})
       //- The apply button fills the row at once; the NPC Name trigger only
       //- fires on blur.
       +action({
@@ -102,11 +104,11 @@ each group, index in ccTalentGroups
       //- Type. NPCs get free text with a <datalist> of every talent; player
       //- characters get a dropdown that only shows talents whose
       //- requirements they meet (browsers can't hide datalist entries).
-      //- Recalculate Max Stress in case the talent is Unyielding.
+      //- Recalculate the values a talent's bonuses change.
       +text({
         name: 'name',
         list: 'cc-talent-options',
-        trigger: {triggeredFuncs: ['ccApplyTalentPreset', 'ccUpdateTalentFilter'], affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}
+        trigger: {triggeredFuncs: ['ccApplyTalentPreset', 'ccUpdateTalentFilter'], affects: ccTalentBonusAffects}
       }).cc-talent-name-text
       //- A plain select: k-scaffold's +select drops generated options, and the
       //- text field above already registers this attribute's triggers.
@@ -212,11 +214,40 @@ each group, index in ccTalentGroups
     const prefix = `${section}_${rowID}_`;
     const profile = ccTalentProfiles[attributes[`${prefix}name`]];
     if (!profile) { return; }
-    Object.keys(profile).forEach((field) => {
+    ccTalentRowFields.forEach((field) => {
       attributes[`${prefix}${field}`] = profile[field];
     });
   };
   k.registerFuncs({ccApplyTalentPreset});
+
+  // The talents.json fields copied into a talent row; bonuses stay in the
+  // data and are read by ccTalentBonus.
+  const ccTalentRowFields = ['keywords', 'requirements'];
+
+  // A player character's talent bonuses to one calculated value (talents.json
+  // "bonuses", targets courage, stress_max or injuries). They are worked out
+  // from the talent rows each time the value is calculated, so picking a
+  // talent adds its bonus and changing or deleting the row removes it.
+  // Modes: add (the default) adds value; highest uses a skill's ranks
+  // instead when higher than the added total (Platonist); set fixes the
+  // final value, returned as {set} (Numb to the Horrors). Names match
+  // ignoring case and spacing, as NPC rows are free text.
+  const ccTalentProfileByName = Object.fromEntries(Object.keys(ccTalentProfiles)
+    .map((name) => [name.trim().toLowerCase(), ccTalentProfiles[name]]));
+  const ccTalentBonus = (attributes, target) => {
+    if (ccIsNpc(attributes)) { return {add: 0}; }
+    const bonuses = (attributes.repeating_talent || [])
+      .flatMap((row) => (ccTalentProfileByName[String(row.name || '').trim().toLowerCase()] || {}).bonuses || [])
+      .filter((bonus) => bonus.target === target);
+    const fixed = bonuses.find((bonus) => bonus.mode === 'set');
+    if (fixed) { return {set: Number(fixed.value) || 0}; }
+    let add = bonuses.filter((bonus) => !bonus.mode || bonus.mode === 'add')
+      .reduce((sum, bonus) => sum + (Number(bonus.value) || 0), 0);
+    bonuses.filter((bonus) => bonus.mode === 'highest').forEach((bonus) => {
+      add = Math.max(add, Number(attributes[`${bonus.skill}_ranks`]) || 0);
+    });
+    return {add};
+  };
 
   // Sets one flag per distinct talent requirement (see ccParseRequirements):
   // 1 when the character meets it. Reruns when archetype, specialization,

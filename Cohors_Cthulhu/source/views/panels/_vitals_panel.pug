@@ -91,7 +91,14 @@
       +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
   .cc-vitals-injuries-fortune
     .cc-vitals-injuries
-      .cc-banner Injuries
+      //- Defeated at: the injury limit (calcInjuryLimit), which talent
+      //- bonuses such as Iron Hide raise. The NPC panel shows it too; both
+      //- declare the same calculation, as either may register it.
+      .cc-injuries-header
+        .cc-banner Injuries
+        span.cc-injury-limit
+          | Defeated at
+          +span({name: 'injury limit', trigger: {calculation: 'calcInjuryLimit'}})
       +textarea({name: 'injuries'}).cc-injuries
     .cc-field.cc-vitals-fortune
       .cc-banner Fortune
@@ -343,6 +350,26 @@
       flex: 1;
     }
 
+    .cc-injuries-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cc-injury-limit {
+      display: inline-flex;
+      gap: 0.25rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+
+      span {
+        font-weight: bold;
+        color: var(--cc-ink);
+      }
+    }
+
     .cc-injuries {
       width: 100%;
       flex: 1;
@@ -358,9 +385,12 @@
   const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
   k.registerFuncs({calcBaseArmour});
 
+  // Courage: the Will bonus plus talent bonuses, unless a talent fixes it.
   const calcCourage = ({attributes}) => {
     const book = ccNpcBookValue(attributes, 'npc_courage');
-    return book !== null ? book : ccAttributeBonus(attributes.will_rating);
+    if (book !== null) { return book; }
+    const talent = ccTalentBonus(attributes, 'courage');
+    return talent.set !== undefined ? talent.set : ccAttributeBonus(attributes.will_rating) + talent.add;
   };
   k.registerFuncs({calcCourage});
 
@@ -374,9 +404,8 @@
   };
   k.registerFuncs({calcTotalArmor});
 
-  // Raw Max Stress: the higher of Brawn or Will, plus Resilience, plus 3 for
-  // Unyielding (matched by name, ignoring case and spacing). calcStressMax
-  // and the Fatigue cap both use this.
+  // Raw Max Stress: the higher of Brawn or Will, plus Resilience, plus talent
+  // bonuses (Unyielding). calcStressMax and the Fatigue cap both use this.
   //
   // NPCs: Troopers halve it, rounding up. A stat block value overrides it.
   const ccStressMaxBase = (attributes) => {
@@ -387,10 +416,7 @@
     const will = Number(attributes.will_rating) || 0;
     const base = Math.max(brawn, will) + resilience;
     if (attributes.character_type === 'trooper') { return Math.ceil(base / 2); }
-    if (ccIsNpc(attributes)) { return base; }
-    const talents = attributes.repeating_talent || [];
-    const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
-    return base + (hasUnyielding ? 3 : 0);
+    return base + ccTalentBonus(attributes, 'stress_max').add;
   };
 
   const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
@@ -404,12 +430,13 @@
   };
   k.registerFuncs({calcStressMax});
 
-  // Injury limit: 3 for PCs and Nemesis, 2 for Toughened, 1 for Troopers. A
-  // stat block value (which includes Tough X) overrides it.
+  // Injury limit: 3 for PCs and Nemesis, 2 for Toughened, 1 for Troopers,
+  // plus talent bonuses (Iron Hide). A stat block value (which includes
+  // Tough X) overrides it.
   const calcInjuryLimit = ({attributes}) => {
     const book = ccNpcBookValue(attributes, 'npc_injuries');
     if (book !== null) { return book; }
-    return {trooper: 1, toughened: 2}[attributes.character_type] || 3;
+    return ({trooper: 1, toughened: 2}[attributes.character_type] || 3) + ccTalentBonus(attributes, 'injuries').add;
   };
   k.registerFuncs({calcInjuryLimit});
 
