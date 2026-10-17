@@ -1,0 +1,569 @@
+//- views/_character.pug
+//- Character tab: identity header, truths & scars, vitals, attributes,
+//- skills, languages, xp, weapons and armor.
+//-
+//- Each panel lives in views/panels/ with its markup, CSS and the workers
+//- only it uses. Workers shared across files are in
+//- views/_global_sheetworker.pug, included first.
+//-
+//- buildVersion is stamped at build time into both the footer HTML and the
+//- footer CSS. If they differ in Roll20, one of the two pastes (Sheet Layout
+//- or Sheet Style) is stale.
+- const buildVersion = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
+//- Every calculation that reads character_type reruns when it changes.
+- const ccCharacterTypeTrigger = {affects: ['npc_sheet', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'courage', 'total_armor', 'injury_limit', 'power_rating', 'spells_type_marker']}
+//- Identity choices. Each archetype has two specializations.
+- const ccCultures = ['Roman citizen', 'Germanic tribe', 'Ægyptus', 'Briton', 'Gaul', 'Greek', 'Foederati', 'Other']
+- const ccCastes = ['Outcast', 'Servant', 'Plebeian', 'Freedman', 'Noble']
+- const ccCharacteristicNames = require('./source/data/characteristics.json')
+- const ccAttributeNames = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
+- const ccSkillKeys = ['academia', 'athletics', 'crafting', 'engineering', 'fighting', 'medicine', 'observation', 'persuasion', 'resilience', 'stealth', 'survival', 'tactics']
+//- A characteristic changes ratings and ranks, so everything calculated from
+//- them reruns (and the talent filter, which reads skill ranks).
+- const ccCharacteristicTrigger = {triggeredFuncs: ['ccApplyCharacteristic', 'ccUpdateTalentFilter'], affects: ['brawn_bonus_damage', 'insight_bonus_damage', 'will_bonus_damage', 'base_armour', 'total_armor', 'courage', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'power_rating']}
+- const ccSpecializations = {Mystic: ['Lupercus', 'Staff Bearer'], Sage: ['Engineer', 'Medicus'], Schemer: ['Frumentarius', 'Magistrate'], Scoundrel: ['Robber', 'Sicarius'], Scout: ['Hunter', 'Veles'], Soldier: ['Berserker', 'Legionary']}
+
+include ./_global_sheetworker.pug
+
+//- An option generated in a loop. k-scaffold renders +option blocks after
+//- the loop ends, so a block that reads the loop variable would show its
+//- last value on every option; a mixin parameter keeps each one's own.
+mixin ccOption(value)
+  +option({value})
+    = value
+
++tab({name: 'character', container: 'article', button: {content: 'Character'}})
+  .cc-page.cc-character
+
+    .cc-banner Cohors Cthulhu
+    //- Shows the sheet as a player character or one of the three NPC tiers
+    //- (Roll20 allows one sheet per game). No value behaves as "pc". Trooper
+    //- and Toughened get a compact combat layout; Nemesis keeps the full
+    //- sheet plus the NPC panels. Old cannon_fodder/npc values are migrated
+    //- by ccRecomputeOnOpen.
+    //-
+    //- The Player/NPC switch beside the tabs (Cohors_Cthulhu.pug) picks
+    //- between "pc" and a tier; the tier labels below show on NPC sheets.
+    //- The radios are direct children of .cc-page.cc-character so the ~
+    //- selectors reach the panels; only the labels sit in .cc-character-type.
+    //- The Spells tab uses its own marker (spells_type_marker).
+    +radio({name: 'character_type', value: 'pc', checked: '', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-pc
+    +radio({name: 'character_type', value: 'trooper', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-trooper
+    +radio({name: 'character_type', value: 'toughened', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-toughened
+    +radio({name: 'character_type', value: 'nemesis', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-nemesis
+    //- The tier to restore when the switch goes back to NPC (ccSetSheetMode).
+    +hidden({name: 'npc last tier'})
+    .cc-character-type
+      label.cc-character-type-label(for='cc-character-type-trooper') Trooper
+      label.cc-character-type-label(for='cc-character-type-toughened') Toughened
+      label.cc-character-type-label(for='cc-character-type-nemesis') Nemesis
+    .cc-field-group.cc-identity-core
+      .cc-field
+        span Name & Pronoun
+        +text({name: 'name pronoun'})
+    //- Cut for Trooper/Toughened NPCs.
+    .cc-field-group.cc-identity-extra
+      .cc-field
+        span Culture
+        +select({name: 'culture', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}})
+          +option({value: ''})
+            | Select One
+          +option({value: 'Roman citizen'})
+            | Roman citizen
+          +option({value: 'Germanic tribe'})
+            | Germanic tribe
+          +option({value: 'Ægyptus'})
+            | Ægyptus
+          +option({value: 'Briton'})
+            | Briton
+          +option({value: 'Gaul'})
+            | Gaul
+          +option({value: 'Greek'})
+            | Greek
+          +option({value: 'Foederati'})
+            | Foederati
+          +option({value: 'Other'})
+            | Other
+      .cc-field
+        span Caste
+        +select({name: 'caste', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}})
+          +option({value: ''})
+            | Select One
+          +option({value: 'Outcast'})
+            | Outcast
+          +option({value: 'Servant'})
+            | Servant
+          +option({value: 'Plebeian'})
+            | Plebeian
+          +option({value: 'Freedman'})
+            | Freedman
+          +option({value: 'Noble'})
+            | Noble
+      .cc-field
+        span Wealth
+        +text({name: 'wealth'})
+    //- Also cut for Trooper/Toughened.
+    .cc-field-group.cc-identity-flavor
+      //- Hidden radios mirroring Archetype (calcArchetypeMarker), so CSS can
+      //- show the matching Specialization select.
+      +radio({name: 'archetype marker', value: 'none', checked: '', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-none
+      +radio({name: 'archetype marker', value: 'mystic', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-mystic
+      +radio({name: 'archetype marker', value: 'sage', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-sage
+      +radio({name: 'archetype marker', value: 'schemer', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-schemer
+      +radio({name: 'archetype marker', value: 'scoundrel', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-scoundrel
+      +radio({name: 'archetype marker', value: 'scout', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-scout
+      +radio({name: 'archetype marker', value: 'soldier', trigger: {calculation: 'calcArchetypeMarker'}}).cc-archetype-marker.cc-archetype-marker-soldier
+      .cc-field
+        span Archetype
+        +select({name: 'archetype', trigger: {affects: ['archetype_marker'], triggeredFuncs: ['ccCheckSpecialization', 'ccUpdateTalentFilter']}})
+          +option({value: ''})
+            | Select One
+          +option({value: 'Mystic'})
+            | Mystic
+          +option({value: 'Sage'})
+            | Sage
+          +option({value: 'Schemer'})
+            | Schemer
+          +option({value: 'Scoundrel'})
+            | Scoundrel
+          +option({value: 'Scout'})
+            | Scout
+          +option({value: 'Soldier'})
+            | Soldier
+      .cc-field
+        span Specialization
+        //- One select per archetype on the same attribute; CSS shows the one
+        //- for the checked archetype marker.
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-none
+          +option({value: ''})
+            | Pick an archetype first
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-mystic
+          +option({value: ''})
+            | Select One
+          +option({value: 'Lupercus'})
+            | Lupercus
+          +option({value: 'Staff Bearer'})
+            | Staff Bearer
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-sage
+          +option({value: ''})
+            | Select One
+          +option({value: 'Engineer'})
+            | Engineer
+          +option({value: 'Medicus'})
+            | Medicus
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-schemer
+          +option({value: ''})
+            | Select One
+          +option({value: 'Frumentarius'})
+            | Frumentarius
+          +option({value: 'Magistrate'})
+            | Magistrate
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-scoundrel
+          +option({value: ''})
+            | Select One
+          +option({value: 'Robber'})
+            | Robber
+          +option({value: 'Sicarius'})
+            | Sicarius
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-scout
+          +option({value: ''})
+            | Select One
+          +option({value: 'Hunter'})
+            | Hunter
+          +option({value: 'Veles'})
+            | Veles
+        +select({name: 'specialization', trigger: {triggeredFuncs: ['ccUpdateTalentFilter']}}).cc-specialization.cc-specialization-soldier
+          +option({value: ''})
+            | Select One
+          +option({value: 'Berserker'})
+            | Berserker
+          +option({value: 'Legionary'})
+            | Legionary
+      .cc-field
+        span Background
+        +text({name: 'background'})
+      //- Characteristic, with Secret (checked by default).
+      +radio({name: 'characteristic choices marker', value: 'none', checked: '', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-none
+      +radio({name: 'characteristic choices marker', value: 'skills', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-skills
+      +radio({name: 'characteristic choices marker', value: 'both', trigger: {calculation: 'calcCharacteristicChoices'}}).cc-characteristic-choices-marker.cc-characteristic-choices-both
+      .cc-field.cc-characteristic
+        .cc-characteristic-label
+          span Characteristic
+          +checkbox({name: 'characteristic secret', value: 1, checked: '', id: 'cc-characteristic-secret', trigger: ccCharacteristicTrigger}).cc-characteristic-secret
+          label.cc-characteristic-secret-label(for='cc-characteristic-secret') Secret
+        +select({name: 'characteristic', trigger: Object.assign({}, ccCharacteristicTrigger, {affects: ccCharacteristicTrigger.affects.concat(['characteristic_choices_marker'])})})
+          +option({value: ''})
+            | Select One
+          each characteristicName in ccCharacteristicNames
+            +ccOption(characteristicName)
+        .cc-characteristic-choices
+          span.cc-characteristic-pick.cc-characteristic-pick-attribute
+            span +1
+            +select({name: 'characteristic attribute choice', trigger: ccCharacteristicTrigger})
+              +option({value: ''})
+                | Attribute
+              each attributeName in ccAttributeNames
+                +ccOption(attributeName)
+          each n in [1, 2]
+            span.cc-characteristic-pick
+              span +1
+              +select({name: `characteristic skill choice ${n}`, trigger: ccCharacteristicTrigger})
+                +option({value: ''})
+                  | Skill
+                each skillName in ccSkillKeys
+                  +ccOption(skillName)
+        //- What ccApplyCharacteristic added, as JSON, so exactly that is
+        //- taken off again.
+        +hidden({name: 'characteristic applied'})
+
+    include ./panels/_npc_profile_panel.pug
+    include ./panels/_truths_scars_panel.pug
+    include ./panels/_vitals_panel.pug
+    include ./panels/_attributes_panel.pug
+    include ./panels/_skills_panel.pug
+    include ./panels/_weapons_panel.pug
+    include ./panels/_armor_panel.pug
+    include ./panels/_talents_panel.pug
+    include ./panels/_special_rules_panel.pug
+
+    .cc-field-group
+      .cc-field.cc-languages
+        span Languages
+        +textarea({name: 'languages'})
+      include ./panels/_experience_panel.pug
+
+    .cc-footer
+      span.cc-build-html HTML build: #{buildVersion}
+
++module.
+  const ccCultures = !{JSON.stringify(ccCultures)};
+  const ccCastes = !{JSON.stringify(ccCastes)};
+  const ccSpecializations = !{JSON.stringify(ccSpecializations)};
+
+  // The Player/NPC switch (npc_sheet). Switching to NPC restores the last
+  // tier (Toughened the first time); switching to Player remembers it.
+  // Setting character_type reruns everything that reads it.
+  const ccSetSheetMode = ({attributes}) => {
+    const npc = Number(attributes.npc_sheet) === 1;
+    if (npc && !ccIsNpc(attributes)) {
+      attributes.character_type = ccNpcTiers.includes(attributes.npc_last_tier) ? attributes.npc_last_tier : 'toughened';
+    } else if (!npc && ccIsNpc(attributes)) {
+      attributes.npc_last_tier = attributes.character_type;
+      attributes.character_type = 'pc';
+    }
+  };
+  // The switch follows character_type when that changes some other way.
+  const calcNpcSheet = ({attributes}) => (ccIsNpc(attributes) ? 1 : 0);
+  k.registerFuncs({ccSetSheetMode, calcNpcSheet});
+
+  // Characteristic bonuses, by characteristic name (none in this sheet).
+  // While the characteristic is revealed (Secret unchecked) its attribute
+  // and skill bonuses, plus the player's chosen +1 attribute and +1 skills,
+  // are added to the ratings and ranks. characteristic_applied records what
+  // was added, so changing the characteristic or a choice, clearing it or
+  // checking Secret takes exactly that off again before adding the new
+  // bonuses. A chosen attribute or skill must differ from the fixed ones
+  // (and from each other) to count.
+  const ccCharacteristicNames = !{JSON.stringify(ccCharacteristicNames)};
+  const ccCharacteristics = {};
+  const ccCharacteristicBonuses = (attributes) => {
+    const profile = ccCharacteristics[attributes.characteristic];
+    if (!profile || Number(attributes.characteristic_secret) === 1) { return {}; }
+    const bonuses = {};
+    const add = (key) => (amount) => { bonuses[key] = (bonuses[key] || 0) + amount; };
+    Object.keys(profile.attributes).forEach((name) => add(`${name}_rating`)(profile.attributes[name]));
+    Object.keys(profile.skills).forEach((name) => add(`${name}_ranks`)(profile.skills[name]));
+    const attributeChoice = attributes.characteristic_attribute_choice;
+    if (profile.choose.attributes && attributeChoice && !profile.attributes[attributeChoice]) {
+      add(`${attributeChoice}_rating`)(1);
+    }
+    const skillChoices = [attributes.characteristic_skill_choice_1, attributes.characteristic_skill_choice_2]
+      .filter((name, i, all) => name && !profile.skills[name] && all.indexOf(name) === i)
+      .slice(0, profile.choose.skills);
+    skillChoices.forEach((name) => add(`${name}_ranks`)(1));
+    return bonuses;
+  };
+  const ccApplyCharacteristic = ({attributes}) => {
+    let applied = {};
+    try { applied = JSON.parse(attributes.characteristic_applied || '{}') || {}; } catch (err) { applied = {}; }
+    const wanted = ccCharacteristicBonuses(attributes);
+    new Set(Object.keys(applied).concat(Object.keys(wanted))).forEach((key) => {
+      const change = (wanted[key] || 0) - (Number(applied[key]) || 0);
+      if (change) { attributes[key] = Math.max(0, (Number(attributes[key]) || 0) + change); }
+    });
+    attributes.characteristic_applied = JSON.stringify(wanted);
+  };
+  // Which choice dropdowns the characteristic needs: none, skills or both.
+  const calcCharacteristicChoices = ({attributes}) => {
+    const profile = ccCharacteristics[attributes.characteristic];
+    if (!profile || !profile.choose.skills) { return 'none'; }
+    return profile.choose.attributes ? 'both' : 'skills';
+  };
+  k.registerFuncs({ccApplyCharacteristic, calcCharacteristicChoices});
+
+  // Sync the archetype marker radios with Archetype.
+  const calcArchetypeMarker = ({attributes}) => {
+    const archetype = String(attributes.archetype || '').toLowerCase();
+    return ccSpecializations[attributes.archetype] ? archetype : 'none';
+  };
+  k.registerFuncs({calcArchetypeMarker});
+
+  // A new archetype clears a specialization that belongs to another one.
+  const ccCheckSpecialization = ({attributes}) => {
+    const allowed = ccSpecializations[attributes.archetype] || [];
+    if (attributes.specialization && !allowed.includes(attributes.specialization)) {
+      attributes.specialization = '';
+    }
+  };
+  k.registerFuncs({ccCheckSpecialization});
+
+  // The dropdown option matching a free-text value: same text ignoring case
+  // and accents, or an option that starts with it ("Roman" -> "Roman
+  // citizen"). Unmatched values are kept as they are.
+  const ccMatchOption = (value, options) => {
+    const plain = (text) => String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/Æ/g, 'Ae').replace(/æ/g, 'ae').trim().toLowerCase();
+    const wanted = plain(value);
+    if (!wanted || options.includes(value)) { return value; }
+    return options.find((option) => plain(option) === wanted) ||
+      options.find((option) => plain(option).startsWith(`${wanted} `)) ||
+      value;
+  };
+
+  // Culture, Caste, Archetype, Specialization and Characteristic used to be
+  // free text; match old and imported values to the dropdowns on sheet open.
+  const ccNormalizeIdentity = (attributes) => {
+    const match = (field, options) => {
+      const value = ccMatchOption(attributes[field], options);
+      if (value !== attributes[field]) { attributes[field] = value; }
+    };
+    match('culture', ccCultures);
+    match('caste', ccCastes);
+    match('archetype', Object.keys(ccSpecializations));
+    match('specialization', Object.values(ccSpecializations).flat());
+    match('characteristic', ccCharacteristicNames);
+    // A known specialization with no archetype implies the archetype.
+    if (!ccSpecializations[attributes.archetype]) {
+      const owner = Object.keys(ccSpecializations)
+        .find((archetype) => ccSpecializations[archetype].includes(attributes.specialization));
+      if (owner && !attributes.archetype) { attributes.archetype = owner; }
+    }
+    attributes.archetype_marker = calcArchetypeMarker({attributes});
+    attributes.characteristic_choices_marker = calcCharacteristicChoices({attributes});
+  };
+
++scss.
+  .cc-character {
+    .cc-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      padding-top: 0.2rem;
+      border-top: 1px solid var(--cc-rule);
+      font-size: 0.65rem;
+      color: var(--cc-ink);
+      opacity: 0.6;
+    }
+
+    // This text is only in the CSS: if it's missing or older than .cc-build-
+    // html, the Sheet Style paste is stale.
+    .cc-build-css::after {
+      content: "CSS build: #{buildVersion}";
+    }
+
+    .cc-languages textarea {
+      min-height: 4rem;
+    }
+
+    // The tier labels show on NPC sheets only.
+    .cc-character-type {
+      display: none;
+    }
+
+    #cc-character-type-trooper:checked ~ .cc-character-type,
+    #cc-character-type-toughened:checked ~ .cc-character-type,
+    #cc-character-type-nemesis:checked ~ .cc-character-type {
+      display: flex;
+      margin-bottom: 0.4rem;
+    }
+
+    // Hidden but still real radios; the labels are what gets clicked.
+    .cc-character-type-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cc-character-type-label {
+      flex: 1 1 auto;
+      text-align: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      // Segmented control: shared borders, rounded outer ends.
+      & + & {
+        border-left: none;
+      }
+
+      &:first-of-type {
+        border-radius: 4px 0 0 4px;
+      }
+
+      &:last-of-type {
+        border-radius: 0 4px 4px 0;
+      }
+    }
+
+    // The label is nested in .cc-character-type, so this needs the sibling-
+    // then-descendant form.
+    #cc-character-type-trooper:checked ~ .cc-character-type label[for='cc-character-type-trooper'],
+    #cc-character-type-toughened:checked ~ .cc-character-type label[for='cc-character-type-toughened'],
+    #cc-character-type-nemesis:checked ~ .cc-character-type label[for='cc-character-type-nemesis'] {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+    }
+
+    // Trooper and Toughened: drop identity flavor, Languages and Experience
+    // (reached through their shared .cc-field-group).
+    #cc-character-type-trooper:checked ~ .cc-identity-extra,
+    #cc-character-type-trooper:checked ~ .cc-identity-flavor,
+    #cc-character-type-trooper:checked ~ .cc-field-group .cc-languages,
+    #cc-character-type-trooper:checked ~ .cc-field-group .cc-experience,
+    #cc-character-type-toughened:checked ~ .cc-identity-extra,
+    #cc-character-type-toughened:checked ~ .cc-identity-flavor,
+    #cc-character-type-toughened:checked ~ .cc-field-group .cc-languages,
+    #cc-character-type-toughened:checked ~ .cc-field-group .cc-experience {
+      display: none;
+    }
+
+    // Every NPC tier: Truths but no Scars, and no Fortune track (NPC Fortune
+    // costs 3 Threat).
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-trooper:checked ~ .cc-vitals .cc-vitals-fortune,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-toughened:checked ~ .cc-vitals .cc-vitals-fortune,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-nemesis:checked ~ .cc-vitals .cc-vitals-fortune {
+      display: none;
+    }
+
+    // Show only the Specialization select for the checked archetype.
+    .cc-archetype-marker,
+    .cc-specialization {
+      display: none;
+    }
+
+    .cc-archetype-marker-none:checked ~ .cc-field .cc-specialization-none,
+    .cc-archetype-marker-mystic:checked ~ .cc-field .cc-specialization-mystic,
+    .cc-archetype-marker-sage:checked ~ .cc-field .cc-specialization-sage,
+    .cc-archetype-marker-schemer:checked ~ .cc-field .cc-specialization-schemer,
+    .cc-archetype-marker-scoundrel:checked ~ .cc-field .cc-specialization-scoundrel,
+    .cc-archetype-marker-scout:checked ~ .cc-field .cc-specialization-scout,
+    .cc-archetype-marker-soldier:checked ~ .cc-field .cc-specialization-soldier {
+      display: block;
+    }
+
+    // Characteristic: the Secret checkbox sits beside the label, and the +1
+    // choice dropdowns below show only for characteristics that grant them.
+    // A steady width, so showing the choice dropdowns doesn't shift the
+    // fields beside it.
+    .cc-characteristic {
+      flex: 0 1 23rem;
+      min-width: 0;
+    }
+
+    // The label row matches the other fields' labels (.cc-field > span).
+    .cc-characteristic-label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+    }
+
+    .cc-characteristic-label > input[type='checkbox'].cc-characteristic-secret {
+      width: 0.8rem;
+      height: 0.8rem;
+      margin: 0 0 0 auto;
+      border: 1px solid var(--cc-rule);
+      background: var(--cc-editable-fill);
+    }
+
+    .cc-characteristic-secret-label {
+      font-size: 0.6rem;
+      cursor: pointer;
+    }
+
+    .cc-characteristic-choices-marker {
+      display: none;
+    }
+
+    .cc-characteristic-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem 0.5rem;
+      margin-top: 0.2rem;
+      font-size: 0.75rem;
+    }
+
+    .cc-characteristic-pick {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+
+      select {
+        width: auto;
+        max-width: 7.5rem;
+        font-size: 0.75rem;
+        text-transform: capitalize;
+        background-color: var(--cc-editable-fill);
+        border: none;
+        border-bottom: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+      }
+    }
+
+    .cc-characteristic-choices-none:checked ~ .cc-characteristic .cc-characteristic-choices,
+    .cc-characteristic-choices-skills:checked ~ .cc-characteristic .cc-characteristic-pick-attribute {
+      display: none;
+    }
+
+    // NPC-only panels are hidden for players.
+    .cc-npc-panel {
+      display: none;
+    }
+
+    #cc-character-type-trooper:checked ~ .cc-npc-panel,
+    #cc-character-type-toughened:checked ~ .cc-npc-panel,
+    #cc-character-type-nemesis:checked ~ .cc-npc-panel {
+      display: block;
+    }
+
+    // One tier note per tier in the NPC Profile panel.
+    .cc-tier-note {
+      display: none;
+    }
+
+    #cc-character-type-trooper:checked ~ .cc-npc-profile .cc-tier-note-trooper,
+    #cc-character-type-toughened:checked ~ .cc-npc-profile .cc-tier-note-toughened,
+    #cc-character-type-nemesis:checked ~ .cc-npc-profile .cc-tier-note-nemesis {
+      display: block;
+    }
+  }

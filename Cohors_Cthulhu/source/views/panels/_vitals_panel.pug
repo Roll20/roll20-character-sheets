@@ -1,0 +1,552 @@
+//- views/panels/_vitals_panel.pug
+//- Stress, Fatigue, Courage, Fortune, Armor summary and Injuries. Base Armour
+//- and Total Armor are shown here but calculated from Brawn and the armor
+//- rows; sheet workers see attributes by name, whichever file declares them.
+.cc-panel.cc-vitals
+  .cc-vitals-stress
+    .cc-banner Stress
+    //- Hand-expanded +fillLeft. Each box is an +action button, so every click
+    //- reaches ccTrackBoxClick, which also clears the track when box 1 is
+    //- clicked while it is the only box filled.
+    //-
+    //- The fill coloring comes from a hidden radio group named after the
+    //- tracked attribute, one radio after each box, so `:checked ~ .fill-
+    //- left__radio` greys out every box past the current value. The value=0
+    //- radio must be a real radio: a type="hidden" input never matches
+    //- :checked.
+    .cc-stress-track
+      +radio({name: 'stress', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+      //- value=0 marker, so a Max Stress of 0 still has a matching radio.
+      +radio({name: 'stress max marker', value: 0, trigger: {calculation: 'calcStressMax'}}).cc-stress-max-marker
+      //- Boxes 21-30 only show for a Max Stress above 20.
+      each value in Array.from({length: 30}, (_, i) => i + 1)
+        +action({
+          name: `stress box ${value}`,
+          class: value > 20 ? 'fill-left__radio cc-track-box-extra' : 'fill-left__radio',
+          trigger: {triggeredFuncs: ['ccTrackBoxClick']}
+        })
+        +radio({name: 'stress', value}).cc-track-value-marker
+        +radio({
+          name: 'stress max marker',
+          value,
+          trigger: {calculation: 'calcStressMax'}
+        }).cc-stress-max-marker
+    //- Max is the raw capacity (calcStressMaxBase); Current Max is that less
+    //- Fatigue (calcStressMax), the actual limit of the Stress track.
+    .cc-field.cc-stress-max
+      span Max
+      +number({name: 'stress max base', readonly: true, trigger: {calculation: 'calcStressMaxBase'}})
+      span Current Max
+      +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
+    //- Fatigue: each point reduces Max Stress by 1 (floored at 0). Same track
+    //- construction as Stress. Fatigue is capped at the raw Max Stress, not
+    //- the Fatigue-reduced Current Max, by .cc-fatigue-max-marker.
+    .cc-vitals-fatigue
+      .cc-banner Fatigue
+      .cc-fatigue-track
+        +radio({name: 'fatigue', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+        //- value=0 marker, as on the Stress track.
+        +radio({name: 'fatigue max marker', value: 0, trigger: {calculation: 'calcStressMaxBase'}}).cc-fatigue-max-marker
+        each value in Array.from({length: 30}, (_, i) => i + 1)
+          +action({
+            name: `fatigue box ${value}`,
+            class: value > 20 ? 'fill-left__radio cc-track-box-extra' : 'fill-left__radio',
+            trigger: {triggeredFuncs: ['ccTrackBoxClick'], affects: ['stress_max', 'stress_max_marker']}
+          })
+          +radio({name: 'fatigue', value}).cc-track-value-marker
+          +radio({
+            name: 'fatigue max marker',
+            value,
+            trigger: {calculation: 'calcStressMaxBase'}
+          }).cc-fatigue-max-marker
+      //- Resist, with the smaller Ignore Fatigue toggle on the same row.
+      .cc-fatigue-actions
+        +roller({
+          name: 'fatigue resist',
+          class: 'cc-fatigue-resist',
+          trigger: {triggeredFuncs: ['initiateFatigueResistRoll']}
+        })
+          | Resist
+        //- Ignore Fatigue: stops Fatigue reducing Max Stress without clearing
+        //- it. A hidden checkbox whose label is styled as a sticky push-
+        //- button.
+        +checkbox({
+          name: 'fatigue ignored',
+          value: 1,
+          id: 'cc-fatigue-ignored',
+          trigger: {affects: ['stress_max', 'stress_max_marker']}
+        }).cc-fatigue-ignore-checkbox
+        label.cc-fatigue-ignore-toggle(for='cc-fatigue-ignored')
+          span.cc-fatigue-ignore-off Ignore Fatigue
+          span.cc-fatigue-ignore-on Fatigue Ignored
+  .cc-vitals-courage-armor
+    .cc-field
+      .cc-banner Courage
+      +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
+    .cc-field
+      .cc-banner Base Armour
+      +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
+    .cc-field
+      .cc-banner Total Armor
+      +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
+  .cc-vitals-injuries-fortune
+    .cc-vitals-injuries
+      //- Defeated at: the injury limit (calcInjuryLimit), which talent
+      //- bonuses such as Iron Hide raise. The NPC panel shows it too; both
+      //- declare the same calculation, as either may register it.
+      .cc-injuries-header
+        .cc-banner Injuries
+        span.cc-injury-limit
+          | Defeated at
+          +span({name: 'injury limit', trigger: {calculation: 'calcInjuryLimit'}})
+      +textarea({name: 'injuries'}).cc-injuries
+    .cc-field.cc-vitals-fortune
+      .cc-banner Fortune
+      //- Hand-expanded like the Stress track.
+      .cc-fortune-track
+        +radio({name: 'fortune', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+        each value in [1, 2, 3, 4, 5]
+          +action({
+            name: `fortune box ${value}`,
+            trigger: {triggeredFuncs: ['ccTrackBoxClick']}
+          }).fill-left__radio
+          +radio({name: 'fortune', value}).cc-track-value-marker
+
++scss.
+  .cc-character {
+    // Tracks 2 and 4 are spacers; content goes in tracks 1, 3 and 5.
+    .cc-vitals {
+      display: grid;
+      grid-template-columns: 1.5fr 0.4fr 1.4fr 0.4fr 1.2fr;
+      align-items: start;
+    }
+
+    .cc-vitals-stress {
+      grid-column: 1;
+    }
+
+    .cc-vitals-courage-armor {
+      grid-column: 3;
+    }
+
+    .cc-vitals-injuries-fortune {
+      grid-column: 5;
+    }
+
+    .cc-vitals-courage-armor,
+    .cc-vitals-injuries-fortune {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    // Keep the banner at its own width inside flex-column fields, so the
+    // brush stroke doesn't stretch.
+    .cc-vitals .cc-banner {
+      align-self: flex-start;
+    }
+
+    // Max and Current Max on one line.
+    .cc-stress-max {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    // The value=0 anchor radio only matters for its :checked state.
+    .cc-fill-left-zero {
+      display: none;
+    }
+
+    // Hidden radios mirroring the track value; their :checked state drives
+    // the coloring below.
+    .cc-track-value-marker {
+      display: none;
+    }
+
+    .cc-track-value-marker:checked ~ .fill-left__radio {
+      background-color: var(--fillLeftUnselectedColor);
+    }
+
+    .cc-stress-track {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.15rem;
+      // fillLeft colors boxes up to the checked one with the selected color
+      // and the rest with the unselected color: dark for filled, and for empty
+      // the same light fill as the rating and rank fields.
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-editable-fill);
+
+      // Reset button styling on top of k-scaffold's .fill-left__radio rule.
+      .fill-left__radio {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1px solid var(--cc-rule);
+        padding: 0;
+        margin: 0;
+      }
+
+      // Max markers only matter for their :checked state.
+      .cc-stress-max-marker {
+        display: none;
+      }
+
+      // Grey out and disable every box past stress_max. pointer-events stops
+      // clicks; a disabled attribute can't be toggled by a sheet worker.
+      .cc-stress-max-marker:checked ~ .fill-left__radio {
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      // Boxes 21-30: hidden rather than greyed out past the max.
+      .cc-stress-max-marker:checked ~ .cc-track-box-extra {
+        display: none;
+      }
+    }
+
+    .cc-fortune-track {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.15rem;
+      // Left-align the boxes instead of fillLeft's default centering.
+      align-self: flex-start;
+      // A gap keeps adjacent filled boxes distinct.
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-editable-fill);
+
+      .fill-left__radio {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1px solid var(--cc-rule);
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+    .cc-vitals-fatigue {
+      margin-top: 0.5rem;
+      padding-top: 0.4rem;
+      border-top: 1px dashed var(--cc-rule-soft);
+    }
+
+    // Same construction as the Stress track. .cc-fatigue-max-marker caps
+    // Fatigue at the raw Max Stress (calcStressMaxBase).
+    .cc-fatigue-track {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.15rem;
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-editable-fill);
+
+      .fill-left__radio {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1px solid var(--cc-rule);
+        padding: 0;
+        margin: 0;
+      }
+
+      .cc-fatigue-max-marker {
+        display: none;
+      }
+
+      .cc-fatigue-max-marker:checked ~ .fill-left__radio {
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      // Boxes 21-30, as on the Stress track.
+      .cc-fatigue-max-marker:checked ~ .cc-track-box-extra {
+        display: none;
+      }
+    }
+
+    .cc-fatigue-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.3rem;
+    }
+
+    // Hidden but still a real checkbox; the label below is what the player
+    // clicks.
+    .cc-fatigue-ignore-checkbox {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    // Push-button face for the checkbox: maroon fill and an inset shadow when
+    // checked.
+    .cc-fatigue-ignore-toggle {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      .cc-fatigue-ignore-on {
+        display: none;
+      }
+    }
+
+    .cc-fatigue-ignore-checkbox:checked ~ .cc-fatigue-ignore-toggle {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+
+      .cc-fatigue-ignore-off {
+        display: none;
+      }
+
+      .cc-fatigue-ignore-on {
+        display: inline;
+      }
+    }
+
+    // Same maroon chip as the repeating-section Add/Modify buttons.
+    .cc-fatigue-resist {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      font-family: var(--cc-body-font);
+      font-weight: bold;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--cc-parchment);
+        color: var(--cc-ink);
+      }
+
+      // '0' is the d20 glyph in Roll20's dicefontd20 font.
+      &:before {
+        content: '0';
+        font-size: 1.2em;
+      }
+    }
+
+    // Same soft-border edit box as the Notes textareas; flex: 1 fills the
+    // column above Fortune.
+    .cc-vitals-injuries {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .cc-injuries-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cc-injury-limit {
+      display: inline-flex;
+      gap: 0.25rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+
+      span {
+        font-weight: bold;
+        color: var(--cc-ink);
+      }
+    }
+
+    .cc-injuries {
+      width: 100%;
+      flex: 1;
+      min-height: 4rem;
+      // Same light fill as .cc-field's editable inputs.
+      background: var(--cc-editable-fill);
+      border: 1px solid var(--cc-rule-soft);
+      color: var(--cc-ink);
+    }
+  }
+
++module.
+  const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
+  k.registerFuncs({calcBaseArmour});
+
+  // Courage: the Will bonus plus talent bonuses, unless a talent fixes it.
+  const calcCourage = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_courage');
+    if (book !== null) { return book; }
+    const talent = ccTalentBonus(attributes, 'courage');
+    return talent.set !== undefined ? talent.set : ccAttributeBonus(attributes.will_rating) + talent.add;
+  };
+  k.registerFuncs({calcCourage});
+
+  const calcTotalArmor = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_armor');
+    if (book !== null) { return book; }
+    const base = ccAttributeBonus(attributes.brawn_rating);
+    const armorRows = attributes.repeating_armor || [];
+    const armorSum = armorRows.reduce((sum, row) => sum + (Number(row.resistance) || 0), 0);
+    return base + armorSum;
+  };
+  k.registerFuncs({calcTotalArmor});
+
+  // Raw Max Stress: the higher of Brawn or Will, plus Resilience, plus talent
+  // bonuses (Unyielding). calcStressMax and the Fatigue cap both use this.
+  //
+  // NPCs: Troopers halve it, rounding up. A stat block value overrides it.
+  const ccStressMaxBase = (attributes) => {
+    const book = ccNpcBookValue(attributes, 'npc_stress');
+    if (book !== null) { return book; }
+    const resilience = Number(attributes.resilience_ranks) || 0;
+    const brawn = Number(attributes.brawn_rating) || 0;
+    const will = Number(attributes.will_rating) || 0;
+    const base = Math.max(brawn, will) + resilience;
+    if (attributes.character_type === 'trooper') { return Math.ceil(base / 2); }
+    return base + ccTalentBonus(attributes, 'stress_max').add;
+  };
+
+  const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
+  k.registerFuncs({calcStressMaxBase});
+
+  // Current Max: Max Stress less Fatigue, floored at 0, unless Ignore Fatigue
+  // is checked.
+  const calcStressMax = ({attributes}) => {
+    const fatigue = attributes.fatigue_ignored ? 0 : (Number(attributes.fatigue) || 0);
+    return Math.max(0, ccStressMaxBase(attributes) - fatigue);
+  };
+  k.registerFuncs({calcStressMax});
+
+  // Injury limit: 3 for PCs and Nemesis, 2 for Toughened, 1 for Troopers,
+  // plus talent bonuses (Iron Hide). A stat block value (which includes
+  // Tough X) overrides it.
+  const calcInjuryLimit = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_injuries');
+    if (book !== null) { return book; }
+    return ({trooper: 1, toughened: 2}[attributes.character_type] || 3) + ccTalentBonus(attributes, 'injuries').add;
+  };
+  k.registerFuncs({calcInjuryLimit});
+
+  // Every Stress, Fortune and Fatigue box. A click sets the track to that
+  // box's value; clicking box 1 when it is the only box filled clears the
+  // track. trigger.name arrives dash-separated ('stress-box-5').
+  const ccTrackBoxClick = ({trigger, attributes}) => {
+    const match = /^(stress|fortune|fatigue)-box-(\d+)$/.exec(trigger.name);
+    if (!match) { return; }
+    const [, track, posStr] = match;
+    const position = Number(posStr);
+    const current = Number(attributes[track]) || 0;
+    attributes[track] = (position === 1 && current === 1) ? 0 : position;
+  };
+  k.registerFuncs({ccTrackBoxClick});
+
+  // Fatigue resist: difficulty 1, the higher of Brawn or Will + Resilience. A
+  // pass removes 1 fatigue, plus 1 per Momentum spent. The Momentum is a
+  // query, charged like a spell's Extra Momentum and only applied on a pass.
+  //
+  // k-scaffold saves the sheet when this function returns its promise, before
+  // the roll comes back, so the new Fatigue and the Current Max it changes
+  // are saved here with attributes.set().
+  const initiateFatigueResistRoll = async ({attributes}) => {
+    const brawnRating = Number(attributes.brawn_rating) || 0;
+    const willRating = Number(attributes.will_rating) || 0;
+    const resilienceRanks = Number(attributes.resilience_ranks) || 0;
+    const attributeRating = Math.max(brawnRating, willRating);
+
+    const difficultyQuery = '?{Difficulty|1}';
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
+    const extraMomentumQuery = `?{${ccPoolName(attributes)} spent to remove extra fatigue|0}`;
+    const extraordinary = ccExtraordinary(attributes, brawnRating >= willRating ? 'brawn' : 'will');
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=Resist Fatigue}} ` +
+      `{{focus=Resilience}} ` +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{fatigue_removed=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
+
+      const dice = ccTestDice(roll.results.roll1);
+
+      // Crit only on a natural 1: no Focus applies.
+      const targetNumber = attributeRating + resilienceRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= 1).length + extraordinary;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const bonusDiceCount = Math.max(0, dice.length - 2);
+
+      // Remove fatigue on a pass, floored at 0.
+      const momentumSpent = passed ? extraMomentum : 0;
+      const fatigueRemoved = passed ? 1 + momentumSpent : 0;
+      const fatigueBefore = Number(attributes.fatigue) || 0;
+      if (fatigueRemoved > 0 && fatigueBefore > 0) {
+        attributes.fatigue = Math.max(0, fatigueBefore - fatigueRemoved);
+        attributes.queue.push('stress_max', 'stress_max_marker');
+        attributes.set();
+      }
+
+      // ccSettleRoll is in views/_global_sheetworker.pug.
+      const poolSpent = await ccSettleRoll({
+        attributes, generated: bonusMomentum, bonusDiceCount, extraSpent: momentumSpent, complications: complicationCount,
+      });
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: bonusMomentum,
+        complications: complicationCount,
+        extra_momentum: momentumSpent,
+        momentum_spent: poolSpent,
+        fatigue_removed: fatigueRemoved,
+        auto_successes: extraordinary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        fatigue_removed: 0,
+      });
+    }
+  };
+  k.registerFuncs({initiateFatigueResistRoll});
