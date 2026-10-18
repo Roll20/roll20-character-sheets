@@ -767,6 +767,8 @@ on(attrsFKBase.map(attr => "change:" + attr).join(" ").toLowerCase(),
 /* WS ('Wundschwelle', Wound Threshold) */
 const attrsWS = [
 	'KO_Basis',
+	'WS_Basis',
+	'WS_mod_general',
 	'WS_mod_advantages_disadvantages',
 ];
 Object.freeze(attrsWS);
@@ -776,7 +778,23 @@ on(attrsWS.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		const caller = "Action Listener for Wound Threshold";
 		safeGetAttrs(
 			attrsWS, function(v) {
-				let attrsToChange = { "Wundschwelle": Math.ceil(parseInt(v["KO_Basis"]) / 2) + v["WS_mod_advantages_disadvantages"] };
+				// Boilerplate
+				const WSBaseMin = 1;
+				const WSMin = 1;
+				const WSMax = 99;
+				const attrsToChange = {};
+
+				// WS base
+				let WSBase = parseInt(v["KO_Basis"]) / 2;
+				WSBase = DSAround(WSBase);
+				WSBase = Math.max(WSBaseMin, WSBase);
+				attrsToChange["WS_Basis"] = WSBase;
+
+				// WS
+				let WS = WSBase + parseInt(v["WS_mod_general"]) + parseInt(v["WS_mod_advantages_disadvantages"]);
+				WS = Math.max(WSMin, WS);
+				WS = Math.min(WS, WSMax);
+				attrsToChange["Wundschwelle"] = WS;
 
 				for (attr in attrsToChange)
 				{

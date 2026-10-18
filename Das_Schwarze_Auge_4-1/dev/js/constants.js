@@ -89,8 +89,10 @@ const defaultValues = {
 
 	"mrgrundw": 5,
 	"MR": 5,
-	"wundschwelle": 4,
+	"WS_Basis": 4,
+	"WS_mod_general": 0,
 	"WS_mod_advantages_disadvantages": 0,
+	"Wundschwelle": 4,
 
 	"AE": 12,
 	"AE_max": 12,
