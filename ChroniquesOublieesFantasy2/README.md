@@ -4,11 +4,118 @@
 
 Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
+Testez la version beta sur [Roll20](https://app.roll20.net/join/20677494/PzCI6Q)
+
 ## Version courante
 
-v1.13.0 [Screenshot](cof2e.png)
+v1.18.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.18.0_ (2026-09-20)
+
+- Fiche de PJ:
+  - Ajout des jets secrets au MJ (commande `/s`)
+  - Ajout du bouton d'activation des buffs dans l'onglet Attaques
+  - Amélioration des boutons Chance (affichage des DM en cas de dépense après une attaque ratée)
+  - Ajout de la condition spéciale _sans défense_ (cible avec DEF -5)
+  - Ajout de la propriété `bonus` aux équipements (bonus de compétence)
+  - Ajout des propriétés `type: parchemin`, `type: grimoire`, `type: combat` et `type: jour` aux ressources
+  - Ajout du modificateur d'attaque `crit` pour les coups critiques
+  - Ajout du modificateur d'attaque `seuil` pour les effets à partir d'un seuil au D20
+  - Fonction *LOOT* sans le script MOD ChatSetAttr
+  - Ajout d'une aide à la sélection des deux premières voies au niveau 1
+  - Ajout d'une aide à la sélection des modificateurs de peuples
+  - Ajout de la catégorie de taille du peuple
+  - Prise en compte de la petite taille pour le maniement des armes
+
+- Fiche de PNJ:
+  - Ajout des rangs de boss & filtres narratifs (Bestiaire)
+  - Ajout de la zone _Equipement divers_
+  - Prise en charge des capacités _par initiative_
+  - Fonction *LOOT* sans le script MOD ChatSetAttr
+
+### Version _1.17.1_ (2026-07-19)
+
+- Fiche de PJ:
+  - Ajout des Points d'Ego et des capacités combat/jour aux boutons de récupération
+  - Ajout des maîtrises de compétences liées aux peuples (compagnon compris)
+  - Ajout des propriétés `mods` et `options` aux équipements de type arme
+  - Amélioration des armes maîtrisées (arme magique avec +X dans son nom)
+  - Ajout de 4 langues personnalisées + possibilité de renommer les langues standard
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Ajout de conditions d'armure pour les buffs (comparaison avec l'_agi-max_ de l'armure portée)
+  - Ajout du _pacte occulte_ des mages
+  - Interactions avec **COFantasy2** (contact/lancer, potions, décompte des PM et capacités)
+
+- Fiche de PNJ:
+  - Modification de la case à cocher _Attaques multiples_ par un nombre d'attaques (1 par défaut)
+  - Amélioration de l'import des attaques à distance d'un statblock
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Interactions avec **COFantasy2** (paramètres des capacités)
+
+### Version _1.16.0_ (2026-06-08)
+
+- Fiche de PJ:
+  - Gestion des Points d'Ego du profil de Psionique
+  - Amélioration des DM temporaires (message d'information, récupération)
+  - Affichage optionnel d'un bouton _Fin de tour_ sur les attaques
+  - Amélioration des jets de caractéristiques pour les capacités réglées sur _Demander_
+  - Ajout d'une saisie de modificateur aux jets de capacités et de compétences depuis le bouton caractéristique +
+  - Ajout de `DM/2` dans les DM supplémentaires des options tactiques (_Frappe du justicier_)
+  - Corrections sur la gestion des voies de prestige
+  - Possibilité d'indiquer plusieurs capacités (nom + description) par rang dans les voies 7 à 9
+  - Changement de syntaxe des propriétés de capacités `selonRang` et `buff`
+  - Ajout de la propriété de capacité `pcorphelin` pour calcul correct des PV maximum
+  - Ajout de `atk N` et `jet N` dans la propriété de capacité `roll`
+  - Ajout des modificateurs d'attaque `aoe` et `save`
+  - Ajout des options high fantasy de _Récupération complète_ et _Concentration puissante_
+
+- Fiche de PNJ:
+  - Ajout de 2 coups spéciaux paramétrables (pour un total de 5)
+  - Corrections sur les jets de caractéristiques
+  - Corrections sur les scores d'attaque de base
+
+### Version _1.15.1_ (2026-04-08)
+
+- Fiche de PJ:
+  - Affichage optionnel des options tactiques favorites sur le sous-onglet Attaques
+  - Ajout d'une option de configuration pour les options tactiques favorites
+  - Ajout d'un champ post-it pour saisie de notes "techniques"
+  - Ajout d'un bouton pour le combat à deux armes dans le sous-onglet _En main_
+  - Ajout d'une case pour le combat en milieu aquatique dans le sous-onglet _En main_
+  - Prise en compte des armes maîtrisées par profil
+  - Ajout d'une icone pour afficher les maîtrises martiales
+  - **Compagnon du Joueur**
+    - Ajout des peuples optionnels et des profils
+    - Prise en compte des bonus de manoeuvres et aux DM des armes
+
+- Fiche de PNJ:
+  - Ajout d'un modificateur d'attaque btn:N pour afficher un bouton de chat d'appel de la capacité no N
+  - Possibilité d'envoyer une description anonyme du PNJ dans le chat
+  - Affichage optionnel des capacités favorites sur le sous-onglet Attaques
+  - Ajout d'une option de configuration pour les capacités favorites
+
+### Version _1.14.0_ (2026-01-31)
+
+- Fiche de PJ:
+  - Ajout d'une liste d'options tactiques activables avec bonus d'attaque, dé bonus/malus, DM supplémentaires
+  - Suppression des buffs au DM et conversion en options tactiques
+  - Meilleure prise en charge des jets liés aux capacités (propriété `roll:`)
+  - Amélioration des buffs de capacités (propriété `buff:`)
+  - Ajout d'un contrôle du bonus maximum de compétence
+  - Gestion des DM temporaires
+  - Ajout des emojis des compétences dans le popup Roll20
+  - Remplacement du menu de chat des états préjudiciables par un popup Roll20
+  - Assignation automatique des paramètres de base d'une nouvelle attaque
+
+- Fiche de PNJ:
+  - Ajout d'un bouton de réinitialisation des utilisation de capacités
+  - Ajout d'un onglet _Version_
+  - Ajout d'une case à cocher _Mook_ (pour liaison des PV par attribut ou par valeur en cas d'utilisation du script _TokenMod_)
+  - Ajout de la liste des ressources à l'onglet _Equipement_
+  - Ajout d'une option pense-bête pour le script _TokenMod_
+  - Ajout de la possibilité d'afficher les informations de tactique et/ou les notes dans une infobulle visible du MJ uniquement
 
 ### Version _1.13.0_ (2026-01-04)
 
@@ -17,6 +124,7 @@ v1.13.0 [Screenshot](cof2e.png)
 - Ajout d'un champ pour le score d'attaque à distance de base à la fiche de PNJ
 - Ajout d'un champ Genre à la fiche de PNJ
 - Mise à jour automatique des PV en cas d'utilisation d'un consommable de soins
+- Prise en charge de l'import de texte (voies et créatures) depuis le DRS officiel
 - Gestion des effets prolongés des attaques et capacités
 - Prise en charge du script MOD AddCustomTurn pour les effets prolongés
 
