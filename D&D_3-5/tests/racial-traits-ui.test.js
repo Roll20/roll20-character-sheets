@@ -58,8 +58,8 @@ assert.match(
 );
 assert.match(
     styles,
-    /\.racial-trait-summary-display\s*{[\s\S]*?overflow-wrap:\s*anywhere;[\s\S]*?white-space:\s*normal;/,
-    'the compact summary must wrap instead of being truncated'
+    /\.racial-trait-summary-display\s*{[\s\S]*?grid-column:\s*2;[\s\S]*?grid-row:\s*2;[\s\S]*?overflow-wrap:\s*anywhere;[\s\S]*?white-space:\s*normal;/,
+    'the compact summary must wrap on its own line beneath the title'
 );
 
 assert.match(
