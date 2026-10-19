@@ -32,13 +32,30 @@ assert.ok(repeatingSection, 'the structured racial traits repeating section must
     'racialtrait_expanded',
     'racialtrait_name',
     'racialtrait_summary',
-    'racialtrait_description'
+    'racialtrait_description',
+    'racialtrait_notes'
 ].forEach(field => {
     assert.match(repeatingSection[1], new RegExp(`name="attr_${field}"`), `${field} must be stored on each racial trait row`);
 });
 const expandedToggle = repeatingSection[1].match(/<input[^>]+name="attr_racialtrait_expanded"[^>]*>/);
 assert.ok(expandedToggle, 'each racial trait row must have an expand toggle');
 assert.doesNotMatch(expandedToggle[0], /\schecked(?:\s|=|\/|>)/, 'new racial trait rows must start collapsed');
+
+const chatButton = repeatingSection[1].match(/<button[^>]+class="racial-trait-roll"[^>]*>/);
+assert.ok(chatButton, 'each racial trait title must be a chat roll button');
+assert.match(chatButton[0], /type="roll"/);
+assert.match(chatButton[0], /name="roll_racialtrait"/);
+assert.match(chatButton[0], /&{template:DnD35StdRoll}/);
+assert.match(chatButton[0], /{{basicflag=true}}/);
+assert.match(chatButton[0], /@{character_name}: @{racialtrait_name}/);
+assert.match(chatButton[0], /{{subtags=@{racialtrait_summary}}}/);
+assert.match(chatButton[0], /{{Description=@{racialtrait_description}}}/);
+assert.match(chatButton[0], /{{notes=@{racialtrait_notes}}}/);
+assert.match(
+    repeatingSection[1],
+    /class="racial-trait-summary-display"[^>]+name="attr_racialtrait_summary"/,
+    'the summary must remain visible in the compact row'
+);
 
 assert.match(
     styles,
@@ -52,8 +69,13 @@ assert.match(
 );
 assert.match(
     styles,
-    /\.racial-trait-expanded:not\(:checked\)\s*~\s*\.racial-trait-description/,
-    'collapsed rows must hide their full description'
+    /\.racial-trait-expanded:not\(:checked\)\s*~\s*\.racial-trait-details/,
+    'collapsed rows must hide all editing fields'
+);
+assert.match(
+    styles,
+    /button\.racial-trait-roll\[type="roll"\]::before\s*{[\s\S]*?content:\s*"";/,
+    'the compact title button must not show the default dice icon'
 );
 assert.match(
     styles,
