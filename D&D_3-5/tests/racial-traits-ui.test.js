@@ -46,15 +46,36 @@ assert.ok(chatButton, 'each racial trait title must be a chat roll button');
 assert.match(chatButton[0], /type="roll"/);
 assert.match(chatButton[0], /name="roll_racialtrait"/);
 assert.match(chatButton[0], /&{template:DnD35StdRoll}/);
-assert.match(chatButton[0], /{{basicflag=true}}/);
-assert.match(chatButton[0], /@{character_name}: @{racialtrait_name}/);
+assert.match(chatButton[0], /{{abilityflag=true}}/);
+assert.match(chatButton[0], /{{name=@{racialtrait_name}}}/);
 assert.match(chatButton[0], /{{subtags=@{racialtrait_summary}}}/);
-assert.match(chatButton[0], /{{Description=@{racialtrait_description}}}/);
-assert.match(chatButton[0], /{{notes=@{racialtrait_notes}}}/);
+assert.match(chatButton[0], /{{traitdescription=@{racialtrait_description}}}/);
+assert.match(chatButton[0], /{{traitnotes=@{racialtrait_notes}}}/);
 assert.match(
     repeatingSection[1],
     /class="racial-trait-summary-display"[^>]+name="attr_racialtrait_summary"/,
     'the summary must remain visible in the compact row'
+);
+assert.match(
+    styles,
+    /\.racial-trait-summary-display\s*{[\s\S]*?overflow-wrap:\s*anywhere;[\s\S]*?white-space:\s*normal;/,
+    'the compact summary must wrap instead of being truncated'
+);
+
+assert.match(
+    sheet,
+    /{{#traitdescription}}<tr class="sheet-racial-trait-section">[\s\S]*?{{traitdescription}}[\s\S]*?{{\/traitdescription}}/,
+    'the D&D 3.5 standard roll template must render a full-width trait description'
+);
+assert.match(
+    sheet,
+    /{{#traitnotes}}<tr class="sheet-racial-trait-section sheet-racial-trait-notes">[\s\S]*?{{traitnotes}}[\s\S]*?{{\/traitnotes}}/,
+    'the D&D 3.5 standard roll template must render a separate notes section'
+);
+assert.match(
+    sheet,
+    /{{#allprops\(\) notes traitdescription traitnotes /,
+    'trait-only template properties must not be repeated as generic key/value rows'
 );
 
 assert.match(
