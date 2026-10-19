@@ -2206,7 +2206,7 @@ function registerEventHandlers() {
     'change:repeating_spells:create-attack-entry',
     TAS.callback(function eventcreateAttackEntryFromSpell(eventInfo) {
       TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
-      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+      if ((eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') && SWUtils.isCheckboxTurnedOn(eventInfo)) {
         createAttackEntryFromRow(null, null, false, eventInfo);
       }
     }),
