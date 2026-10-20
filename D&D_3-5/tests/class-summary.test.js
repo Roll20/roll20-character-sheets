@@ -17,7 +17,13 @@ assert.match(summaryInput[0], /data-i18n-placeholder="no-classes-configured"/);
 
 const headerStart = sheet.indexOf('<input type="checkbox" class="pc-charrpinfo-show');
 const tabStart = sheet.indexOf('<input type="radio" name="attr_tab" class="tab tab1"');
-assert.ok(sheet.indexOf('class="pc-class-summary"', headerStart) < tabStart, 'the summary must appear in the persistent character header');
+const header = sheet.slice(headerStart, tabStart);
+const racePosition = header.indexOf('name="attr_race"');
+const summaryPosition = header.indexOf('class="pc-class-summary"');
+const agePosition = header.indexOf('name="attr_age"');
+assert.notEqual(summaryPosition, -1, 'the summary must appear in the persistent character header');
+assert.ok(racePosition < summaryPosition, 'the summary must appear below the Race field');
+assert.ok(summaryPosition < agePosition, 'the summary must appear before the next header field row');
 
 assert.equal(translations['classes-and-levels'], 'Classes and levels');
 assert.equal(translations['class-summary-help'], 'Derived from the Classes section in Configuration.');
