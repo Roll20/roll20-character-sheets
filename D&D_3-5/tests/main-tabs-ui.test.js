@@ -31,10 +31,26 @@ expectedTabs.forEach(([value, tabClass, title]) => {
     );
 });
 
+const tabNavigationStart = sheet.indexOf('<input type="radio" name="attr_tab" class="tab tab1"');
+const tabNavigationEnd = sheet.indexOf('<div class="tab-content tab1 tab99">', tabNavigationStart);
+assert.notEqual(tabNavigationStart, -1, 'the main tab row must exist');
+assert.notEqual(tabNavigationEnd, -1, 'the first main tab content section must exist');
+const tabNavigation = sheet.slice(tabNavigationStart, tabNavigationEnd);
+assert.equal(
+    [...tabNavigation.matchAll(/<\/span><!--\s*--><input/g)].length,
+    expectedTabs.length - 1,
+    'HTML whitespace between adjacent tabs must be suppressed so the tabs touch'
+);
+
 assert.match(
     styles,
     /\.content-sheet span\.tab\s*{[\s\S]*?background:\s*#c7c7c7;[\s\S]*?border:\s*1px solid #666;[\s\S]*?text-transform:\s*uppercase;/,
     'inactive tabs must use the connected PF1-inspired tab styling'
+);
+assert.match(
+    styles,
+    /\.content-sheet span\.tab\s*{[\s\S]*?margin:\s*0 -1px -1px -70px;/,
+    'adjacent tab borders must overlap by one pixel'
 );
 assert.match(
     styles,
