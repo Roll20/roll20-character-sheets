@@ -21,6 +21,7 @@ const header = sheet.slice(headerStart, tabStart);
 const racePosition = header.indexOf('name="attr_race"');
 const summaryPosition = header.indexOf('class="pc-class-summary"');
 const agePosition = header.indexOf('name="attr_age"');
+assert.match(header, /<tr><td rowspan=5>/, 'the header spacer must span the added class-summary row');
 assert.notEqual(summaryPosition, -1, 'the summary must appear in the persistent character header');
 assert.ok(racePosition < summaryPosition, 'the summary must appear below the Race field');
 assert.ok(summaryPosition < agePosition, 'the summary must appear before the next header field row');
