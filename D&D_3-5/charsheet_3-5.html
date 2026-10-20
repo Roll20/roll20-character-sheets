@@ -103,6 +103,10 @@
                 </table>
             </div>
             <hr/>
+            <div class="pc-class-summary">
+                <span class="pc-class-summary-label" data-i18n="classes-and-levels">Classes and levels</span>:
+                <input type="text" class="pc-class-summary-value" name="attr_class_summary" title="Derived from the Classes section in Configuration." data-i18n-title="class-summary-help" placeholder="No classes configured" data-i18n-placeholder="no-classes-configured" readonly />
+            </div>
         </div>
         <br>
         <input type="hidden" class="main-tab-visibility tab-visibility-spells" name="attr_show_spells_tab" value="1" />
@@ -13924,6 +13928,28 @@ const sumNumberedAttributes = (values, prefix, count = 10) => {
 	return Array.from({length: count}, (unused, index) => index + 1)
 		.reduce((total, row) => total + toNumber(values[`${prefix}${row}`]), 0);
 };
+
+const classSummaryRows = Array.from({length: 10}, (unused, index) => index + 1);
+const classSummaryFields = classSummaryRows.reduce((fields, row) => {
+	fields.push(`class${row}`, `level${row}`);
+	return fields;
+}, []);
+const buildClassSummary = values => classSummaryRows
+	.map(row => {
+		const className = String(values[`class${row}`] || "").trim();
+		if(!className) return "";
+		const classLevel = parseInt(values[`level${row}`], 10) || 0;
+		return classLevel > 0 ? `${className} ${classLevel}` : className;
+	})
+	.filter(Boolean)
+	.join(" / ");
+const updateClassSummary = () => {
+	getAttrs(classSummaryFields, values => {
+		setAttrs({class_summary: buildClassSummary(values)}, {silent: true});
+	});
+};
+const classSummaryEvents = classSummaryFields.map(field => `change:${field}`).join(" ");
+on(`sheet:opened ${classSummaryEvents}`, updateClassSummary);
 
 on("change:autoCalcHP change:level1 change:level2 change:level3 change:level4 change:level5 change:level6 change:level7 change:level8 change:level9 change:level10", eventInfo => {
 	getAttrs(["autoCalcHP", "level1", "level2", "level3", "level4", "level5", "level6", "level7", "level8", "level9", "level10"], values => {
