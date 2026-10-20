@@ -56,7 +56,8 @@ assert.match(
 
 [
     ['show_spells_tab', 'spells', 'show-spells-tab'],
-    ['show_summons_tab', 'summons', 'show-summons-tab']
+    ['show_summons_tab', 'summons', 'show-summons-tab'],
+    ['show_all_tab', 'all', 'show-all-tab']
 ].forEach(([attribute, tabName, translationKey]) => {
     const controller = sheet.match(new RegExp(`<input[^>]+class="main-tab-visibility tab-visibility-${tabName}"[^>]+name="attr_${attribute}"[^>]+value="1"[^>]*>`));
     assert.ok(controller, `${tabName} tab visibility must have an enabled-by-default CSS controller`);
@@ -71,6 +72,7 @@ assert.equal(translations.configuration, 'Configuration');
 assert.equal(translations['visible-tabs'], 'Visible tabs');
 assert.equal(translations['show-spells-tab'], 'Show Spells tab');
 assert.equal(translations['show-summons-tab'], 'Show Summons tab');
+assert.equal(translations['show-all-tab'], 'Show All tab');
 
 assert.match(
     styles,
@@ -96,6 +98,21 @@ assert.match(
     styles,
     /input\.tab-visibility-spells\[value="0"\][\s\S]*?~ div\.tab6,[\s\S]*?input\.tab-visibility-summons\[value="0"\][\s\S]*?~ div\.tab9\s*{\s*display:\s*none;/,
     'disabled optional tabs and their All-view content must be hidden'
+);
+assert.match(
+    styles,
+    /input\.tab-visibility-all\[value="0"\] ~ input\.tab99,[\s\S]*?input\.tab-visibility-all\[value="0"\] ~ span\.tab99\s*{\s*display:\s*none;/,
+    'the All tab button must be hidden when disabled'
+);
+assert.doesNotMatch(
+    styles,
+    /tab-visibility-all\[value="0"\][^,{]*~ div\.tab99/,
+    'hiding the All tab must not hide every content section carrying the tab99 class'
+);
+assert.match(
+    sheet,
+    /on\("change:show_all_tab", eventInfo => \{[\s\S]*?eventInfo\.newValue !== "1"[\s\S]*?setAttrs\(\{tab: "8"\}\);[\s\S]*?\}\);/,
+    'disabling the active All tab must return the user to Configuration'
 );
 assert.match(
     styles,
