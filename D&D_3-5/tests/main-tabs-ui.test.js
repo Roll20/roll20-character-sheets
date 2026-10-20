@@ -49,7 +49,12 @@ assert.match(
 );
 assert.match(
     styles,
-    /\.content-sheet span\.tab\s*{[\s\S]*?margin:\s*0 -1px -1px -70px;/,
+    /\.content-sheet input\.tab\s*{[\s\S]*?width:\s*74px;/,
+    'tabs must be wide enough for Equipment when selected text becomes bold'
+);
+assert.match(
+    styles,
+    /\.content-sheet span\.tab\s*{[\s\S]*?width:\s*74px;[\s\S]*?margin:\s*0 -1px -1px -74px;/,
     'adjacent tab borders must overlap by one pixel'
 );
 assert.match(
