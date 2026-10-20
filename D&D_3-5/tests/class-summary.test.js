@@ -31,6 +31,11 @@ assert.equal(translations['class-summary-help'], 'Derived from the Classes secti
 assert.equal(translations['no-classes-configured'], 'No classes configured');
 assert.match(
     styles,
+    /\.pc-class-summary\s*{[\s\S]*?padding:\s*4px 0 8px;/,
+    'the class summary must leave a small gap above the tab row'
+);
+assert.match(
+    styles,
     /\.content-sheet input\.pc-class-summary-value:read-only\s*{[\s\S]*?background:\s*#e0e0e0;[\s\S]*?flex:\s*0 1 400px;[\s\S]*?width:\s*400px;/,
     'the read-only summary must use a compact width and gray background'
 );
