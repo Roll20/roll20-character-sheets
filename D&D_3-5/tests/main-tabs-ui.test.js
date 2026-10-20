@@ -91,8 +91,13 @@ assert.match(
 );
 assert.match(
     styles,
-    /\.content-sheet input\.tab8,[\s\S]*?\.content-sheet span\.tab8\s*{\s*width:\s*98px;/,
+    /\.content-sheet input\.tab8,[\s\S]*?\.content-sheet span\.tab8\s*{\s*width:\s*120px;/,
     'the Configuration tab must be wide enough for its full label'
+);
+assert.match(
+    styles,
+    /\.content-sheet span\.tab8\s*{\s*margin-left:\s*-120px;/,
+    'the wider Configuration label must remain aligned with its radio control'
 );
 assert.match(
     styles,
