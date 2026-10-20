@@ -5,6 +5,7 @@ const vm = require('node:vm');
 
 const sheetDirectory = path.join(__dirname, '..');
 const sheet = fs.readFileSync(path.join(sheetDirectory, 'charsheet_3-5.html'), 'utf8');
+const styles = fs.readFileSync(path.join(sheetDirectory, 'charsheet_3-5.css'), 'utf8');
 const translations = JSON.parse(fs.readFileSync(path.join(sheetDirectory, 'translation.json'), 'utf8'));
 
 const summaryInput = sheet.match(/<input[^>]+class="pc-class-summary-value"[^>]*>/);
@@ -21,6 +22,16 @@ assert.ok(sheet.indexOf('class="pc-class-summary"', headerStart) < tabStart, 'th
 assert.equal(translations['classes-and-levels'], 'Classes and levels');
 assert.equal(translations['class-summary-help'], 'Derived from the Classes section in Configuration.');
 assert.equal(translations['no-classes-configured'], 'No classes configured');
+assert.match(
+    styles,
+    /\.content-sheet input\.pc-class-summary-value:read-only\s*{[\s\S]*?background:\s*#e0e0e0;[\s\S]*?flex:\s*0 1 400px;[\s\S]*?width:\s*400px;/,
+    'the read-only summary must use a compact width and gray background'
+);
+assert.match(
+    styles,
+    /\.sheet-darkmode \.content-sheet input\.pc-class-summary-value:read-only\s*{[\s\S]*?background-color:\s*#595959;/,
+    'the read-only summary must retain an appropriate gray background in dark mode'
+);
 
 const workerStart = sheet.indexOf('const classSummaryRows =');
 const workerEnd = sheet.indexOf('on("change:autoCalcHP change:level1', workerStart);
