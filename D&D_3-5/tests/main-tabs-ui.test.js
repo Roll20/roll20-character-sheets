@@ -54,6 +54,36 @@ assert.match(
     'the former Misc tab must be named Configuration'
 );
 
+const characterHeaderStart = sheet.indexOf('<input type="checkbox" class="pc-charrpinfo-show');
+const characterHeader = sheet.slice(characterHeaderStart, tabNavigationStart);
+const configurationStart = sheet.indexOf('<div class="tab-content tab8 tab99">');
+const configurationEnd = sheet.indexOf('<div class="tab-content tab9 tab99">', configurationStart);
+assert.notEqual(configurationStart, -1, 'the Configuration content must exist');
+assert.notEqual(configurationEnd, -1, 'the Configuration content boundary must exist');
+const configuration = sheet.slice(configurationStart, configurationEnd);
+assert.doesNotMatch(
+    characterHeader,
+    /class="pc-charclasses-show arrow"/,
+    'the Classes section must no longer appear above the main tabs'
+);
+assert.match(
+    configuration,
+    /class="pc-charclasses-show arrow"[\s\S]*?class="pc-charclasses"/,
+    'Configuration must contain the complete expandable Classes section'
+);
+assert.ok(
+    configuration.indexOf('class="tab-visibility-settings"') < configuration.indexOf('class="pc-charclasses-show arrow"'),
+    'Classes must appear below the visible-tab settings in Configuration'
+);
+assert.equal(
+    [...sheet.matchAll(/class="pc-charclasses-show arrow"/g)].length,
+    1,
+    'the Classes editor must exist exactly once'
+);
+for(let row = 1; row <= 10; row += 1) {
+    assert.match(configuration, new RegExp(`name="attr_class${row}"`), `Configuration must retain class row ${row}`);
+}
+
 [
     ['show_spells_tab', 'spells', 'show-spells-tab'],
     ['show_summons_tab', 'summons', 'show-summons-tab'],
