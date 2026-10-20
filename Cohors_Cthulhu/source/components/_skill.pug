@@ -1,0 +1,22 @@
+//- components/_skill.pug
+//- One Skills row: name (roll button), Ranks and the skill's Focuses. Only
+//- learned Focuses show until Edit Focuses is pressed (_skills_panel.pug).
+//- extraAffects lets Ranks feed a derived stat (Resilience -> Max Stress).
+mixin skill(name, focuses, extraAffects)
+  .cc-skill-row
+    +roller({
+      name: `${name} skill roll`,
+      class: 'cc-skill-name-roll',
+      trigger: {triggeredFuncs: ['initiateSkillRoll']}
+    })
+      = name
+    +number({
+      name: `${name} ranks`,
+      placeholder: '0',
+      trigger: extraAffects ?
+        {affects: extraAffects, triggeredFuncs: ['ccUpdateTalentFilter']} :
+        {triggeredFuncs: ['ccUpdateTalentFilter']}
+    }).cc-skill-ranks
+    .cc-skill-focuses
+      each focus in focuses
+        +focusItem(name, focus)
