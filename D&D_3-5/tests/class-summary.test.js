@@ -23,8 +23,8 @@ const summaryPosition = header.indexOf('class="pc-class-summary"');
 const agePosition = header.indexOf('name="attr_age"');
 assert.match(header, /<tr><td rowspan=5>/, 'the header spacer must span the added class-summary row');
 assert.notEqual(summaryPosition, -1, 'the summary must appear in the persistent character header');
-assert.ok(racePosition < summaryPosition, 'the summary must appear below the Race field');
-assert.ok(summaryPosition < agePosition, 'the summary must appear before the next header field row');
+assert.ok(racePosition < agePosition, 'the Age field row must follow the Race field row');
+assert.ok(agePosition < summaryPosition, 'the summary must appear below the Age, Weight, and related fields');
 
 assert.equal(translations['classes-and-levels'], 'Classes and levels');
 assert.equal(translations['class-summary-help'], 'Derived from the Classes section in Configuration.');
