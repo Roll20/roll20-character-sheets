@@ -394,8 +394,6 @@
 /* long descriptions open up while being edited */
 .charsheet .tnw .jrow > textarea { resize: none; overflow: hidden; line-height: 22px; padding-top: 2px; white-space: nowrap; text-overflow: ellipsis; }
 .charsheet .tnw .jrow > textarea:focus { height: 88px; overflow-y: auto; white-space: pre-wrap; }
-.charsheet .tnw .jt > textarea { height: 25px; line-height: 20px; padding-top: 2px; }
-.charsheet .tnw .js > textarea { height: 28px; padding-top: 3px; }
 .charsheet .tnw .jrow > button.die { align-self: center; justify-self: center; }
 
 /* weapon cell: the book picker, with a name box laid over it for Custom.
@@ -453,11 +451,61 @@
    spells have the die column under it, talents shift their name clear of it */
 .charsheet .tnw .rep-flow .repcontainer.editmode .jt > .c-tname { padding-left: 28px; }
 
+/* long text (spell difficulty and effect, talent description) shows in full: a hidden copy of the text sets the row's
+   height and the edit box is laid over it */
+.charsheet .tnw .jrow > .grow {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    border-left: 1px solid var(--line);
+}
+/* the text block sits in the middle of the row, level with the one-line
+   cells beside it, when another cell makes the row taller */
+.charsheet .tnw .grow > .grow-inner { position: relative; }
+.charsheet .tnw .grow-inner > .grow-copy {
+    display: block;
+    visibility: hidden;
+    min-height: 22px;
+    padding: 3px 6px 3px;
+    font-family: 'IM Fell English', serif;
+    font-size: 16px;
+    line-height: 22px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.charsheet .tnw .grow-inner > .grow-copy:after { content: ' '; }
+.charsheet .tnw .grow-inner > textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 3px 6px 3px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--ink);
+    font-family: 'IM Fell English', serif;
+    font-size: 16px;
+    line-height: 22px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    resize: none;
+}
+.charsheet .tnw .grow-inner > textarea:hover { background: rgba(255, 250, 238, 0.5); }
+.charsheet .tnw .grow-inner > textarea:focus { background: rgba(255, 250, 238, 0.9); outline: none; }
+
 /* Modify and +Add sit on the section's heading line */
 .charsheet .tnw .rep-flow .repcontrol {
     position: absolute;
-    top: -55px;
-    right: 44px;
+    top: -62px;
+    right: 78px;
     display: flex;
     gap: 6px;
     margin: 0;
@@ -844,11 +892,58 @@
 }
 .sheet-rolltemplate-tnw .sheet-links a:hover { background: linear-gradient(#7a1f12, #5a170d); }
 
-/* armour pieces have long names; a smaller face keeps them inside the boxes */
-.charsheet .tnw .pg.art select.ar-head,
-.charsheet .tnw .pg.art select.ar-body,
-.charsheet .tnw .pg.art select.ar-arms,
-.charsheet .tnw .pg.art select.ar-legs { font-size: 13.5px; padding: 0 18px 0 6px; background-position: right 10px center, right 5px center; }
+/* armour: a label under the see-through dropdown shows the chosen piece */
+.charsheet .tnw .art > .armour-show {
+    position: absolute;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 6px;
+    white-space: nowrap;
+    color: var(--ink);
+    font-family: 'IM Fell English', serif;
+    font-size: 16px;
+    line-height: 16px;
+    overflow: hidden;
+}
+.charsheet .tnw .art > .armour-show:empty:before { content: 'None'; }
+.charsheet .tnw .pg.art select.armour-pick {
+    color: transparent;
+    font-size: 16px;
+    padding: 0 18px 0 6px;
+    background-position: right 8px center, right 3px center;
+}
+/* no hover or focus tint: it would wash over the name shown underneath */
+.charsheet .tnw .pg.art select.armour-pick:hover,
+.charsheet .tnw .pg.art select.armour-pick:focus {
+    background-color: transparent;
+    box-shadow: none;
+    outline: none;
+}
+
+/* "Total:" replaces the printed "Value:" in the armour boxes, set to match the
+   printed labels */
+.charsheet .tnw .art > .relabel {
+    position: absolute;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 2px;
+    background: #f6ecdb;
+    color: #1d140a;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+    letter-spacing: -0.2px;
+    pointer-events: none;
+}
+
+/* centred grow cells, such as a spell's difficulty */
+.charsheet .tnw .grow.ctr .grow-copy,
+.charsheet .tnw .grow.ctr textarea { text-align: center; }
+/* the Body box is the narrowest: a little smaller so long names fit two lines */
+.charsheet .tnw .art > .as-arms { font-size: 15.5px; padding-left: 4px; letter-spacing: -0.2px; }
+.charsheet .tnw .art > .as-body { font-size: 13.5px; padding: 0 13px 0 2px; letter-spacing: -0.25px; }
 
 /* ---------- overlay positions, measured on the 1103x1426 artwork ---------- */
 .charsheet .tnw .art .f-name { left: 54px; top: 237px; width: 268px; height: 35px; }
@@ -1157,18 +1252,26 @@
 .charsheet .tnw .art .cn-c5 { left: 736px; top: 1246px; width: 80px; height: 26px; }
 .charsheet .tnw .art .cc-c5 { left: 816px; top: 1247px; width: 38px; height: 24px; }
 .charsheet .tnw .art .gr-c5 { left: 747px; top: 1271px; width: 88px; height: 20px; }
-.charsheet .tnw .art .ar-head { left: 140px; top: 253px; width: 208px; height: 24px; }
+.charsheet .tnw .art .as-head { left: 140px; top: 247px; width: 212px; height: 34px; }
+.charsheet .tnw .art .ar-head { left: 140px; top: 253px; width: 212px; height: 24px; }
 .charsheet .tnw .art .av-head { left: 109px; top: 287px; width: 49px; height: 33px; }
 .charsheet .tnw .art .va-head { left: 245px; top: 287px; width: 103px; height: 33px; }
-.charsheet .tnw .art .ar-arms { left: 140px; top: 381px; width: 170px; height: 24px; }
+.charsheet .tnw .art .tl-head { left: 182px; top: 295px; width: 52px; height: 24px; }
+.charsheet .tnw .art .as-arms { left: 140px; top: 375px; width: 177px; height: 34px; }
+.charsheet .tnw .art .ar-arms { left: 140px; top: 381px; width: 177px; height: 24px; }
 .charsheet .tnw .art .av-arms { left: 109px; top: 416px; width: 49px; height: 35px; }
 .charsheet .tnw .art .va-arms { left: 241px; top: 416px; width: 70px; height: 35px; }
-.charsheet .tnw .art .ar-legs { left: 140px; top: 515px; width: 200px; height: 24px; }
+.charsheet .tnw .art .tl-arms { left: 182px; top: 425px; width: 52px; height: 24px; }
+.charsheet .tnw .art .as-legs { left: 140px; top: 509px; width: 204px; height: 34px; }
+.charsheet .tnw .art .ar-legs { left: 140px; top: 515px; width: 204px; height: 24px; }
 .charsheet .tnw .art .av-legs { left: 109px; top: 549px; width: 49px; height: 35px; }
 .charsheet .tnw .art .va-legs { left: 241px; top: 549px; width: 100px; height: 35px; }
-.charsheet .tnw .art .ar-body { left: 674px; top: 297px; width: 123px; height: 22px; }
+.charsheet .tnw .art .tl-legs { left: 182px; top: 558px; width: 52px; height: 24px; }
+.charsheet .tnw .art .as-body { left: 664px; top: 291px; width: 143px; height: 32px; }
+.charsheet .tnw .art .ar-body { left: 664px; top: 297px; width: 143px; height: 22px; }
 .charsheet .tnw .art .av-body { left: 641px; top: 336px; width: 41px; height: 34px; }
 .charsheet .tnw .art .va-body { left: 751px; top: 336px; width: 46px; height: 34px; }
+.charsheet .tnw .art .tl-body { left: 694px; top: 343px; width: 52px; height: 24px; }
 .charsheet .tnw .art .f-gear { left: 50px; top: 44px; width: 568px; height: 198px; }
 .charsheet .tnw .art .f-pieces { left: 785px; top: 37px; width: 145px; height: 26px; }
 .charsheet .tnw .art .f-bits { left: 785px; top: 71px; width: 145px; height: 28px; }
