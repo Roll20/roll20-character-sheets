@@ -7162,6 +7162,12 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <option value="mentforce">Mentalism: Force</option>
         <option value="mentinfo">Mentalism: Information</option>
         <option value="mentutlity">Mentalism: Utility</option>
+
+        <option value="arcaneelem">Arcane: Elemental</option>
+        <option value="arcaneforce">Arcane: Force</option>
+        <option value="arcaneinfo">Arcane: Information</option>
+        <option value="arcaneutlity">Arcane: Utility</option>
+
       </select>
 
       <span class='attackrollcriticaltoggle'><b>Critical Type</b></span>
@@ -10789,6 +10795,88 @@ const pbonussuffix = "_pbonus";
 const rankssuffix = "_ranks";
 const ranksmiscsuffix = "_ranks";
 const namesuffix = "_name";
+const valuesuffix = "_value";
+
+function onCheck(str, func) {
+  'use strict';
+  if (typeof(str) != 'string') {
+    rmuerror("Calling on with not a string", str);
+    return -1;
+  }
+  if (typeof(func) != 'function') {
+    rmuerror("Calling on with not a functio", str, func);
+    return -1;
+  }
+  const items = str.split(/ +/);
+  for (let item of items) {
+    // Each should have at least one :
+    if (item != '' && !item.includes(":")) {
+      rmuerror(`${item} doesn't have a colon from ${str}`);
+    }
+    // Must match one of these:
+    if (!item.match(/^(change|clicked|page|mancerchange|mancerfinish|remove|sheet):(repeating_[^:]*:)?[^:]*$/)) {
+      rmuerror(`${item} doesn't seem right`);
+    }
+  }
+  on(str, func);
+}
+
+/** Sets the character ID and returns the current one.*/
+function setActiveCharacterId(id) {
+  'use strict';
+  const ocid = getActiveCharacterId();
+  const data = {
+    id: '0',
+    type: 'setActiveCharacter',
+    data: id,
+  };
+  if (self.dispatchEvent) {
+    const event = new CustomEvent('message');
+    event.data = data;
+    self.dispatchEvent(event);
+  }
+  else {
+    self.onmessage({ data });
+  }
+  return ocid;
+}
+
+function asCharacter(id, func) {
+  'use strict';
+  const origid = setActiveCharacterId(id);
+  let rv;
+  try {
+    rv = func()
+  } catch (error) {
+    console.error(error)
+    rv = false;
+  }
+  setActiveCharacterId(origid);
+  return rv;
+}
+
+function rmuSetAttrsRemote(characterid, attrs, done) {
+  'use strict';
+  // FIXME: Validate the damn args
+  const myid = setActiveCharacterId(characterid);
+  if (myid == characterid) {
+    rmuerror("Set active and current character to the same", characterid);
+  }
+  setAttrs(attrs, { silent: true }, done);
+  setActiveCharacterId(myid);
+}
+
+function rmuGetAttrsRemote(characterid, attrs, done) {
+  'use strict';
+  // FIXME: Validate the damn args
+  const myid = setActiveCharacterId(characterid);
+  if (myid == characterid) {
+    rmuerror("Set active and current character to the same", characterid);
+  }
+  rmuGetAttrs(attrs, done);
+  setActiveCharacterId(myid);
+}
+
 
 
 function parseIntDefault(str, def) {
@@ -10856,6 +10944,7 @@ class BonusAdder {
     const [bonus, misclog] = miscBonusTotal(misc)
     this.add(bonus, heading)
     this.text.push(misclog.replace(/\n$/,"").replace(/^/gm, "    "))
+    return this
   }
 
   // So add a misc heading if it's defined.
@@ -10866,6 +10955,7 @@ class BonusAdder {
   addMiscMaybe(heading, misc) {
     if (!misc) return;
     this.addMisc(heading, misc);
+    return this
   }
 
   // So this is for a misc added:
@@ -10879,17 +10969,30 @@ class BonusAdder {
     } else {
       this.add(bonus, heading);
     }
+    return this;
   }
 
   // Note it does _NOT_ add the bonus, just format
   addIndentMessageNoAdd(bonus, message) {
     this.text.push("    " + F(bonus) + " " + message);
+    return this;
   }
 
   add(num, str) {
     this.total += num;
     this.text.push(F(num) + " " + str);
     return this; // chainable
+  }
+
+  addTemporary(tempdata, fieldname) {
+    if (!tempdata) return this;
+    const td = JSON.parse(tempdata);
+    if (!(td[fieldname])) {
+      this.text.push("    No Temporary Effects")
+      return this;
+    }
+    this.addMisc(td[fieldname])
+    return this;
   }
 
   getSum() {
@@ -12468,87 +12571,6 @@ function pendingReset() {
     pendingList = [];
   }
 }
-
-function onCheck(str, func) {
-  'use strict';
-  if (typeof(str) != 'string') {
-    rmuerror("Calling on with not a string", str);
-    return -1;
-  }
-  if (typeof(func) != 'function') {
-    rmuerror("Calling on with not a functio", str, func);
-    return -1;
-  }
-  const items = str.split(/ +/);
-  for (let item of items) {
-    // Each should have at least one :
-    if (item != '' && !item.includes(":")) {
-      rmuerror(`${item} doesn't have a colon from ${str}`);
-    }
-    // Must match one of these:
-    if (!item.match(/^(change|clicked|page|mancerchange|mancerfinish|remove|sheet):(repeating_[^:]*:)?[^:]*$/)) {
-      rmuerror(`${item} doesn't seem right`);
-    }
-  }
-  on(str, func);
-}
-
-/** Sets the character ID and returns the current one.*/
-function setActiveCharacterId(id) {
-  'use strict';
-  const ocid = getActiveCharacterId();
-  const data = {
-    id: '0',
-    type: 'setActiveCharacter',
-    data: id,
-  };
-  if (self.dispatchEvent) {
-    const event = new CustomEvent('message');
-    event.data = data;
-    self.dispatchEvent(event);
-  }
-  else {
-    self.onmessage({ data });
-  }
-  return ocid;
-}
-
-function asCharacter(id, func) {
-  'use strict';
-  const origid = setActiveCharacterId(id);
-  let rv;
-  try {
-    rv = func()
-  } catch (error) {
-    console.error(error)
-    rv = false;
-  }
-  setActiveCharacterId(origid);
-  return rv;
-}
-
-function rmuSetAttrsRemote(characterid, attrs, done) {
-  'use strict';
-  // FIXME: Validate the damn args
-  const myid = setActiveCharacterId(characterid);
-  if (myid == characterid) {
-    rmuerror("Set active and current character to the same", characterid);
-  }
-  setAttrs(attrs, { silent: true }, done);
-  setActiveCharacterId(myid);
-}
-
-function rmuGetAttrsRemote(characterid, attrs, done) {
-  'use strict';
-  // FIXME: Validate the damn args
-  const myid = setActiveCharacterId(characterid);
-  if (myid == characterid) {
-    rmuerror("Set active and current character to the same", characterid);
-  }
-  rmuGetAttrs(attrs, done);
-  setActiveCharacterId(myid);
-}
-
 
 onCheck("clicked:resetworkers", () => {
   'use strict';
@@ -14692,6 +14714,7 @@ const voiceNames = { novoice : "Silent", whisper: "Whisper", normal: "Normal Voi
 
 function getSubtlePenalty(realm, type, trickery, subtle, voice, hands, enc, metalenc, transcend,
 	    listname) {
+  'use strict';
   let penalty = 0;
   let log = '';
   let usedtrickery = false;
@@ -14803,6 +14826,7 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands, enc, meta
  * This is pretty generic
  */
 function sendMessage(msg) {
+  'use strict';
   // FIXME: CHeck for braces
   startRoll('&{template:rmumessage}{\{message=[[1d1]]}}', roll => {
     finishRoll(roll.rollId, { message: msg });
@@ -14810,6 +14834,7 @@ function sendMessage(msg) {
 }
 
 function sendEOTMessage(msg) {
+  'use strict';
   // FIXME: CHeck for braces
   startRoll('&{template:rmueotmessage}{\{message=[[1d1]]}}', roll => {
     finishRoll(roll.rollId, { message: msg });
@@ -14818,6 +14843,7 @@ function sendEOTMessage(msg) {
 
 /***/
 function spellGenerateMesssage(spelltype, result, casterlevel) {
+  'use strict';
   let response = ''
   let target = result + 2 * casterlevel;
   switch (spelltype) {
@@ -14855,15 +14881,18 @@ let spellcastevents = [];
 
 
 onCheck(spellcastevents.join(" "), (ev) => {
+    'use strict';
     // get the numbe from the end
     const level = parseInt(ev.sourceAttribute.match(/\d+$/)[0]);
+    console.log("level", level);
 
     const basename = ev.sourceAttribute.replace(/_castspell\d*$/, "");
     getAttrs([`${basename}_type${level}`, `${basename}_name${level}`, `${basename}_spell${level}`,
 	`${basename}_nopp${level}`, `${basename}_instant${level}`,
 	`${basename}_ranks`, `${basename}_listname`,
 	'pp', 'realm', 'character_name', 'scr_misc',
-	`${basename}_group`,
+	// Trickery and grace are per list
+        `${basename}_trickery`, `${basename}_grace`, `${basename}_group`,
 	// Transcendance is global
 	'transcendence_bonus', 'level', 'castingmiscmod',
 	'armorencmetal', 'armorenc',
@@ -14877,7 +14906,6 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	],
       (spelldata) => {
 	console.log("Casting a spell", spelldata);
-
 	// Extract stuff to sane names:
 	const type = spelldata[`${basename}_type${level}`];
 	const ranks = spelldata[`${basename}_ranks`] || 0;
@@ -14885,6 +14913,8 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	const listname = spelldata[`${basename}_listname`] || "";
 	const nopp = spelldata[`${basename}_nopp${level}`] == 'true' ? true : false;
 	const instant = spelldata[`${basename}_instant${level}`] == 'true' ? true : false;
+	const trickery = Math.max(parseIntDefault(spelldata[`${basename}_trickery`], 0, 0));
+	const grace = Math.max(parseIntDefault(spelldata[`${basename}_grace`], 0), 0);
 	const caster = spelldata.character_name; 
 	const casterlevel = spelldata.level;
 	const preprounds = Math.min(parseIntDefault(spelldata.castingpreprounds, 0), 2);
@@ -15040,7 +15070,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	      totalroll -= roll.results.oeroll.result;
 	      totalrollstr = `${totalrollstr} - (${roll.results.oeroll.dice.join(' + ')})`;
 	    }
-	    total = totalroll + mod;
+	    let total = totalroll + mod;
 	    let result = "Unknown";
 	    let ppmsg = '';
 	    if (total > 0) {
@@ -15098,6 +15128,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 })*/
 
 function updateSpells() {
+  'use strict';
   // For each category, get the repeating children and do the calculation
     updateSpellCategory('ownbase', 5)
   updateSpellCategory('open', 0)
@@ -15113,12 +15144,14 @@ function updateSpells() {
 // The spell_ranks_misc field changed.
 // Update the total ranks _and_ the number of spells shown.
 function updateSpellRanks(prefix) {
+  'use strict';
   getAttrs([prefix + rankssuffix + miscsuffix, prefix + name], (data) => {
     
   });
 }
 
 function spellListUpdateDisplayed(prefix) {
+  'use strict';
   getAttrs([prefix + rankssuffix, prefix + namesuffix], (data) => {
       let name = data[prefix + namesuffix];
       const ranks = parseIntDefault(data[prefix + rankssuffix], 0);
@@ -15172,6 +15205,7 @@ function spellListUpdateDisplayed(prefix) {
 
 // All the bloody things
 onCheck("change:spellrefresh", (ev) => {
+  'use strict';
       updateSpells(); 
 });
 
@@ -15179,6 +15213,7 @@ onCheck("change:spellrefresh", (ev) => {
 onCheck("change:repeating_spelllistspellownbase:ranks_misc", RMUSkills.edsDynamicRankUpdate);
 
 onCheck("change:repeating_spelllistspellownbase:ranks", (ev) => {
+    'use strict';
     const prefix = ev.sourceAttribute.replace(/_ranks$/, "");
     spellListUpdateDisplayed(prefix); 
 });
@@ -15186,6 +15221,7 @@ onCheck("change:repeating_spelllistspellownbase:ranks", (ev) => {
 
 
 onCheck("clicked:editspells", (_) => {
+    'use strict';
     getAttrs(["edit_spell_toggle"], (ev) => {
 	let nv = 'on';
 	if (ev.edit_spell_toggle == 'on') {
@@ -15205,6 +15241,7 @@ onCheck("clicked:editspells", (_) => {
   */
 
 onCheck("change:castingvoice change:castingpreprounds change:castingsubtle change:castinghands", (ev) => {
+    'use strict';
     // Something changed: So we get all the stuff we need, and then calculate the modifier.
     getAttrs(["castingvoice", "castingpreprounds", "castingsubtle", "castinghands", "realm"], (mods) => {
 	let mod = 0;
@@ -15222,6 +15259,7 @@ onCheck("change:castingvoice change:castingpreprounds change:castingsubtle chang
 
 
 onCheck("clicked:repeating_creaturespell:creatureskillroll", (ev) => {
+    'use strict';
     const basename = ev.sourceAttribute.replace(/_creatureskillroll$/, "");
     getAttrs([basename + "_name", basename + "_scr", 'character_name',
 	    'statuspenalty', 'statuseffect'], (cdata) => {
@@ -15238,6 +15276,7 @@ onCheck("clicked:repeating_creaturespell:creatureskillroll", (ev) => {
 });
 
 function creatureSpellRoll(cdata) {
+  'use strict';
   startRoll("@{whispertype} &{template:rmu} " +
       `[[ [[ [[ 1d100!>96 ]] + ${cdata.bonus} ]] - [[ 1d100!>96 ]] ]] ` +
       `{\{bonus=${cdata.bonus}}} ` + 
@@ -15254,6 +15293,7 @@ function creatureSpellRoll(cdata) {
 
 
 onCheck("clicked:uploadspelllist", (ev) => {
+    'use strict';
     setAttrs({uploadspelllistmessage: "Uploading..."});
     getAttrs(['customlistupload'], (liststr) => {
       console.log(liststr);
@@ -15295,6 +15335,10 @@ onCheck("clicked:uploadspelllist", (ev) => {
  * Param is the short name:  4 letter realm, followed by type 
  */
 const spellfailureinfo = [
+  { aname: "arcaneelem", realm: "Arcane", type: "Elemental", display:  "Arcane Elemental" },
+  { aname: "arcaneforce", realm: "Arcane", type: "Force", display:  "Arcane Force" },
+  { aname: "arcaneinfo", realm: "Arcane", type: "Informational", display:  "Arcane Information" },
+  { aname: "arcaneutlity", realm: "Arcane", type: "Utility", display:  "Arcane Utility" },
   { aname: "chanelem", realm: "Channeling", type: "Elemental", display:  "Channeling Elemental", },
   { aname: "chanforce", realm: "Channeling", type: "Force", display:  "Channeling Force" },
   { aname: "chaninfo", realm: "Channeling", type: "Informantional", display:  "Channeling Information" },
@@ -15307,13 +15351,13 @@ const spellfailureinfo = [
   { aname: "mentforce", realm: "Mentalism", type: "Force", display:  "Mentalism Force" },
   { aname: "mentinfo", realm: "Mentalism", type: "Informational", display:  "Mentalism Information" },
   { aname: "mentutlity", realm: "Mentalism", type: "Utility", display:  "Mentalism Utility" },
+
 ];
 function spellFailureRoll(type, mod, lookup) {
   console.log(type, mod, lookup);
   for (info of spellfailureinfo) {
     if (type === info.aname) {
       // found
-      console.log("FFF");
       return spellFailureFromInfo(info, mod, lookup);
     }
   }
@@ -15324,6 +15368,7 @@ function spellFailureRoll(type, mod, lookup) {
  * Main worder function.
  */
 function spellFailureFromInfo(info, modifier, lookup) {
+  'use strict';
   if (!info) { return false; }
   if (typeof(lookup) != 'boolean') { return false; }
   if (typeof(modifier) != 'number') { return false; }
@@ -20142,7 +20187,6 @@ frontpage.updateDB = function () {
     updates.db_passivedodgemissile = basedb + passivedodgebonusmissile;
     {
       const pd2 = Math.floor(passivedodgebonus / 2);
-      console.log("passive dodge");
       updates.db_passivedodge_info = "Passive Dodge\n" +
 				     `${F(basedb)} Base DB\n` +
 				     `${F(passivedodgebonus)} Passive Dodge (Max 50)\n` +
@@ -20186,7 +20230,6 @@ frontpage.updateDB = function () {
       updates.db_fulldodge = basedb + Math.max(0, running_bonus + encump);
       updates.db_fulldodgemissile = basedb +
 	      Math.floor(Math.max(0, running_bonus + encump) / 2);
-	console.log("full dodge");
       updates.db_fulldodge_info = "Full Dodge\n" +
 				  `${F(basedb)} Base DB\n` +
 				  `${F(full_dodge_bonus)} Dodge Bonus\n` +
@@ -20208,7 +20251,6 @@ frontpage.updateDB = function () {
     
     {
       updates.db_passiveblock = basedb + passiveblockbonus;
-      console.log("passibe block ", basedb, shielddb, shield_ranks);
       updates.db_passiveblock_info = "Passive Block\n" +
 				     `${F(basedb)} Base DB\n` +
 				     `${F(shielddb)} Shield DB\n` +
@@ -22162,6 +22204,7 @@ function sizeFromNumeric(value) {
 	}
 
 	// We hit - Where?
+	console.log("Crit roll", critroll);
 	let hit = attacks.getLocation(critroll);
 
 	// Attack data is a really big string - json it as late as we can
@@ -22484,13 +22527,12 @@ function sizeFromNumeric(value) {
 			'attackuseap', 'actionapperphase',
 			'token_id'
 			], values => {
-		console.log('New attack: get attrs (with token)', values, ev);
 		if (values.actionapperphase == '1' && 
 			    values.statuseffect && values.statuseffect == 'staggered') {
 		    sendMessage(`${values.character_name} is staggered, cannot attack`);
 		    return;
 		}
-		cdata = {}
+		const cdata = {}
 		cdata.min = +values[`${basename}_attackmin`];
 		cdata.max = +values[`${basename}_attackmax`];
 		cdata.fumblerange = +values[`${basename}_attackfumble`];
@@ -22536,13 +22578,10 @@ function sizeFromNumeric(value) {
 
     onCheck('clicked:rmuattacktargetrefresh', (_) => {
 	getAttrs(["target_characterid"], (ev) => {
-	    console.log(ev);
 	    const myid = setActiveCharacterId(ev.target_characterid);
-	    console.log(myid);
 	
 	    getAttrs(["name", "db", "size", "name", "at_head", "at_torso", "at_arms", "at_legs"],
 		    (remote) => {
-		console.log("remote", remote);
 		let atstr = ev.athead;
 		if (remote.at_head != remote.at_torso ||
 			remote.at_head != remote.at_arms ||

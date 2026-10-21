@@ -1,3 +1,14 @@
+# 2026-10-22
+
+- Add Arcane spell failure
+- Rearrange to remove non-async code from rmuasync (moved to support)
+- Fix test dependencies to be more explicit
+- Spells:
+  - Fetch trickery & grace when casting spells
+  - Fix for total not being defined (again, rare error)
+  - Add a basic test for spell casting.
+  - More strictness in the spells page.
+
 # 2026-10-20
 
 - Add Arcane average option to the options in game
