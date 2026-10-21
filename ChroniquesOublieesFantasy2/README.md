@@ -4,11 +4,55 @@
 
 Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
+Testez la version beta sur [Roll20](https://app.roll20.net/join/20677494/PzCI6Q)
+
 ## Version courante
 
-v1.16.0 [Screenshot](cof2e.png)
+v1.18.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.18.0_ (2026-09-20)
+
+- Fiche de PJ:
+  - Ajout des jets secrets au MJ (commande `/s`)
+  - Ajout du bouton d'activation des buffs dans l'onglet Attaques
+  - Amélioration des boutons Chance (affichage des DM en cas de dépense après une attaque ratée)
+  - Ajout de la condition spéciale _sans défense_ (cible avec DEF -5)
+  - Ajout de la propriété `bonus` aux équipements (bonus de compétence)
+  - Ajout des propriétés `type: parchemin`, `type: grimoire`, `type: combat` et `type: jour` aux ressources
+  - Ajout du modificateur d'attaque `crit` pour les coups critiques
+  - Ajout du modificateur d'attaque `seuil` pour les effets à partir d'un seuil au D20
+  - Fonction *LOOT* sans le script MOD ChatSetAttr
+  - Ajout d'une aide à la sélection des deux premières voies au niveau 1
+  - Ajout d'une aide à la sélection des modificateurs de peuples
+  - Ajout de la catégorie de taille du peuple
+  - Prise en compte de la petite taille pour le maniement des armes
+
+- Fiche de PNJ:
+  - Ajout des rangs de boss & filtres narratifs (Bestiaire)
+  - Ajout de la zone _Equipement divers_
+  - Prise en charge des capacités _par initiative_
+  - Fonction *LOOT* sans le script MOD ChatSetAttr
+
+### Version _1.17.1_ (2026-07-19)
+
+- Fiche de PJ:
+  - Ajout des Points d'Ego et des capacités combat/jour aux boutons de récupération
+  - Ajout des maîtrises de compétences liées aux peuples (compagnon compris)
+  - Ajout des propriétés `mods` et `options` aux équipements de type arme
+  - Amélioration des armes maîtrisées (arme magique avec +X dans son nom)
+  - Ajout de 4 langues personnalisées + possibilité de renommer les langues standard
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Ajout de conditions d'armure pour les buffs (comparaison avec l'_agi-max_ de l'armure portée)
+  - Ajout du _pacte occulte_ des mages
+  - Interactions avec **COFantasy2** (contact/lancer, potions, décompte des PM et capacités)
+
+- Fiche de PNJ:
+  - Modification de la case à cocher _Attaques multiples_ par un nombre d'attaques (1 par défaut)
+  - Amélioration de l'import des attaques à distance d'un statblock
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Interactions avec **COFantasy2** (paramètres des capacités)
 
 ### Version _1.16.0_ (2026-06-08)
 

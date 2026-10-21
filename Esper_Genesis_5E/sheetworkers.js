@@ -435,7 +435,11 @@ on("change:repeating_inventory:itemmodifiers change:repeating_inventory:equipped
     });
 });
 
-on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield change:ac_misc_mod", function(eventinfo) {
+// change:simpleinventory is included because update_ac() gates the entire armor scan on
+// simpleinventory === "complex". Without this trigger, switching INVENTORY between Simple and
+// Compendium Compatible leaves the previously calculated AC in place until some unrelated
+// change happens to fire a recalculation.
+on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield change:ac_misc_mod change:simpleinventory", function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
         return;
     }
@@ -2272,10 +2276,19 @@ var update_ac = function() {
                         var custom_total = 0;
                         if(v.custom_ac_flag === "1") {
                             var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
-                            var part1attr = b.custom_ac_part1.toLowerCase();
-                            var part2attr = b.custom_ac_part2.toLowerCase();
+                            // A class "Custom AC" blob writes "" for an absent second attribute,
+                            // and .toLowerCase() throws outright when the attribute is undefined.
+                            // Either way custom_total became NaN -- and because `NaN > 0` is false,
+                            // the entire custom-AC block below was skipped SILENTLY: no custom AC
+                            // applied and no "custom AC is not being used" warning shown. Treat an
+                            // empty/missing part as "none", and floor an unresolvable ability name
+                            // (e.g. "Dex" rather than "Dexterity") at 0 instead of NaN.
+                            var part1attr = (b.custom_ac_part1 || "none").toLowerCase();
+                            var part2attr = (b.custom_ac_part2 || "none").toLowerCase();
                             var part1 = part1attr === "none" ? 0 : parseInt(b[part1attr + "_mod"], 10);
                             var part2 = part2attr === "none" ? 0 : parseInt(b[part2attr + "_mod"], 10);
+                            if(isNaN(part1)) { part1 = 0; }
+                            if(isNaN(part2)) { part2 = 0; }
                             custom_total = base + part1 + part2;
                         }
                         var globalacmod = 0;

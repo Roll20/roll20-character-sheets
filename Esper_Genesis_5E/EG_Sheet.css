@@ -1,5 +1,18 @@
+/* Esper Genesis 5E Sheet - v3.1
+   Revision 2026-07-26. Bug fixes only; sheet version intentionally NOT bumped.
+     - Armor Class: simpleinventory / simpletraits / simpleproficencies each had two
+       inputs declaring conflicting defaults. Equipped armor was ignored, and the
+       multiple-armor and custom-AC warnings could never fire.
+     - Armor Class: custom AC was silently discarded when a class formula supplied
+       only one ability (NaN fallthrough).
+     - Charactermancer: malformed equipment bundles no longer expand into one
+       inventory row per character.
+     - Header token frame: empty-state rules synced from the SASS source, and the
+       person glyph added to the Material Symbols icon subset.
+   Full detail in CHANGES.md.
+*/
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&family=Noto+Sans:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,settings,star_shine');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,person,settings,star_shine');
 
 /* Esper Genesis Character Sheet */
 
@@ -279,6 +292,16 @@ input[type=radio].npc-button:checked + span {
 }
 .toggleflag[value="1"] + .hidden, .toggleflag[value="1"] + :is(.sheet-row, .row).hidden {
   display: block;
+}
+
+/* Platform override. The `.hidden` class collides with a Bootstrap-style rule bundled
+   by the Roll20 CSE platform carrying display:none !important, so the plain rule above
+   (specificity 0,3,0, no !important) never wins and the toggle sections could never be
+   revealed. Roll20's own OGL sheet carries the same .charsheet-prefixed override for
+   the same reason. Governs the five global modifier fields and the Custom AC row. */
+.charsheet .toggleflag[value="1"] + .hidden,
+.charsheet .toggleflag[value="1"] + :is(.sheet-row, .row).hidden {
+  display: block !important;
 }
 
 .npc_toggle[value="1"] + .npcspellcastingflag[value="1"] ~ .pc {
@@ -712,12 +735,37 @@ input[type=radio].npc-button.ships + span {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+/* Placeholder shown when no avatar is bound. The VTT populates attr_character_avatar
+   from the character portrait; Roll20 Characters does NOT, so without the rule
+   below, the frame rendered a broken image and displayed its alt text ("Character Token"). The glyph
+   sits at z-index 0 and the avatar covers it at z-index 1 when a src is present. */
+.name-container :is(.sheet-token-frame, .token-frame)::before {
+  content: 'person';
+  font-family: 'Material Symbols Outlined';
+  font-size: 56px;
+  color: #ccc;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-transform: none;
+  font-variant: normal;
 }
 .name-container :is(.sheet-char-avatar, .char-avatar) {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+  position: relative;
+  z-index: 1;
+  background: var(--eg-bg);
+}
+.name-container :is(.sheet-char-avatar, .char-avatar):not([src]),
+.name-container :is(.sheet-char-avatar, .char-avatar)[src=''] {
+  display: none;
 }
 
 /* Right column: name row + toggle + edit/display panels */
@@ -3336,7 +3384,8 @@ button[type=roll] * {
 
 /* ---- Attacks section redesign ---- */
 .attacks .global-dmg > span.label,
-.attacks > span.label {
+.attacks > span.label,
+.globalattack > span.label {
   font-family: 'Oxanium', sans-serif;
   color: var(--eg-blue);
   letter-spacing: 1px;
@@ -7156,8 +7205,8 @@ span.spellritual, span.spellconcentration {
   margin-bottom: 1em;
 }
 /* Review tab: the section headers (Features / Feats / Powers) are p.label elements
-   that Roll20's platform CSS center-aligns by default. EG never overrode this, so it
-   was invisible until dark mode gave the labels a readable color. Left-align them to
+   that Roll20's platform CSS center-aligns by default. EG never overrode the
+   default, so the heading was invisible until dark mode gave the labels a readable color. Left-align them to
    match the "Before/After Leveling" h2 headers and the body text. */
 .charmancer .summary .label {
   text-align: left;
@@ -7675,6 +7724,67 @@ body:not(:-moz-handler-blocked) .charmancer .bottombar {
   display: flex;
   align-items: center;
 }
+
+/* Unify the five global-modifier rows. Only .global-dmg used to get the flex
+   treatment, so `align-self: center` on .active-flag had no flex container in
+   the save / skill / attack / AC rows and the checkbox sat top-aligned. */
+.pc .globalattack .global-mod {
+  display: flex;
+  align-items: center;
+}
+.pc .globalattack .global-mod > :is(.sheet-display, .display),
+.pc .globalattack .global-mod > div.globaldisplay,
+.pc .globalattack .global-mod > :is(.sheet-options, .options) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Global-modifier row contents. The shared label rule
+   (".attacks span, .globalattack span, ...") pins every span to 9px, centred, with
+   margin-top:5px, which outranks anything inherited from the container. Override it
+   here so the values read at 11px like the attacks damage cell (.atk-dmg-cell). */
+.pc .globalattack .global-mod div.globaldisplay,
+.pc .globalattack .global-mod div.globaldisplay span,
+.pc .globalattack .global-mod :is(.sheet-display, .display) .title,
+.pc .globalattack .global-mod :is(.sheet-display, .display) .title span {
+  font-size: 11px;
+  line-height: 16px;
+  text-align: left;
+  width: auto;
+  margin-top: 0;
+}
+/* ".globalattack input[type=checkbox]" adds margin-top:10px, which shoves the
+   enable checkbox below centre even though align-self:center is already applied. */
+.pc .globalattack .global-mod .active-flag {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Header underline ran past the box edge: the shared span rule sets width:100% on
+   every .globalattack span, and the header style adds 8px of side padding, which
+   under the PC core's content-box sizing adds 16px on top of the full width. */
+.pc .globalattack > span.label {
+  width: auto;
+}
+
+/* Click target for the gear on global-modifier rows. The target starts 15px above the
+   icon (inline "top: -15px") and is only 18px tall, so on Save / Skill / AC it covered
+   just the top 3px of the icon. Attack and Damage already work because they sit inside
+   ".attacks", which enlarges the target to 22x32. Use the same proven size everywhere -
+   the icon and every positioning anchor stay exactly where they are. */
+.pc .globalattack .global-mod > .options-flag {
+  width: 22px;
+  height: 32px;
+}
+
+/* The gear icon draws at the top-right of each modifier row, and Roll20's add/lock
+   control row followed immediately underneath, so the two collided. Push the control
+   row down to clear it. Follows the same approach as ".resources .repcontrol".
+   The icon, its click target and every positioning anchor are left alone. */
+.pc .globalattack .repcontrol {
+  margin-top: 10px;
+}
+
 .pc div.global-dmg div:is(.sheet-display, .display) {
   flex: 1;
   min-width: 0;
@@ -7695,19 +7805,16 @@ body:not(:-moz-handler-blocked) .charmancer .bottombar {
 
 /* Customizations for the PC's global damage area */
 div.globaldisplay {
-  width: 80%;
-  background-color: var(--eg-bg-alt);
-  border-bottom-right-radius: 5px;
-  border-top-left-radius: 5px;
-  display: inline-block;
-  font-size: 9px;
+  background-color: transparent;
+  display: block;
+  font-size: 11px;
   font-weight: bold;
+  color: var(--eg-text);
   line-height: 16px;
-  padding-bottom: 3px;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 3px;
+  padding: 0;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 div.globaldisplay span {
@@ -8499,6 +8606,13 @@ div.charmancer .compendium-logo, div.charmancer .compendium-logo {
   height: 100%;
   object-fit: contain;
   display: block;
+}
+/* Same empty-state guard as the PC frame: without it a src-less <img> renders as a
+   broken image. The ship markup carries no alt text, so no placeholder glyph is used
+   here - the empty gold frame is the intended look. */
+.charsheet .pc .sheet-pc-ship :is(.sheet-char-avatar, .char-avatar):not([src]),
+.charsheet .pc .sheet-pc-ship :is(.sheet-char-avatar, .char-avatar)[src=''] {
+  display: none;
 }
 .charsheet .pc .sheet-pc-ship .sheet-ship-info {
   flex: 1;
