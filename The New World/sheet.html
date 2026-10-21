@@ -1,5 +1,5 @@
 <input type="hidden" class="tab-toggle" name="attr_tab" value="character" />
-<input type="hidden" class="zoom-toggle" name="attr_sheet_zoom" value="1" />
+<input type="hidden" class="zoom-toggle" name="attr_sheet_zoom" value="0.75" />
 <div class="tnw">
   <div class="tabs">
     <button type="action" class="tab tab-character" name="act_tabcharacter">Character</button>
@@ -66,7 +66,7 @@
     <span class="calc big f-move" name="attr_movement" title="3 + AGI (2 + AGI for halflings)"></span>
     <span class="calc big f-mdef" name="attr_melee_defence" title="7 + MS + half AGI"></span>
     <span class="calc big f-rdef" name="attr_ranged_defence" title="8 + AGI"></span>
-    <button type="roll" class="roll big f-init" name="roll_initiative" title="Add to turn order (AGI, no roll)" value="&{template:tnw} {{name=@{character_name}}} {{title=Initiative}} {{init=[[@{initiative} &{tracker}]]}} {{info=Agility, highest first. Ties go to higher Wits.}}"><span name="attr_initiative"></span></button>
+    <button type="roll" class="roll big f-init" name="roll_initiative" title="Add to turn order (AGI, no roll)" value="&{template:tnw} {{name=@{character_name}}} {{kind=Combat}} {{title=Initiative}} {{init=[[@{initiative} &{tracker}]]}} {{info=Agility, highest first. Ties go to higher Wits.}}"><span name="attr_initiative"></span></button>
     <input type="number" class="big f-luck" name="attr_luck" title="Current Luck" />
     <span class="calc big f-luckmax" name="attr_luck_max" title="Human 3, Elf 1, Dwarf 2, Halfling 4 (+1 Lucky)"></span>
     <input type="radio" class="pip pip0" name="attr_luck" value="0" checked="checked" />
@@ -443,7 +443,7 @@
         <label>Roll visibility</label>
         <select name="attr_roll_visibility"><option value="public">Everyone</option><option value="gm">GM only (whisper)</option></select>
         <label>Sheet size</label>
-        <select name="attr_sheet_zoom"><option value="1">100%</option><option value="0.9">90%</option><option value="0.8">80%</option><option value="0.7">70%</option><option value="0.6">60%</option></select>
+        <select name="attr_sheet_zoom"><option value="1">100%</option><option value="0.9">90%</option><option value="0.85">85%</option><option value="0.8">80%</option><option value="0.75" selected="selected">75%</option><option value="0.7">70%</option><option value="0.65">65%</option><option value="0.6">60%</option></select>
         <label>Spells cast with</label>
         <select name="attr_magic_skill"><option value="auto">Best magic skill</option><option value="hearthmagic">Hearth Magic (PRE)</option><option value="soulmagic">Soul Magic (RES)</option><option value="runemagic">Rune Magic (INT)</option></select>
         <label>Lucky talent</label>
@@ -477,38 +477,65 @@
 </div>
 
 <rolltemplate class="sheet-rolltemplate-tnw">
-  <div class="tnw-card">
-    <div class="tnw-head">
-      <div class="tnw-title">{{title}}</div>
-      <div class="tnw-who">{{name}}</div>
+  <div class="card">
+    <div class="banner">
+      {{#kind}}<div class="kind"><span>{{kind}}</span></div>{{/kind}}
     </div>
-    {{#sub}}<div class="tnw-sub">{{sub}}</div>{{/sub}}
-    {{#dice}}
-    <div class="tnw-main">
-      <div class="tnw-dice"><span class="tnw-die">{{computed::d1}}</span><span class="tnw-die">{{computed::d2}}</span></div>
-      <div class="tnw-total">{{computed::total}}</div>
-      {{#rollGreater() target 0}}<div class="tnw-vs">vs {{target}}</div>{{/rollGreater() target 0}}
+    <div class="body">
+      <div class="title">{{title}}</div>
+      <div class="who">{{name}}</div>
+      {{#sub}}<div class="sub">{{sub}}</div>{{/sub}}
+      <div class="rule"><span class="gem"></span><span class="gem"></span><span class="gem"></span></div>
+      {{#dice}}
+      <div class="throw">
+        <div class="dice">
+          {{#rollTotal() computed::d1 1}}<span class="d6"><span class="pip p22"></span></span>{{/rollTotal() computed::d1 1}}
+          {{#rollTotal() computed::d1 2}}<span class="d6"><span class="pip p11"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d1 2}}
+          {{#rollTotal() computed::d1 3}}<span class="d6"><span class="pip p11"></span><span class="pip p22"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d1 3}}
+          {{#rollTotal() computed::d1 4}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d1 4}}
+          {{#rollTotal() computed::d1 5}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p22"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d1 5}}
+          {{#rollTotal() computed::d1 6}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p21"></span><span class="pip p23"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d1 6}}
+          {{#rollTotal() computed::d2 1}}<span class="d6"><span class="pip p22"></span></span>{{/rollTotal() computed::d2 1}}
+          {{#rollTotal() computed::d2 2}}<span class="d6"><span class="pip p11"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d2 2}}
+          {{#rollTotal() computed::d2 3}}<span class="d6"><span class="pip p11"></span><span class="pip p22"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d2 3}}
+          {{#rollTotal() computed::d2 4}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d2 4}}
+          {{#rollTotal() computed::d2 5}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p22"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d2 5}}
+          {{#rollTotal() computed::d2 6}}<span class="d6"><span class="pip p11"></span><span class="pip p13"></span><span class="pip p21"></span><span class="pip p23"></span><span class="pip p31"></span><span class="pip p33"></span></span>{{/rollTotal() computed::d2 6}}
+        </div>
+        <div class="seal">
+          <span class="total">{{computed::total}}</span>
+          {{#rollGreater() target 0}}<span class="vs">vs {{target}}</span>{{/rollGreater() target 0}}
+          {{^rollGreater() target 0}}<span class="vs">total</span>{{/rollGreater() target 0}}
+        </div>
+      </div>
+      {{#rollTotal() computed::outcome 0}}<div class="ribbon snake"><span>{{computed::verdict}}</span></div>{{/rollTotal() computed::outcome 0}}
+      {{#rollTotal() computed::outcome 1}}<div class="ribbon fail"><span>{{computed::verdict}}</span></div>{{/rollTotal() computed::outcome 1}}
+      {{#rollTotal() computed::outcome 2}}<div class="ribbon open"><span>{{computed::verdict}}</span></div>{{/rollTotal() computed::outcome 2}}
+      {{#rollTotal() computed::outcome 3}}<div class="ribbon win"><span>{{computed::verdict}}</span></div>{{/rollTotal() computed::outcome 3}}
+      {{#rollTotal() computed::crit 1}}<div class="crit">Critical · Damage ×2</div>{{/rollTotal() computed::crit 1}}
+      {{#rollTotal() computed::crit 2}}<div class="crit">Doubles · critical if it hits</div>{{/rollTotal() computed::crit 2}}
+      {{/dice}}
+      <div class="rows">
+        {{^rollTotal() mod 0}}{{#mod}}<div class="row"><span class="lab">Modifier</span><span class="dots"></span><span class="val">{{mod}}</span></div>{{/mod}}{{/rollTotal() mod 0}}
+        {{#fatigue}}<div class="row"><span class="lab">Fatigue</span><span class="dots"></span><span class="val">−{{fatigue}}</span></div>{{/fatigue}}
+        {{#location}}<div class="row"><span class="lab">Hit location</span><span class="dots"></span><span class="val">{{computed::location}}</span></div>{{/location}}
+      </div>
+      {{#damage}}
+      <div class="damage">
+        <div class="dmg-head"><span class="dmg-lab">Damage</span><span class="dmg-val">{{computed::damage}}</span></div>
+        <div class="dmg-src">{{computed::dmgsrc}}</div>
+        {{#pierce}}<div class="dmg-src pierce">Piercing: ignores 2 points of armour.</div>{{/pierce}}
+      </div>
+      {{/damage}}
+      {{#init}}
+      <div class="throw"><div class="seal"><span class="total">{{init}}</span><span class="vs">AGI</span></div></div>
+      {{/init}}
+      {{#notes}}<div class="note">{{notes}}</div>{{/notes}}
+      {{#effect}}<div class="note effect">{{effect}}</div>{{/effect}}
+      {{#info}}<div class="note">{{info}}</div>{{/info}}
+      {{#reroll}}<div class="links">{{reroll}}{{spend}}</div>{{/reroll}}
     </div>
-    {{#rollTotal() computed::outcome 0}}<div class="tnw-verdict tnw-snake">{{computed::verdict}}</div>{{/rollTotal() computed::outcome 0}}
-    {{#rollTotal() computed::outcome 1}}<div class="tnw-verdict tnw-fail">{{computed::verdict}}</div>{{/rollTotal() computed::outcome 1}}
-    {{#rollTotal() computed::outcome 2}}<div class="tnw-verdict tnw-open">{{computed::verdict}}</div>{{/rollTotal() computed::outcome 2}}
-    {{#rollTotal() computed::outcome 3}}<div class="tnw-verdict tnw-win">{{computed::verdict}}</div>{{/rollTotal() computed::outcome 3}}
-    {{#rollTotal() computed::crit 1}}<div class="tnw-crit">Critical hit · Damage doubled</div>{{/rollTotal() computed::crit 1}}
-    {{#rollTotal() computed::crit 2}}<div class="tnw-crit">Doubles: a critical if it hits</div>{{/rollTotal() computed::crit 2}}
-    {{/dice}}
-    <div class="tnw-rows">
-      {{^rollTotal() mod 0}}{{#mod}}<div class="tnw-row"><span>Modifier</span><span>{{mod}}</span></div>{{/mod}}{{/rollTotal() mod 0}}
-      {{#fatigue}}<div class="tnw-row"><span>Fatigue</span><span>−{{fatigue}}</span></div>{{/fatigue}}
-      {{#location}}<div class="tnw-row"><span>Location</span><span>{{computed::location}}</span></div>{{/location}}
-      {{#damage}}<div class="tnw-row tnw-dmg"><span>Damage</span><span>{{computed::damage}}</span></div>
-      <div class="tnw-note">{{computed::dmgsrc}}</div>{{/damage}}
-      {{#pierce}}<div class="tnw-note">Piercing: ignores 2 points of armour.</div>{{/pierce}}
-      {{#notes}}<div class="tnw-note">{{notes}}</div>{{/notes}}
-      {{#effect}}<div class="tnw-note">{{effect}}</div>{{/effect}}
-      {{#init}}<div class="tnw-row tnw-dmg"><span>Initiative</span><span>{{init}}</span></div>{{/init}}
-      {{#info}}<div class="tnw-note">{{info}}</div>{{/info}}
-    </div>
-    {{#reroll}}<div class="tnw-links">{{reroll}} {{spend}}</div>{{/reroll}}
+    <div class="footer"></div>
   </div>
 </rolltemplate>
 
@@ -679,7 +706,7 @@
     const doRoll = (opts, values) => {
         const prefix = values.roll_visibility === "gm" ? "/w gm " : "";
         const target = opts.target === undefined ? diff_query : opts.target;
-        let str = `${prefix}&{template:tnw} {{name=@{character_name}}} {{title=${opts.title}}} `
+        let str = `${prefix}&{template:tnw} {{name=@{character_name}}} {{kind=${opts.kind}}} {{title=${opts.title}}} `
             + `{{sub=${opts.sub}}} {{dice=[[2d6]]}} {{mod=[[${mod_query}]]}} {{target=[[${target}]]}} `
             + `{{total=[[0]]}} {{d1=[[0]]}} {{d2=[[0]]}} {{outcome=[[0]]}} {{verdict=[[0]]}} {{crit=[[0]]}} `
             + `{{reroll=[Reroll](~${opts.btn})}} {{spend=[Spend Luck](~spendluck)}}`;
@@ -704,7 +731,7 @@
 
             if (snake) {
                 computed.outcome = 0;
-                computed.verdict = "Snake eyes — always fails";
+                computed.verdict = "Snake eyes · fails";
             } else if (!known) {
                 computed.outcome = 2;
                 computed.verdict = opts.attack ? "Hits if this beats the target's Defence" : "Compare with the opposing total";
@@ -750,7 +777,7 @@
         on(`clicked:roll${char}`, () => {
             getAttrs(roll_inputs, values => {
                 const v = int(values[char]);
-                doRoll({btn: `roll${char}`, title: chars_data[char].name,
+                doRoll({btn: `roll${char}`, kind: "Characteristic", title: chars_data[char].name,
                     sub: `${chars_data[char].abbr} ${v}`, score: v}, values);
             });
         });
@@ -761,7 +788,7 @@
         on(`clicked:roll${skill}`, () => {
             getAttrs(roll_inputs, values => {
                 const s = skillScore(skill, values);
-                doRoll({btn: `roll${skill}`, title: skillTitle(skill, values), sub: s.sub, score: s.score}, values);
+                doRoll({btn: `roll${skill}`, kind: "Skill test", title: skillTitle(skill, values), sub: s.sub, score: s.score}, values);
             });
         });
     });
@@ -799,7 +826,7 @@
             const notes = clean(weapon.notes);
             const pierce = /(^|[^a-z])(p|piercing)([^a-z]|$)/i.test(notes);
             doRoll({
-                btn, attack: true, target: def_query, fatigue, pierce,
+                btn, kind: "Attack", attack: true, target: def_query, fatigue, pierce,
                 notes: /^(p|piercing)$/i.test(notes) ? "" : notes,
                 title: clean(weapon.name) || "Attack",
                 sub: `${skill_label} · ${s.sub}`,
@@ -854,7 +881,7 @@
             const diff = parseDifficulty(spell.difficulty);
             const extra = [clean(spell.range), clean(spell.duration)].filter(x => x).join(" · ");
             doRoll({
-                btn, fatigue,
+                btn, fatigue, kind: "Spell",
                 title: clean(spell.name) || "Cast",
                 sub: `${skill_data[skill].name} · ${s.sub}${extra ? " · " + extra : ""}`,
                 score: s.score,
@@ -894,7 +921,7 @@
                 ? `Spends 1 Luck: +1 to the roll. ${luck - 1} Luck left.`
                 : "No Luck left to spend.";
             if (luck > 0) setAttrs({"luck": luck - 1});
-            startRoll(`${prefix}&{template:tnw} {{name=@{character_name}}} {{title=Luck}} {{info=${info}}}`,
+            startRoll(`${prefix}&{template:tnw} {{name=@{character_name}}} {{kind=Fortune}} {{title=Luck spent}} {{info=${info}}}`,
                 results => finishRoll(results.rollId));
         });
     });
