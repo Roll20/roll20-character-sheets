@@ -334,17 +334,17 @@
 
   <!-- ===================== PAGE 2: GEAR AND MAGIC ===================== -->
   <div class="page art page-gear">
-    <input type="text" class="cell ar-head" name="attr_armour_head" spellcheck="false" />
-    <input type="number" class="mid av-head" name="attr_av_head" title="Armour value" />
+    <select class="cell pick ar-head" name="attr_armour_head" title="Armour worn here, from chapter 6"><option value="">None</option><option value="Padded cap or fur hood" title="No drawback">Padded cap or fur hood</option><option value="Hardened leather cap" title="No drawback">Hardened leather cap</option><option value="Wooden helmet" title="No drawback">Wooden helmet</option><option value="Mail coif" title="No drawback">Mail coif</option><option value="Steel helmet" title="No drawback">Steel helmet</option><option value="Plate helm" title="No drawback">Plate helm</option></select>
+    <span class="calc mid av-head" name="attr_av_head" title="Armour value, from the armour chosen"></span>
     <span class="calc mid va-head" name="attr_value_head" title="Armour value + Endurance"></span>
-    <input type="text" class="cell ar-arms" name="attr_armour_arms" spellcheck="false" />
-    <input type="number" class="mid av-arms" name="attr_av_arms" title="Armour value" />
+    <select class="cell pick ar-arms" name="attr_armour_arms" title="Armour worn here, from chapter 6"><option value="">None</option><option value="Padded or buckskin sleeves" title="No drawback">Padded or buckskin sleeves</option><option value="Hardened leather bracers" title="No drawback">Hardened leather bracers</option><option value="Wooden slat bracers" title="No drawback">Wooden slat bracers</option><option value="Mail sleeves" title="No drawback">Mail sleeves</option><option value="Steel vambraces" title="No drawback">Steel vambraces</option><option value="Plate arms" title="No drawback">Plate arms</option></select>
+    <span class="calc mid av-arms" name="attr_av_arms" title="Armour value, from the armour chosen"></span>
     <span class="calc mid va-arms" name="attr_value_arms" title="Armour value + Endurance"></span>
-    <input type="text" class="cell ar-legs" name="attr_armour_legs" spellcheck="false" />
-    <input type="number" class="mid av-legs" name="attr_av_legs" title="Armour value" />
+    <select class="cell pick ar-legs" name="attr_armour_legs" title="Armour worn here, from chapter 6"><option value="">None</option><option value="Padded or buckskin leggings" title="No drawback">Padded or buckskin leggings</option><option value="Hardened leather greaves" title="No drawback">Hardened leather greaves</option><option value="Wooden slat greaves" title="No drawback">Wooden slat greaves</option><option value="Mail leggings" title="No drawback">Mail leggings</option><option value="Steel tassets and greaves" title="-1 Movement">Steel tassets and greaves</option><option value="Plate legs" title="-1 Stealth and Acrobatics, -1 Movement">Plate legs</option></select>
+    <span class="calc mid av-legs" name="attr_av_legs" title="Armour value, from the armour chosen"></span>
     <span class="calc mid va-legs" name="attr_value_legs" title="Armour value + Endurance"></span>
-    <input type="text" class="cell ar-body" name="attr_armour_body" spellcheck="false" />
-    <input type="number" class="mid av-body" name="attr_av_body" title="Armour value" />
+    <select class="cell pick ar-body" name="attr_armour_body" title="Armour worn here, from chapter 6"><option value="">None</option><option value="Padded jack or buckskin shirt" title="No drawback">Padded jack or buckskin shirt</option><option value="Hardened leather or hide jerkin" title="No drawback">Hardened leather or hide jerkin</option><option value="Wooden slat or rod cuirass" title="-1 Stealth">Wooden slat or rod cuirass</option><option value="Mail shirt" title="-1 Stealth">Mail shirt</option><option value="Brigandine, half plate or breastplate" title="-1 Stealth and Acrobatics">Brigandine, half plate or breastplate</option><option value="Plate cuirass" title="-1 Stealth and Acrobatics">Plate cuirass</option></select>
+    <span class="calc mid av-body" name="attr_av_body" title="Armour value, from the armour chosen"></span>
     <span class="calc mid va-body" name="attr_value_body" title="Armour value + Endurance"></span>
     <div class="rep-box rb-weapons">
       <fieldset class="repeating_weapons">
@@ -580,6 +580,8 @@
         "halfling": {"luck": 4, "move": 2}
     };
     const locations = ["head", "arms", "body", "legs"];
+    // Armour by location from chapter 6: piece name -> armour value.
+    const armour_data = {"head": {"Padded cap or fur hood": 1, "Hardened leather cap": 2, "Wooden helmet": 3, "Mail coif": 3, "Steel helmet": 4, "Plate helm": 5}, "body": {"Padded jack or buckskin shirt": 1, "Hardened leather or hide jerkin": 2, "Wooden slat or rod cuirass": 3, "Mail shirt": 3, "Brigandine, half plate or breastplate": 4, "Plate cuirass": 5}, "arms": {"Padded or buckskin sleeves": 1, "Hardened leather bracers": 2, "Wooden slat bracers": 3, "Mail sleeves": 3, "Steel vambraces": 4, "Plate arms": 5}, "legs": {"Padded or buckskin leggings": 1, "Hardened leather greaves": 2, "Wooden slat greaves": 3, "Mail leggings": 3, "Steel tassets and greaves": 4, "Plate legs": 5}};
     const roll_limit = 9;
 
     const chars_list = Object.keys(chars_data);
@@ -591,7 +593,7 @@
         .concat(chars_list.map(c => `cap_${c}`))
         .concat(skill_list.map(s => `rank_${s}`))
         .concat(custom_list.map(s => `cchar_${s}`))
-        .concat(locations.map(l => `av_${l}`))
+        .concat(locations.map(l => `armour_${l}`))
         .concat(["species", "lucky", "xp_total", "xp_spent"]);
     const roll_inputs = []
         .concat(chars_list)
@@ -640,7 +642,9 @@
             update.initiative = cur.agi;
             update.luck_max = spd.luck + (int(values.lucky) ? 1 : 0);
             locations.forEach(l => {
-                update[`value_${l}`] = int(values[`av_${l}`]) + cur.end;
+                const av = armour_data[l][values[`armour_${l}`]] || 0;
+                update[`av_${l}`] = av;
+                update[`value_${l}`] = av + cur.end;
             });
             update.xp_unspent = int(values.xp_total) - int(values.xp_spent);
             setAttrs(update, {silent: true});
@@ -1424,7 +1428,7 @@
     // Version 4: spell rows got a picker. Old rows match a book spell or rune by
     // name where they can, keeping what was typed; otherwise they become Custom.
     const migrate4 = version => {
-        if (version >= 4) return;
+        if (version >= 4) return migrate5(version);
         getSectionIDs("repeating_spells", ids => {
             const fields = ids.map(id => `repeating_spells_${id}_name`).concat(ids.map(id => `repeating_spells_${id}_pick`));
             getAttrs(fields, values => {
@@ -1436,8 +1440,29 @@
                     update[`repeating_spells_${id}_pick`] = key || "custom";
                     if (key) update[`repeating_spells_${id}_skill`] = spell_data[key].skill;
                 });
-                setAttrs(update, {silent: true});
+                setAttrs(update, {silent: true}, () => migrate5(4));
             });
+        });
+    };
+
+    // Version 5: armour became a choice per location. Typed armour that matches a
+    // piece is kept; anything else becomes None and is noted in Notes.
+    const migrate5 = version => {
+        if (version >= 5) return;
+        getAttrs(locations.map(l => `armour_${l}`).concat(["notes"]), values => {
+            const update = {migration_version: 5};
+            const lost = [];
+            locations.forEach(l => {
+                const typed = (values[`armour_${l}`] || "").trim();
+                if (!typed || armour_data[l][typed] !== undefined) return;
+                const match = Object.keys(armour_data[l]).find(n => n.toLowerCase() === typed.toLowerCase());
+                update[`armour_${l}`] = match || "";
+                if (!match) lost.push(`${l}: ${typed}`);
+            });
+            if (lost.length) {
+                update.notes = (values.notes ? values.notes + "\n\n" : "") + "Armour from before the armour lists: " + lost.join("; ");
+            }
+            setAttrs(update, {silent: true}, recalc);
         });
     };
 </script>
