@@ -920,45 +920,48 @@
 					</div>
 					<div class="sheet-row">
 						<div class="sheet-col-2-3 sheet-small-label sheet-center">
-							<select name="attr_eqarmour">
-								<option value="0" selected="selected">None</option>
-								<option value="200">Leather Armor (AC 7)</option>
-								<option value="300">Scale Mail (AC 6)</option>
-								<option value="400">Chain Mail (AC 5)</option>
-								<option value="450">Banded Mail (AC 4)</option>
-								<option value="500">Plate Mail (AC 3)</option>
-								<option value="750">Suit Armor (AC 0)</option>
-								<option value="50">Protective Skins</option>
-								<option value="150">Fur</option>
-								<option value="80">Paper</option>									
-								<option value="100">Padded</option>
-								<option value="120">Corded</option>
-								<option value="180">Slat</option>
-								<option value="140">Leather</option>
-								<option value="170">Plated Leather</option>
-								<option value="160">Studded Leather</option>
-								<option value="150">Cuir Boulli</option>
-								<option value="200">Hide</option>
-								<option value="200">Breastplate</option>
-								<option value="300">Scale</option>
-								<option value="250">Brigandine</option>
-								<option value="300">Banded Leather</option>
-								<option value="350">Lamellare</option>									
-								<option value="400">Chainmail</option>
-								<option value="450">Splint</option>
-								<option value="500">Banded-Mail</option>
-								<option value="600">Plate-mail</option>
-								<option value="900">Full Plate</option>
+							<select name="attr_eqarmourtype">
+								<option value="none" selected="selected">None</option>
+								<option value="classic-leather">Leather Armor (AC 7)</option>
+								<option value="classic-scale">Scale Mail (AC 6)</option>
+								<option value="classic-chain">Chain Mail (AC 5)</option>
+								<option value="classic-banded">Banded Mail (AC 4)</option>
+								<option value="classic-plate">Plate Mail (AC 3)</option>
+								<option value="suit">Suit Armor (AC 0)</option>
+								<option value="skins">Protective Skins (AC 8)</option>
+								<option value="fur">Fur (AC 8)</option>
+								<option value="paper">Paper (AC 8)</option>
+								<option value="padded">Padded (AC 8)</option>
+								<option value="corded">Corded (AC 8)</option>
+								<option value="slat">Slat (AC 7)</option>
+								<option value="leather">Leather (AC 7)</option>
+								<option value="plated-leather">Plated Leather (AC 7)</option>
+								<option value="studded-leather">Studded Leather (AC 7)</option>
+								<option value="cuir-boulli">Cuir Boulli (AC 7)</option>
+								<option value="hide">Hide (AC 6)</option>
+								<option value="breastplate">Breastplate (AC 6)</option>
+								<option value="scale">Scale (AC 6)</option>
+								<option value="brigandine">Brigandine (AC 6)</option>
+								<option value="banded-leather">Banded Leather (AC 5)</option>
+								<option value="lamellar">Lamellare (AC 5)</option>
+								<option value="chainmail">Chainmail (AC 5)</option>
+								<option value="splint">Splint (AC 4)</option>
+								<option value="banded-mail">Banded-Mail (AC 4)</option>
+								<option value="plate-mail">Plate-mail (AC 3)</option>
+								<option value="full-plate">Full Plate (AC 0)</option>
 							</select>
 						</div>
 						<!-- mathy bits-->
-						<!--Simplify the encumbrance number so that the 4th dimensional polynomial fit can be simpler-->
-						<input type="hidden" name="attr_eqredux" value="((@{eqarmour})/ 100)" />
+						<!-- Armour identity, encumbrance, and AC are synchronized by the sheet worker. -->
+						<input type="hidden" name="attr_eqarmour" value="0" />
+						<input type="hidden" name="attr_eqarmourversion" value="0" />
+						<!-- Retain the old helper for saved custom formulas and macros. -->
+						<input type="hidden" name="attr_eqredux" value="((@{eqarmour}) / 100)" />
 						<!-- Apply suit armour movement restrictions only while the full set is equipped. -->
 						<input type="hidden" name="attr_eqsuittoggle" value="(floor((@{eqarmour}) / 749) * (@{eqarmourfullsettoggle}))" />
 						<input type="hidden" name="attr_eqnosuittoggle" value="abs(@{eqsuittoggle} - 1)" />
-						<!--Fit the encumbrance to an AC value -->
-						<input type="hidden" name="attr_eqarmourbaseac" value="(round(0.0168237512 * @{eqredux} * @{eqredux} * @{eqredux} * @{eqredux} - 0.2351937912 * @{eqredux} * @{eqredux} * @{eqredux} + 0.9378087321 * @{eqredux} * @{eqredux} - 2.1022659782 * @{eqredux} + 9.004497 ))" />
+						<!-- Explicit base AC; independent of encumbrance. -->
+						<input type="hidden" name="attr_eqarmourbaseac" value="9" />
 						<div class="sheet-col-1-3 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_eqarmourmagic" value="0"min="0" step="1"><br/>Magic Bonus</div>
 					</div>
 					<div class="sheet-row">
@@ -4426,6 +4429,81 @@ on('sheet:opened change:repeating_inventtab7 remove:repeating_inventtab7', funct
 
 });
 
+
+/* ---- BEGIN: Armour calculations ---- */
+// Standard armour uses the AC printed in the sheet's original options.
+// Additional armour AC: The Mystaran Armoury v1.3, table 1.3 (p. 13).
+// https://pandius.com/The_Mystaran_Armoury_v1.3.pdf
+// Retain existing encumbrance values for compatibility with saved characters.
+var BECMIArmour = {
+    "none": {enc: 0, ac: 9},
+    "classic-leather": {enc: 200, ac: 7},
+    "classic-scale": {enc: 300, ac: 6},
+    "classic-chain": {enc: 400, ac: 5},
+    "classic-banded": {enc: 450, ac: 4},
+    "classic-plate": {enc: 500, ac: 3},
+    "suit": {enc: 750, ac: 0},
+    "skins": {enc: 50, ac: 8},
+    "fur": {enc: 150, ac: 8},
+    "paper": {enc: 80, ac: 8},
+    "padded": {enc: 100, ac: 8},
+    "corded": {enc: 120, ac: 8},
+    "slat": {enc: 180, ac: 7},
+    "leather": {enc: 140, ac: 7},
+    "plated-leather": {enc: 170, ac: 7},
+    "studded-leather": {enc: 160, ac: 7},
+    "cuir-boulli": {enc: 150, ac: 7},
+    "hide": {enc: 200, ac: 6},
+    "breastplate": {enc: 200, ac: 6},
+    "scale": {enc: 300, ac: 6},
+    "brigandine": {enc: 250, ac: 6},
+    "banded-leather": {enc: 300, ac: 5},
+    "lamellar": {enc: 350, ac: 5},
+    "chainmail": {enc: 400, ac: 5},
+    "splint": {enc: 450, ac: 4},
+    "banded-mail": {enc: 500, ac: 4},
+    "plate-mail": {enc: 600, ac: 3},
+    "full-plate": {enc: 900, ac: 0}
+};
+
+function updateBECMIArmour(migrateLegacy) {
+    getAttrs(['eqarmourtype', 'eqarmour', 'eqarmourbaseac', 'eqarmourversion'], function(values) {
+        var type = values.eqarmourtype;
+        if (migrateLegacy && values.eqarmourversion !== '1') {
+            // The old dropdown stored only weight. Use its first matching option,
+            // which is also how the old dropdown displayed duplicate values.
+            type = Object.keys(BECMIArmour).filter(function(key) {
+                return BECMIArmour[key].enc === (parseFloat(values.eqarmour) || 0);
+            })[0];
+        }
+        if (!Object.prototype.hasOwnProperty.call(BECMIArmour, type)) {
+            return;
+        }
+        var armour = BECMIArmour[type];
+        var updates = {
+            eqarmourtype: type,
+            eqarmour: armour.enc,
+            eqarmourbaseac: armour.ac,
+            eqarmourversion: '1'
+        };
+        Object.keys(updates).forEach(function(key) {
+            if (String(updates[key]) === String(values[key])) {
+                delete updates[key];
+            }
+        });
+        if (Object.keys(updates).length) {
+            setAttrs(updates);
+        }
+    });
+}
+
+on('sheet:opened', function() {
+    updateBECMIArmour(true);
+});
+on('change:eqarmourtype', function() {
+    updateBECMIArmour(false);
+});
+/* ---- END: Armour calculations ---- */
 
 </script>
 
