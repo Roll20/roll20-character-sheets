@@ -29,12 +29,12 @@ class MovementTests(unittest.TestCase):
         parser.feed((Path(__file__).resolve().parents[1] / "BDnDSheet.html").read_text())
         cls.formulas = parser.values
 
-    def movement(self, weight, base=120, suit=False):
+    def movement(self, weight, base=120, suit=False, piecemeal=False):
         values = {
             "total_weight": weight,
             "basemove": base,
-            "eqsuittoggle": int(suit),
-            "eqnosuittoggle": int(not suit),
+            "eqarmour": 750 if suit else 0,
+            "paenabled": int(piecemeal),
         }
 
         def resolve(name):
@@ -78,6 +78,14 @@ class MovementTests(unittest.TestCase):
 
     def test_extreme_overload_cannot_produce_negative_movement(self):
         self.assertEqual(self.movement(1000000), (0, 0, 0))
+
+    def test_piecemeal_armour_disables_the_previous_suit_movement_cap(self):
+        for weight in (0, 100, 400, 800, 1200, 1600, 2000, 2401):
+            with self.subTest(weight=weight):
+                self.assertEqual(
+                    self.movement(weight, suit=True, piecemeal=True),
+                    self.movement(weight, piecemeal=True),
+                )
 
 
 if __name__ == "__main__":
