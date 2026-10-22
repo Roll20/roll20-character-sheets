@@ -2932,11 +2932,15 @@
 					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_coin_weight" value="((@{CP} + @{SP} + @{EP} + @{GP} + @{PP}))" disabled="disabled"></div>
 					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_other_weight" value="0" min="0" step="0.01"></div>
 					<div class="sheet-col-1-4 sheet-center sheet-padr"><input type="number" name="attr_total_weight" value="@{eqarmour} * @{eqarmourfullsettoggle} + @{PA_ENC} * @{PAenabled} + @{inventory_weight} + @{coin_weight} + @{other_weight}" disabled="disabled"></div>
-					<!-- Math fun to find the normal movement rate based on encumbrance-->
-					<input type="hidden" name="attr_nmbase" value="((@{total_weight}) / 400)" />
-					<input type="hidden" name="attr_nmsteep" value="((@{basemove}) - ((floor(@{nmbase})) * 30))" />
-					<input type="hidden" name="attr_nmshallow" value="((5 - (floor(@{nmbase}))) * ((@{basemove})/8))" />
-					<input type="hidden" name="attr_nmbasic" value="(((@{nmsteep} + @{nmshallow}) + abs(@{nmsteep} - @{nmshallow})) / 2)" />
+					<!-- Rules Cyclopedia p. 88: movement changes only ABOVE each encumbrance limit. -->
+					<!-- ceil(x / (abs(x) + 1)) is 1 for x > 0 and 0 otherwise. -->
+					<input type="hidden" name="attr_nmover400" value="(ceil(((@{total_weight}) - 400) / (abs((@{total_weight}) - 400) + 1)))" />
+					<input type="hidden" name="attr_nmover800" value="(ceil(((@{total_weight}) - 800) / (abs((@{total_weight}) - 800) + 1)))" />
+					<input type="hidden" name="attr_nmover1200" value="(ceil(((@{total_weight}) - 1200) / (abs((@{total_weight}) - 1200) + 1)))" />
+					<input type="hidden" name="attr_nmover1600" value="(ceil(((@{total_weight}) - 1600) / (abs((@{total_weight}) - 1600) + 1)))" />
+					<input type="hidden" name="attr_nmover2400" value="(ceil(((@{total_weight}) - 2400) / (abs((@{total_weight}) - 2400) + 1)))" />
+					<!-- Scale base movement by 1, 3/4, 1/2, 1/4, 1/8, or 0. -->
+					<input type="hidden" name="attr_nmbasic" value="((@{basemove}) * (1 - (@{nmover400}) / 4 - (@{nmover800}) / 4 - (@{nmover1200}) / 4 - (@{nmover1600}) / 8 - (@{nmover2400}) / 8))" />
 					<!-- Mathy bit to reduce movement for suit armour to max 30'-->
 					<input type="hidden" name="attr_nmsuit" value="(((@{nmbasic} + 30) - abs(@{nmbasic} - 30)) / 2)" />
 					<input type="hidden" name="attr_normal_movement" value="@{nmsuit} * @{eqsuittoggle} + @{nmbasic} * @{eqnosuittoggle}" />
