@@ -303,7 +303,7 @@ function calculateCombatValues() {
 					atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
 				}
 				if (values["be_at_mod"]) {
-					atValue -= parseInt(values["be_at_mod"]);
+					atValue += parseInt(values["be_at_mod"]);
 				}
 
 				// Negative TP/KK reduziert auch AT
@@ -342,7 +342,7 @@ function calculateCombatValues() {
 				paValue = PA + paMod + spec + wounds;
 
 				if (values["be_pa_mod"]) {
-						paValue -= parseInt(values["be_pa_mod"]);
+						paValue += parseInt(values["be_pa_mod"]);
 				}
 
 				if (Number.isNaN(paValue) || paValue < 0) {
@@ -388,7 +388,7 @@ function calculateCombatValues() {
 
 					// berechne BE modifikator mit ein
 					if (values["be_pa_mod"]) {
-						shieldPa -= parseInt(values["be_pa_mod"]);
+						shieldPa += parseInt(values["be_pa_mod"]);
 					}
 
 					// Zuletzt: Addiere den PA-Modifikator des Schildes
@@ -411,7 +411,7 @@ function calculateCombatValues() {
 						var atValue =
 							AT + atMod
 							+ values["AT_mod_wounds"]
-							- parseInt(values["be_at_mod"]);
+							+ parseInt(values["be_at_mod"]);
 						attrsToChange["parryweapon_at"] = atValue;
 					}
 
@@ -558,7 +558,7 @@ on([
 		{
 			case "be_at_mod":
 			case "be_pa_mod":
-				if (eventInfo["newValue"] > 0)
+				if (eventInfo["newValue"] < 0)
 				{
 					attrsToChange[hintAttr] = 1;
 				} else {
@@ -979,6 +979,37 @@ on(
 			}
 			debugLog(func, "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
+		});
+});
+
+/*
+Evade Modifier from High Acrobatics Value
+
+Evading an attack gets easier for every full three points above a skill value over 12.
+*/
+const attrsEvadeModAcrobatics = [
+	'TaW_akrobatik',
+];
+Object.freeze(attrsEvadeModAcrobatics);
+
+on(attrsEvadeModAcrobatics.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		safeGetAttrs(
+			attrsEvadeModAcrobatics,
+			function(values) {
+				// Boilerplate
+				const step = 3;
+				const offset = 12;
+				let attrsToChange = { 'k_ausweichen_mod_akrobatik': getDefaultValue("k_ausweichen_mod_akrobatik") };
+
+				// Calculation
+				let result = parseInt(values["TaW_akrobatik"]);
+				result = Math.max(result - offset, 0);
+				result = Math.trunc(result / step);
+				// Negative value to get correct behaviour
+				attrsToChange["k_ausweichen_mod_akrobatik"] = -result;
+
+				safeSetAttrs(attrsToChange);
 		});
 });
 
