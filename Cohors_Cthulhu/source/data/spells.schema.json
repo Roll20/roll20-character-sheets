@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cohors Cthulhu spells",
+  "description": "source/data/spells.json: spells by tradition, then by name. The name is what the Spell Name dropdown shows (and an NPC import names). The build checks the file against this schema (generate.js).",
+  "type": "object",
+  "propertyNames": {
+    "description": "The tradition, as the Spells tab's Magical Tradition options spell it.",
+    "enum": ["runic", "oracular", "celtic", "cthulhu", "mormo", "nyarlathotep", "yog_sothoth"]
+  },
+  "additionalProperties": {
+    "type": "object",
+    "additionalProperties": { "$ref": "#/definitions/spell" }
+  },
+  "definitions": {
+    "spell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill", "difficulty", "cost", "duration", "category"],
+      "properties": {
+        "skill": {
+          "description": "The skill the casting roll uses.",
+          "enum": ["Academia", "Athletics", "Crafting", "Engineering", "Fighting", "Medicine", "Observation", "Persuasion", "Resilience", "Stealth", "Survival", "Tactics"]
+        },
+        "difficulty": {
+          "description": "The number of successes needed, as the first number in the text; anything else (an opposed test) is shown as text.",
+          "type": "string",
+          "pattern": "\\d"
+        },
+        "cost": {
+          "description": "The number of Challenge Dice, then the cost's damage effects, comma-separated (\"5 Drain, Piercing 1\"). The casting roll rolls it.",
+          "type": "string",
+          "pattern": "^\\d+"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "category": {
+          "description": "The kind of spell (\"Attack spell\", \"Ward spell\"). A category containing \"attack\" shows the Damage & Effects field on the spell's row.",
+          "type": "string"
+        },
+        "damage_effects": {
+          "description": "Attack spells: the damage the spell does, in the format of a weapon's Damage & Effects: the base rating in Challenge Dice, then the damage effects, comma-separated (\"2, Piercing 1\"; \"2, Stun\"). The casting roll rolls the caster's Power plus this rating in Challenge Dice, like a weapon's damage; each Momentum spent on Spell Effects adds a die, up to 3. Leave it out for spells that do no damage.",
+          "type": "string",
+          "pattern": "^\\d+(\\s*,\\s*[^,\\s][^,]*)*$"
+        }
+      }
+    }
+  }
+}

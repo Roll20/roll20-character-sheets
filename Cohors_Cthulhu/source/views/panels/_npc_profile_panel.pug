@@ -1,0 +1,118 @@
+//- views/panels/_npc_profile_panel.pug
+//- NPC-only panel: allegiance, the tier's rules reminder, and the stat block
+//- totals.
+//-
+//- The stat block fields hold Stress, Injuries, Armor, Courage and Power,
+//- which already include every special rule's bonus. Left blank, the tier
+//- formula applies (ccNpcBookValue).
+.cc-panel.cc-npc-panel.cc-npc-profile
+  .cc-banner NPC Profile
+  .cc-npc-profile-top
+    //- Adversaries use Threat for bought dice and extra successes; allies use
+    //- the party's Momentum. Same segmented control as Character Type.
+    .cc-npc-allegiance
+      +radio({name: 'npc_allegiance', value: 'adversary', checked: ''}).cc-npc-allegiance-input#cc-npc-allegiance-adversary
+      +radio({name: 'npc_allegiance', value: 'ally'}).cc-npc-allegiance-input#cc-npc-allegiance-ally
+      label.cc-npc-allegiance-label(for='cc-npc-allegiance-adversary') Adversary (Threat)
+      label.cc-npc-allegiance-label(for='cc-npc-allegiance-ally') Ally (Momentum)
+    .cc-tier-notes
+      span.cc-tier-note.cc-tier-note-trooper Trooper: does not have reactions, defeated at 1 injury, reinforcements cost 1 Threat, up to 5 can act as a mob (single roll)
+      span.cc-tier-note.cc-tier-note-toughened Toughened: has 1 reaction per round, defeated at 2 injuries, can spend 3 Threat per scene for fortune, reinforcements cost 2 Threat
+      span.cc-tier-note.cc-tier-note-nemesis Nemesis: unlimited reactions at the cost 2 Threat each, defeated at 3 injuries, can spend 3 Threat per scene for fortune any number of times
+  .cc-npc-book
+    .cc-field
+      span Max Stress
+      +text({name: 'npc stress', placeholder: 'auto', inputmode: 'numeric', trigger: {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}})
+    .cc-field
+      span Injuries
+      +text({name: 'npc injuries', placeholder: 'auto', inputmode: 'numeric', trigger: {affects: ['injury_limit', 'injury_limit_marker']}})
+    .cc-field
+      span Armor
+      +text({name: 'npc armor', placeholder: 'auto', inputmode: 'numeric', trigger: {affects: ['total_armor']}})
+    .cc-field
+      span Courage
+      +text({name: 'npc courage', placeholder: 'auto', inputmode: 'numeric', trigger: {affects: ['courage']}})
+    .cc-field
+      span Morale
+      +number({name: 'npc morale'})
+    .cc-field
+      span Power
+      +text({name: 'npc power', placeholder: 'auto', inputmode: 'numeric', trigger: {affects: ['power_rating']}})
+    .cc-field
+      span(title='Injuries that defeat this NPC (stat block value, or the tier default)') Limit
+      +number({name: 'injury limit', readonly: true, trigger: {calculation: 'calcInjuryLimit'}})
+  .cc-npc-book-hint Values from the NPC's stat block; leave blank to calculate from the tier.
+  .cc-field.cc-npc-escalation
+    span Escalation Options
+    +textarea({name: 'npc escalation'})
+
++scss.
+  .cc-character {
+    .cc-npc-profile-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .cc-npc-allegiance {
+      display: flex;
+    }
+
+    .cc-npc-allegiance-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cc-npc-allegiance-label {
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      &:first-of-type {
+        border-radius: 4px 0 0 4px;
+      }
+
+      &:last-of-type {
+        border-left: none;
+        border-radius: 0 4px 4px 0;
+      }
+    }
+
+    #cc-npc-allegiance-adversary:checked ~ label[for='cc-npc-allegiance-adversary'],
+    #cc-npc-allegiance-ally:checked ~ label[for='cc-npc-allegiance-ally'] {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+    }
+
+    .cc-tier-notes {
+      flex: 1 1 16rem;
+      font-size: 0.72rem;
+      font-style: italic;
+    }
+
+    .cc-npc-book {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.4rem;
+    }
+
+    .cc-npc-book-hint {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      margin: 0.15rem 0 0.3rem;
+    }
+
+    .cc-npc-escalation textarea {
+      min-height: 2.5rem;
+    }
+  }
