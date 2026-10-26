@@ -1,3 +1,12 @@
+# 2026-10-27
+
+- Fix tracker to fetch characters again.
+- Remove rmuGetAttrs/rmuSetAttrs.
+- Fix the manual skillrefresh.
+- Fix for leveling up without any talents.
+- Remove a lot of debug messages.
+- BonusAdder is a bit more robust in the case of bad additions.
+
 # 2026-10-22a
 
 - Add `attr_fix` to work around an issue in Roll20 characters.
