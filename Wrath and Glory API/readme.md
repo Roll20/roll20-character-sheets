@@ -40,6 +40,12 @@ Updates:
 
 ### Changelog
 
+** October 16th, 2026 - Roll20 repository compliance fixes (no change to sheet behavior or attribute names)**
+
+Updates:
+01. Fix: Added `spellcheck="false"` to text inputs and textareas.
+02. Cosmetic: Cleaned up the line breaks and Markdown formatting of the `instructions` text in `sheet.json` (wording unchanged).
+
 ** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement** 
 
 
