@@ -120,20 +120,6 @@ Check out the Help Center articles and Community Wiki documentation below to lea
 
 **Sheet translations submitted outside of Crowdin will not be accepted and/or will be overwritten by Crowdin.**
 
-### Uploading Sheets
-
-Ensure that you have installed [jq](https://jqlang.github.io/jq/download/) before running the following commands:
-
-```bash
-cd 5eShaped # Change this to your desired sheet directory
-cat sheet.json|  jq ". += {\"version\":\"$(date +%s)\"}" | tee sheet.json # This will bump the version field in sheet.json
-```
-
-Commit the change to sheet.json, push your changes to one of the supported branches and watch CircleCI for the branch to which you pushed. The supported branches are:
-
-- master
-- staging
-
 ## License
 
 All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see [LICENSE](https://github.com/Roll20/roll20-character-sheets/blob/master/LICENSE) file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
