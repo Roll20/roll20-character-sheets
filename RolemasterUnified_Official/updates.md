@@ -1,3 +1,8 @@
+# 2026-10-28
+
+- Fix for levelup when it's not a specialised skill
+- Test-support `getAttrs`/`setAttrs` does not set nil fields.
+
 # 2026-10-27
 
 - Fix tracker to fetch characters again.
