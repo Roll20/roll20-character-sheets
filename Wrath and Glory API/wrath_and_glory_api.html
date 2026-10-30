@@ -3568,6 +3568,8 @@
 		//******************************** Upgrade Version ************************************************ 
 		//************************************************************************************************* 
 		
+		var updateAttributePools, updateSkillPools, updateRepeatingSkillPools, updateWeaponPools, updatePsychicPools, setupdice;
+		
 		// EXECUTE: When the sheet is opened, update score fields for anyone using an older sheet.
 		on('sheet:opened',function(){
 			getAttrs(["sheetversion"], function(values) {
@@ -3636,7 +3638,7 @@
 						// get all repeating rows and retrieve melee, force, and dr for all weapons
 						getSectionIDs("repeating_weapon", function(IDArray) {
 							var fieldNames = [];
-							_.each(IDArray, function(currentID, i) {
+							_.each(IDArray, function(currentID) {
 								fieldNames.push("repeating_weapon_" + currentID + "_meleewpn");
 								fieldNames.push("repeating_weapon_" + currentID + "_forcewpn");
 								fieldNames.push("repeating_weapon_" + currentID + "_wpnbasedr");
@@ -3700,6 +3702,7 @@
 						attr = String(attr);
 						switch(attr) {
 							case "(0)":awa = 0;
+							// falls through (existing behavior, kept as is)
 							case "(@{STRAdj})":	awa = awa + (values.strbase)*1+(values.strmod)*1;break;
 							case "(@{AGLAdj})":	awa = awa + (values.aglbase)*1+(values.aglmod)*1;break;
 							case "(@{TGHAdj})":	awa = awa + (values.tghbase)*1+(values.tghmod)*1;break;
@@ -3708,7 +3711,7 @@
 							case "(@{FELAdj})": awa = awa + (values.felbase)*1+(values.felmod)*1;break;
 							case "(@{INITAdj})":awa = awa + (values.initbase)*1+(values.initmod)*1;break;
 							case "default": awa = 0;
-						};	
+						}	
 						// TO DO ADD SKill base to Total
 						var total = awa;
 						total = Math.ceil(.5*total);
@@ -3849,7 +3852,7 @@
 					});
 					
 					// Initialize Trauma Count (set to 0)
-					getAttrs(["tcount"], function(values) {
+					getAttrs(["tcount"], function() {
 						var startvalue = 0;
 						setAttrs({tcount:startvalue});
 					});
@@ -3898,7 +3901,7 @@
 					});
 				} // END OF section 3.1 update
 				
-				 // NEW VERSION UPDATES GET INSERTED ABOVE THIS LINE
+				// NEW VERSION UPDATES GET INSERTED ABOVE THIS LINE
 				
 			
 				// After all updates have been applied, update sheet version = to current release
@@ -4074,6 +4077,7 @@
 				attr = String(attr);
 				switch(attr) {
 					case "(0)":awa = 0;
+					// falls through (existing behavior, kept as is)
 					case "(@{STRAdj})":	awa = awa + (values.strbase)*1+(values.strmod)*1;break;
 					case "(@{AGLAdj})":	awa = awa + (values.aglbase)*1+(values.aglmod)*1;break;
 					case "(@{TGHAdj})":	awa = awa + (values.tghbase)*1+(values.tghmod)*1;break;
@@ -4082,7 +4086,7 @@
 					case "(@{FELAdj})": awa = awa + (values.felbase)*1+(values.felmod)*1;break;
 					case "(@{INITAdj})":awa = awa + (values.initbase)*1+(values.initmod)*1;break;
 					case "default": awa = 0;
-				};	
+				}	
 
 				var total = awa;
 				total = Math.ceil(.5*total);
@@ -4111,7 +4115,7 @@
 		});
 		// Influence
 		on("change:inflbase change:inflmod", function() {
-		 	getAttrs(["inflbase","inflmod"], function(values) {
+			getAttrs(["inflbase","inflmod"], function(values) {
 				// calculate base - note players will have to manually subtract 1... assume no subtraction
 				var total = ((values.inflbase)*1);
 				var mod = (values.inflmod)*1;
@@ -4119,17 +4123,17 @@
 				// calculate adjusted base
 				total = total + mod;
 				setAttrs({infladj:total});
-		 	});
+			});
 		});
 		
 		// Wealth Adjusted Base
 		on("change:wlthbase change:wlthmod", function() {
-		 	getAttrs(["wlthbase","wlthmod"], function(values) {
+			getAttrs(["wlthbase","wlthmod"], function(values) {
 				var total = ((values.wlthbase)*1);
 				var mod = (values.wlthmod)*1;
 				total = total + mod;
 				setAttrs({wlthadj:total});
-		 	});
+			});
 		});
 		
 		// Defense
@@ -4215,7 +4219,7 @@
 				// get all repeating rows and retrieve melee, force, and dr for all weapons
 				getSectionIDs("repeating_weapon", function(IDArray) {
 					var fieldNames = [];
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_weapon_" + currentID + "_meleewpn");
 						fieldNames.push("repeating_weapon_" + currentID + "_forcewpn");
 						fieldNames.push("repeating_weapon_" + currentID + "_wpnbasedr");
@@ -4263,7 +4267,7 @@
 					
 				getSectionIDs("repeating_serial", function(IDArray) {
 					var fieldNames = [];	
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_serial_" + currentID + "_XPEARNED");
 					});
 					getAttrs(fieldNames, function(values) {
@@ -4286,7 +4290,7 @@
 					
 				getSectionIDs("repeating_advancements", function(IDArray) {
 					var fieldNames = [];	
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_advancements_" + currentID + "_XPSPENT");
 					});
 					getAttrs(fieldNames, function(values) {
@@ -4304,9 +4308,7 @@
 		on("change:totalxpearned change:totalxpspent change:startingxp change:startingxpspent", function() {
 			getAttrs(["hiddenxpearned","hiddenxpspent","startingxp","startingxpspent"], function(values) { 
 				var xpearned = (values.hiddenxpearned*1);
-				var starting = Math.abs(parseInt(values.startingxp));
 				var xpspent = (values.hiddenxpspent*1);
-				var startingspent = Math.abs(parseInt(values.startingxpspent));
 				
 				setAttrs({hiddenxpavailable: (xpearned) - (xpspent)});	
 					
@@ -4317,8 +4319,8 @@
 		//********************************************************************************************
 		
 		// update tcount when a new trauma is added 
-		 	on("change:repeating_trauma", function(eventInfo) {
-				getAttrs(["tcount"], function(values) { 
+			on("change:repeating_trauma", function() {
+				getAttrs(["tcount"], function() { 
 					var currentcount = 0;				
 					getSectionIDs("repeating_trauma", function(idarray) {
 						currentcount = idarray.length;
@@ -4328,8 +4330,8 @@
 			});	
 		
 		// update tcount on removing a trauma
-		on("sheet:opened remove:repeating_trauma", function(eventInfo) {
-			getAttrs(["tcount"], function(values) { 
+		on("sheet:opened remove:repeating_trauma", function() {
+			getAttrs(["tcount"], function() { 
 				var currentcount = 0;				
 				getSectionIDs("repeating_trauma", function(idarray) {
 					currentcount = idarray.length;
@@ -4349,7 +4351,7 @@
 		//==================================================================
 		// Due to asyncrhonous firing of js and the sequential updates needed - Attributes to skills to weapons/psychic powers - this will be a single sheet worker that will call functions.  This also allows for updates on upgrade.
 
-		on("change:tcount change:isdying change:strbase change:aglbase change:tghbase change:intbase change:willbase change:felbase change:initbase change:strmod change:aglmod change:tghmod change:intmod change:willmod change:felmod change:initmod change:strbonusroll change:aglbonusroll change:tghbonusroll change:intbonusroll change:willbonusroll change:felbonusroll change:initbonusroll change:convadj change:convbonusroll change:corrresistadj change:corrresistbonusroll change:resvadj change:resvbonusroll change:infladj change:inflbonusroll change:athbaserat change:athattrrat change:athbonusroll change:awarebaserat change:awareattrrat change:awarebonusroll change:ballbaserat change:ballattrrat change:ballbonusroll change:cunnbaserat change:cunnattrrat change:cunnbonusroll change:decepbaserat change:decepattrrat change:decepbonusroll change:insightbaserat change:insightattrrat change:insightbonusroll change:intimbaserat change:intimattrrat change:intimbonusroll change:investbaserat change:investattrrat change:investbonusroll change:leadbaserat change:leadattrrat change:leadbonusroll change:medibaserat change:mediattrrat change:medibonusroll change:persbaserat change:persattrrat change:persbonusroll change:pilotbaserat change:pilotattrrat change:pilotbonusroll change:psychicbaserat change:psychicattrrat change:psychicbonusroll change:schobaserat change:schoattrrat change:schobonusroll change:stealthbaserat change:stealthattrrat change:stealthbonusroll change:survbaserat change:survattrrat change:survbonusroll change:techbaserat change:techattrrat change:techbonusroll change:wpnskillbaserat change:wpnskillattrrat change:wpnskillbonusroll change:repeating_skill:repskillbaserat change:repeating_skill:repskillattrrat change:repeating_skill:repskilllinkedattr change:repeating_skill:repskillbonusroll change:repeating_weapon:wpnattbd change:repeating_weapon:wpnattackskill change:balllinkedattr change:wpnskilllinkedattr change:repeating_psychicpower:psypowertestbasepmrate change:repeating_psychicpower:psypowertestlinkedattr change:repeating_psychicpower:psypowerbonusroll change:repeating_psychicpower:psypowerpush", function(eventInfo) {
+		on("change:tcount change:isdying change:strbase change:aglbase change:tghbase change:intbase change:willbase change:felbase change:initbase change:strmod change:aglmod change:tghmod change:intmod change:willmod change:felmod change:initmod change:strbonusroll change:aglbonusroll change:tghbonusroll change:intbonusroll change:willbonusroll change:felbonusroll change:initbonusroll change:convadj change:convbonusroll change:corrresistadj change:corrresistbonusroll change:resvadj change:resvbonusroll change:infladj change:inflbonusroll change:athbaserat change:athattrrat change:athbonusroll change:awarebaserat change:awareattrrat change:awarebonusroll change:ballbaserat change:ballattrrat change:ballbonusroll change:cunnbaserat change:cunnattrrat change:cunnbonusroll change:decepbaserat change:decepattrrat change:decepbonusroll change:insightbaserat change:insightattrrat change:insightbonusroll change:intimbaserat change:intimattrrat change:intimbonusroll change:investbaserat change:investattrrat change:investbonusroll change:leadbaserat change:leadattrrat change:leadbonusroll change:medibaserat change:mediattrrat change:medibonusroll change:persbaserat change:persattrrat change:persbonusroll change:pilotbaserat change:pilotattrrat change:pilotbonusroll change:psychicbaserat change:psychicattrrat change:psychicbonusroll change:schobaserat change:schoattrrat change:schobonusroll change:stealthbaserat change:stealthattrrat change:stealthbonusroll change:survbaserat change:survattrrat change:survbonusroll change:techbaserat change:techattrrat change:techbonusroll change:wpnskillbaserat change:wpnskillattrrat change:wpnskillbonusroll change:repeating_skill:repskillbaserat change:repeating_skill:repskillattrrat change:repeating_skill:repskilllinkedattr change:repeating_skill:repskillbonusroll change:repeating_weapon:wpnattbd change:repeating_weapon:wpnattackskill change:balllinkedattr change:wpnskilllinkedattr change:repeating_psychicpower:psypowertestbasepmrate change:repeating_psychicpower:psypowertestlinkedattr change:repeating_psychicpower:psypowerbonusroll change:repeating_psychicpower:psypowerpush", function() {
 			
 			getAttrs(["tcount","isdying"], function(values) {
 				var dying = (values.isdying)*1;
@@ -4622,7 +4624,7 @@
 		
 		// --------------------------------------------------------------------------------
 		
-	 	// FUNCTION: Update Repeating Skill Base and Wrath Dice Pools
+		// FUNCTION: Update Repeating Skill Base and Wrath Dice Pools
 		updateRepeatingSkillPools = function(tc) {	
 			
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
@@ -4633,7 +4635,7 @@
 				// get all repeating custom skills
 				getSectionIDs("repeating_skill", function(IDArray) {
 					var fieldNames = [];
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_skill_" + currentID + "_repskilllinkedattr");
 						fieldNames.push("repeating_skill_" + currentID + "_repskillbaserat");
 						fieldNames.push("repeating_skill_" + currentID + "_repskillbonusroll");
@@ -4653,6 +4655,7 @@
 							//console.log("attr: " + attr);
 							switch(attr) {
 								case "(0)":			attrbase = 0;  	//None
+								// falls through (existing behavior, kept as is)
 								case "(@{STRAdj})":	attrbase = (v.strbase)*1+(v.strmod)*1;break;
 								case "(@{AGLAdj})":	attrbase = (v.aglbase)*1+(v.aglmod)*1;break;
 								case "(@{TGHAdj})":	attrbase = (v.tghbase)*1+(v.tghmod)*1;break;
@@ -4661,7 +4664,7 @@
 								case "(@{FELAdj})": attrbase = (v.felbase)*1+(v.felmod)*1;break;
 								case "(@{INITAdj})":attrbase = (v.initbase)*1+(v.initmod)*1;break;
 								case "default": attrbase = 0;
-							};	
+							}	
 							//console.log("attrbase: " + attrbase);	
 							
 							base = parseInt(values["repeating_skill_" + currentID + "_repskillbaserat"]) + (attrbase); 
@@ -4684,7 +4687,7 @@
 		
 		// --------------------------------------------------------------------------------
 		
-	 	// FUNCTION: Update Weapon Base and Wrath Dice Pools
+		// FUNCTION: Update Weapon Base and Wrath Dice Pools
 		updateWeaponPools = function(tc) {	
 			
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
@@ -4710,7 +4713,7 @@
 				// get all repeating weapons
 				getSectionIDs("repeating_weapon", function(IDArray) {
 					var fieldNames = [];
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_weapon_" + currentID + "_wpnattackskill"); // linked attribute with skill
 						fieldNames.push("repeating_weapon_" + currentID + "_wpnattbd");
 						fieldNames.push("repeating_weapon_" + currentID + "_repweaponnewbase");
@@ -4729,11 +4732,12 @@
 							
 							switch(attr) {
 								case "(0)":						base = 0;  	//None
+								// falls through (existing behavior, kept as is)
 								case "(@{BallTotal})":			base = (bsattrtotal)+(v.ballbaserat)*1;break; 	//BS + AG
 								case "(@{WpnSkillTotal})":		base = (wsattrtotal)+(v.wpnskillbaserat)*1;break;	//WS + INIT
 								case "(@{WpnSkilAgilTotal})":	base = (v.aglbase)*1+(v.aglmod)*1+(v.wpnskillbaserat)*1;break;	//WS + AG
 								case "default": 				base = 0;
-							};	
+							}	
 							
 							// console.log("base: " + base);	
 							// console.log("bonus: " + bonus);	
@@ -4755,7 +4759,7 @@
 		
 		// --------------------------------------------------------------------------------
 		
-	 	// FUNCTION: Update Psychic Power Base and Wrath Dice Pools
+		// FUNCTION: Update Psychic Power Base and Wrath Dice Pools
 		updatePsychicPools = function(tc) {	
 			
 			// Update psychic powers as tcount change impacts all of their base and wrath dice totals
@@ -4766,7 +4770,7 @@
 				// get all repeating custom skills
 				getSectionIDs("repeating_psychicpower", function(IDArray) {
 					var fieldNames = [];
-					_.each(IDArray, function(currentID, i) {
+					_.each(IDArray, function(currentID) {
 						fieldNames.push("repeating_psychicpower_" + currentID + "_psypowertestlinkedattr");
 						fieldNames.push("repeating_psychicpower_" + currentID + "_psypowerbonusroll");
 						fieldNames.push("repeating_psychicpower_" + currentID + "_reppsypowernewbase");
@@ -4785,6 +4789,7 @@
 
 							switch(attr) {
 								case "(0)":			base = 0;  	//None
+								// falls through (existing behavior, kept as is)
 								case "(@{STRAdj})":	base = (v.strbase)*1+(v.strmod)*1+((v.psychicbaserat)*1);break;
 								case "(@{AGLAdj})":	base = (v.aglbase)*1+(v.aglmod)*1+((v.psychicbaserat)*1);break;
 								case "(@{TGHAdj})":	base = (v.tghbase)*1+(v.tghmod)*1+((v.psychicbaserat)*1);break;
@@ -4793,7 +4798,7 @@
 								case "(@{FELAdj})": base = (v.felbase)*1+(v.felmod)*1+((v.psychicbaserat)*1);break;
 								case "(@{INITAdj})":base = (v.initbase)*1+(v.initmod)*1+((v.psychicbaserat)*1);break;
 								case "default": base = 0;
-							};	
+							}	
 							// console.log("base: " + base);	
 							
 							bonus = parseInt(values["repeating_psychicpower_" + currentID + "_psypowerbonusroll"]);
@@ -4815,9 +4820,9 @@
 		
 		// --------------------------------------------------------------------------------
 		
-	 	// FUNCTION: set dice fields for standard (base) and wrath dice
-	 	setupdice = function(item,tc,base,bonus,wrath) {	
-	 		var newbase = 0;
+		// FUNCTION: set dice fields for standard (base) and wrath dice
+		setupdice = function(item,tc,base,bonus,wrath) {	
+			var newbase = 0;
 			if(tc > (base + bonus)) {wrath = (base + bonus);} else {wrath = tc;}
 			newbase =  ((base + bonus) - wrath);
 			// console.log("***** run setup dice for " + item);
@@ -4826,25 +4831,25 @@
 			// console.log("wrath: " + wrath);				
 			setAttrs({[item + "newbase"]: newbase});
 			setAttrs({[item + "wrath"]: wrath});
-	 	};
+		};
 		
 		// --------------------------------------------------------------------------------
 		
-	 	// FUNCTION: convert the linked attribute into a simple string for cocatenation
-	 	var convertRefAttr = function(attrstring) {	
+		// FUNCTION: convert the linked attribute into a simple string for cocatenation
+		var convertRefAttr = function(attrstring) {	
 				// console.log("Convert Attr string"); // USED FOR TESTING:
 				// console.log("Convert Attr string: " + attrstring); // USED FOR TESTING:
 				switch(attrstring) {
-					case "(@{STRAdj})":	 return "str";break;
-					case "(@{AGLAdj})":	 return "agl";break;
-					case "(@{TGHAdj})":  return "tgh";break;
-					case "(@{INTAdj})":	 return "int";break;
-					case "(@{WILLAdj})": return "will";break;
-					case "(@{FELAdj})": return "fel";break;
-					case "(@{INITAdj})": return "init";break;
+					case "(@{STRAdj})":	 return "str";
+					case "(@{AGLAdj})":	 return "agl";
+					case "(@{TGHAdj})":  return "tgh";
+					case "(@{INTAdj})":	 return "int";
+					case "(@{WILLAdj})": return "will";
+					case "(@{FELAdj})": return "fel";
+					case "(@{INITAdj})": return "init";
 					case "default": return "";
-				};	
-	 	};
+				}	
+		};
 		
 		//********************************************************************************************				
 		//******************************** Lookup Tables ********************************************* 
@@ -4859,43 +4864,33 @@
                 case 3:
                 case 4:
                 case 5: return "0 pure";
-						break;
                 case 6:
                 case 7:
                 case 8:
                 case 9:
                 case 10: return "1 tarnished";
-						 break;
                 case 11: 
                 case 12:
                 case 13:
                 case 14: 
                 case 15: return "2 contaminated";
-						 break;
                 case 16:
                 case 17:
                 case 18:
                 case 19:
                 case 20: return "3 tainted";
-						 break;
                 case 21:
                 case 22:
                 case 23:
                 case 24:
                 case 25: return "4 defiled";
-						 break;
                 case 26: return "5 chaos spawn";
-						 break;
                 case 27: return "5 chaos spawn";
-						 break;
                 case 28: return "5 chaos spawn";
-						 break;
                 case 29: return "5 chaos spawn";
-						 break;
                 case 30: return "5 chaos spawn";
-						 break;
 				case "default": return "5 chaos spawn";
-			};	
+			}	
 		};
 					
 		// FUNCTION: lookup table for corruption label
@@ -4907,56 +4902,43 @@
                 case 3:
                 case 4:
                 case 5: return 3;
-						break;
                 case 6:
                 case 7:
                 case 8:
                 case 9:
                 case 10: return 4;
-						 break;
                 case 11: 
                 case 12:
                 case 13:
                 case 14: 
                 case 15: return 5;
-						 break;
                 case 16:
                 case 17:
                 case 18:
                 case 19:
                 case 20: return 6;
-						 break;
                 case 21:
                 case 22:
                 case 23:
                 case 24:
-                case 25: return 7; 
-						 break;
-                case 26: return "--"; 
-						 break;
-                case 27: return "--"; 
-						 break;
-                case 28: return "--"; 
-						 break;
-                case 29: return "--"; 
-						 break;
-                case 30: return "--"; 
-						 break;
+                case 25: return 7;
+                case 26: return "--";
+                case 27: return "--";
+                case 28: return "--";
+                case 29: return "--";
+                case 30: return "--";
 				case "default": return "--";
-			};	
+			}	
 		};			
 				
 		// FUNCTION: lookup table for rank label
 		var lookup_rank_title = function(crank) { // CRANK = Character Rank
 			switch(crank) {
 				case 1:	return "Initiate";
-						break;
                 case 2:	return "Veteran";
-						break;
                 case 3:	return "Champion";
-						break;
 				case "default": return "--";
-			};	
+			}	
 		};			
 </script> 
 		
