@@ -1,0 +1,617 @@
+<!-- 블러드문 헌터 · 몬스터 시트 (Roll20, legacy:false)
+     이 파일은 bloodmoon/roll20/src/bloodmoon.src.html 을 build.py 로 변환해 만든다. 직접 고치지 말 것.
+     "@이름" 표시가 붙은 주석 자리는 build.py 가 특기표 · 부위 · 텐션/광기 칸 · sheet worker · 롤 템플릿으로 채운다. -->
+
+<!-- 시트 종류: 띠의 드롭다운과 같은 속성. 값에 따라 CSS 로 헌터/몬스터 칸을 가른다 -->
+<input type="hidden" class="bm-type" name="attr_sheet_type" value="hunter">
+<input type="hidden" name="attr_sheet_version" value="">
+<div class="bm">
+  <!-- 띠 -->
+  <div class="band">
+    <span class="mark">BLOOD MOON</span>
+    <label class="stype">♡ 블러드문 ·
+      <select name="attr_sheet_type"><option value="hunter" selected>헌터 시트</option><option value="monster">몬스터 시트</option></select>
+    </label>
+  </div>
+
+  <!-- 상단: 일러스트 | 인적 사항 | 특성치 · 내구력 · 여유 · 혈량 -->
+  <div class="top">
+    <div class="portrait"><span>일러스트</span><img name="attr_character_avatar" alt=""></div>
+    <div class="idcol">
+      <div class="fr r1"><b>이름</b><input type="text" name="attr_character_name"></div>
+      <div class="fr r-lv"><b>레벨</b><input type="number" name="attr_level"><b class="h-only">경험치</b><input class="h-only" type="number" name="attr_exp"></div>
+      <div class="fr r2"><b>성별</b><input type="text" name="attr_sex"><b>연령</b><input type="text" name="attr_age"></div>
+      <div class="fr r1"><b>종족</b><input type="text" name="attr_race"></div>
+      <div class="fr r1 h-only"><b>무장</b><span class="two-in"><input type="text" name="attr_weapon1"><input type="text" name="attr_weapon2"></span></div>
+      <div class="fr r1 h-only"><b>조직</b><input type="text" name="attr_org"></div>
+      <div class="fr r1 h-only"><b>도입 타입</b><input type="text" name="attr_intro_type"></div>
+      <div class="fr r1 h-only"><b>PL</b><input type="text" name="attr_player"></div>
+      <div class="fr r1 m-only"><b>체형·혈통</b><input type="text" name="attr_body_type" placeholder="체형 · 혈통 · 양상"></div>
+      <div class="fr r1 m-only"><b>약점 부위</b><input type="text" name="attr_weak_part"></div>
+      <div class="fr r1 m-only"><b>헌터 수</b><input type="number" name="attr_hunters" min="3"></div>
+    </div>
+    <div class="statcol">
+      <div class="hbar">특성치</div>
+      <div class="fr st-r"><b>공격력</b><input type="number" name="attr_attack"></div>
+      <div class="fr st-r"><b>타격력</b><input type="number" name="attr_strike"></div>
+      <div class="fr st-r"><b>방어력</b><input type="number" name="attr_defense"></div>
+      <div class="fr st-r"><b>행동력</b><input type="number" name="attr_action"></div>
+      <!-- 내구력 = 기본치(입력) + 강도 합계(헌터: 행복·배덕, 몬스터: 지배력 — sheet worker) -->
+      <div class="res3">
+        <div class="vbox"><b class="vl">내구력</b><div class="vc col durb"><input type="number" name="attr_dur_base" min="0" placeholder="기본"><span>+ <span name="attr_dur_sum">0</span></span><span class="big" name="attr_durability">—</span></div></div>
+        <div class="vbox"><b class="vl">여유</b><div class="vc col step"><button type="action" name="act_reserveup" title="여유 +1">▲</button><input type="number" name="attr_reserve" min="0"><button type="action" name="act_reservedn" title="여유 −1">▼</button></div></div>
+        <div class="vbox red"><b class="vl">혈량</b><div class="vc col step"><button type="action" name="act_bloodup" title="혈량 +1">▲</button><input type="number" name="attr_blood" min="0"><button type="action" name="act_blooddn" title="혈량 −1">▼</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 특기 리스트 머리줄: 랜덤 특기 · 신체부위 결정표 · 선제판정표 · nD6+수정치 -->
+  <div class="skbar"><b>특기 리스트</b>
+    <span class="ctl">랜덤 특기<select name="attr_rand_field"><option value="all" selected>전체</option><option value="soc">사회</option><option value="head">머리</option><option value="arm">팔</option><option value="body">동체</option><option value="leg">다리</option><option value="env">환경</option></select><button type="action" name="act_rskill" class="dice" title="랜덤 특기 굴림"></button></span>
+    <span class="ctl">신체부위 결정표<button type="action" name="act_rpart" class="dice red" title="신체부위 결정표 굴림"></button></span>
+    <span class="ctl">선제판정표<button type="action" name="act_rinit" class="dice" title="선제판정표 굴림"></button></span>
+    <span class="ctl" title="대미지 · 회피 · 방해 등">주사위<input type="number" name="attr_nd_count" min="1" max="20" placeholder="n">D6 +<input type="number" name="attr_nd_mod" placeholder="0"><button type="action" name="act_rnd" class="dice" title="nD6 굴림"></button></span>
+  </div>
+
+  <!-- 특기표: 칸마다 습득(◇) · 판정 버튼 · 목표치 · 사용불능 표시. 갭은 열 단위 속성(attr_gap_a~e)이라 머리줄 글자나 막대 어디를 눌러도 열 전체가 바뀐다 -->
+  <div class="skwrap"><div class="sk">
+    <div></div>
+    <div class="hd">사회</div>
+    <label class="gh" title="갭 A 열 칠하기"><input type="checkbox" name="attr_gap_a" value="1"><span>A</span></label>
+    <div class="hd">머리</div>
+    <label class="gh" title="갭 B 열 칠하기"><input type="checkbox" name="attr_gap_b" value="1"><span>B</span></label>
+    <div class="hd">팔</div>
+    <label class="gh" title="갭 C 열 칠하기"><input type="checkbox" name="attr_gap_c" value="1"><span>C</span></label>
+    <div class="hd">동체</div>
+    <label class="gh" title="갭 D 열 칠하기"><input type="checkbox" name="attr_gap_d" value="1"><span>D</span></label>
+    <div class="hd">다리</div>
+    <label class="gh" title="갭 E 열 칠하기"><input type="checkbox" name="attr_gap_e" value="1"><span>E</span></label>
+    <div class="hd">환경</div>
+    <div class="no">2</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc2_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc2" value="1" title="두려워하기 습득"><button type="action" class="n" name="act_rsoc2" title="두려워하기 행동판정">두려워하기<span class="tri">▲</span></button><span class="t" name="attr_sk_soc2_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head2_off" value="0"><input type="checkbox" class="own" name="attr_sk_head2" value="1" title="듣기 습득"><button type="action" class="n" name="act_rhead2" title="듣기 행동판정">듣기</button><span class="t" name="attr_sk_head2_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm2_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm2" value="1" title="조이기 습득"><button type="action" class="n" name="act_rarm2" title="조이기 행동판정">조이기<span class="tri">▲</span></button><span class="t" name="attr_sk_arm2_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body2_off" value="0"><input type="checkbox" class="own" name="attr_sk_body2" value="1" title="막기 습득"><button type="action" class="n" name="act_rbody2" title="막기 행동판정">막기</button><span class="t" name="attr_sk_body2_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg2_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg2" value="1" title="달리기 습득"><button type="action" class="n" name="act_rleg2" title="달리기 행동판정">달리기<span class="tri">▲</span></button><span class="t" name="attr_sk_leg2_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env2_off" value="0"><input type="checkbox" class="own" name="attr_sk_env2" value="1" title="쉬기 습득"><button type="action" class="n" name="act_renv2" title="쉬기 행동판정">쉬기</button><span class="t" name="attr_sk_env2_tn">12</span><span class="hatch"></span></div>
+    <div class="no">3</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc3_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc3" value="1" title="위협하기 습득"><button type="action" class="n" name="act_rsoc3" title="위협하기 행동판정">위협하기</button><span class="t" name="attr_sk_soc3_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_head3_off" value="0"><input type="checkbox" class="own" name="attr_sk_head3" value="1" title="감각기 습득"><button type="action" class="n" name="act_rhead3" title="감각기 행동판정">감각기</button><span class="t" name="attr_sk_head3_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm3_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm3" value="1" title="때리기 습득"><button type="action" class="n" name="act_rarm3" title="때리기 행동판정">때리기</button><span class="t" name="attr_sk_arm3_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_body3_off" value="0"><input type="checkbox" class="own" name="attr_sk_body3" value="1" title="호흡기 습득"><button type="action" class="n" name="act_rbody3" title="호흡기 행동판정">호흡기</button><span class="t" name="attr_sk_body3_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg3_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg3" value="1" title="다가가기 습득"><button type="action" class="n" name="act_rleg3" title="다가가기 행동판정">다가가기</button><span class="t" name="attr_sk_leg3_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_env3_off" value="0"><input type="checkbox" class="own" name="attr_sk_env3" value="1" title="일상 습득"><button type="action" class="n" name="act_renv3" title="일상 행동판정">일상</button><span class="t" name="attr_sk_env3_tn">12</span><span class="hatch"></span></div>
+    <div class="no">4</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc4_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc4" value="1" title="생각하지 않기 습득"><button type="action" class="n" name="act_rsoc4" title="생각하지 않기 행동판정">생각하지 않기</button><span class="t" name="attr_sk_soc4_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head4_off" value="0"><input type="checkbox" class="own" name="attr_sk_head4" value="1" title="보기 습득"><button type="action" class="n" name="act_rhead4" title="보기 행동판정">보기</button><span class="t" name="attr_sk_head4_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm4_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm4" value="1" title="베기 습득"><button type="action" class="n" name="act_rarm4" title="베기 행동판정">베기</button><span class="t" name="attr_sk_arm4_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body4_off" value="0"><input type="checkbox" class="own" name="attr_sk_body4" value="1" title="멈추기 습득"><button type="action" class="n" name="act_rbody4" title="멈추기 행동판정">멈추기</button><span class="t" name="attr_sk_body4_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg4_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg4" value="1" title="차기 습득"><button type="action" class="n" name="act_rleg4" title="차기 행동판정">차기</button><span class="t" name="attr_sk_leg4_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env4_off" value="0"><input type="checkbox" class="own" name="attr_sk_env4" value="1" title="숨기 습득"><button type="action" class="n" name="act_renv4" title="숨기 행동판정">숨기</button><span class="t" name="attr_sk_env4_tn">12</span><span class="hatch"></span></div>
+    <div class="no">5</div>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_soc5_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc5" value="1" title="자신감 습득"><button type="action" class="n" name="act_rsoc5" title="자신감 행동판정">자신감</button><span class="t" name="attr_sk_soc5_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head5_off" value="0"><input type="checkbox" class="own" name="attr_sk_head5" value="1" title="반응 습득"><button type="action" class="n" name="act_rhead5" title="반응 행동판정">반응</button><span class="t" name="attr_sk_head5_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_arm5_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm5" value="1" title="주팔 습득"><button type="action" class="n" name="act_rarm5" title="주팔 행동판정">주팔</button><span class="t" name="attr_sk_arm5_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body5_off" value="0"><input type="checkbox" class="own" name="attr_sk_body5" value="1" title="받기 습득"><button type="action" class="n" name="act_rbody5" title="받기 행동판정">받기</button><span class="t" name="attr_sk_body5_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_leg5_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg5" value="1" title="주다리 습득"><button type="action" class="n" name="act_rleg5" title="주다리 행동판정">주다리</button><span class="t" name="attr_sk_leg5_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env5_off" value="0"><input type="checkbox" class="own" name="attr_sk_env5" value="1" title="기다리기 습득"><button type="action" class="n" name="act_renv5" title="기다리기 행동판정">기다리기</button><span class="t" name="attr_sk_env5_tn">12</span><span class="hatch"></span></div>
+    <div class="no">6</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc6_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc6" value="1" title="침묵하기 습득"><button type="action" class="n" name="act_rsoc6" title="침묵하기 행동판정">침묵하기</button><span class="t" name="attr_sk_soc6_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head6_off" value="0"><input type="checkbox" class="own" name="attr_sk_head6" value="1" title="생각하기 습득"><button type="action" class="n" name="act_rhead6" title="생각하기 행동판정">생각하기</button><span class="t" name="attr_sk_head6_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm6_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm6" value="1" title="쏘기 습득"><button type="action" class="n" name="act_rarm6" title="쏘기 행동판정">쏘기</button><span class="t" name="attr_sk_arm6_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body6_off" value="0"><input type="checkbox" class="own" name="attr_sk_body6" value="1" title="재기 습득"><button type="action" class="n" name="act_rbody6" title="재기 행동판정">재기</button><span class="t" name="attr_sk_body6_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg6_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg6" value="1" title="뛰어오르기 습득"><button type="action" class="n" name="act_rleg6" title="뛰어오르기 행동판정">뛰어오르기</button><span class="t" name="attr_sk_leg6_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env6_off" value="0"><input type="checkbox" class="own" name="attr_sk_env6" value="1" title="나타나기 습득"><button type="action" class="n" name="act_renv6" title="나타나기 행동판정">나타나기</button><span class="t" name="attr_sk_env6_tn">12</span><span class="hatch"></span></div>
+    <div class="no">7</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc7_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc7" value="1" title="전하기 습득"><button type="action" class="n" name="act_rsoc7" title="전하기 행동판정">전하기</button><span class="t" name="attr_sk_soc7_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_head7_off" value="0"><input type="checkbox" class="own" name="attr_sk_head7" value="1" title="뇌 습득"><button type="action" class="n" name="act_rhead7" title="뇌 행동판정">뇌</button><span class="t" name="attr_sk_head7_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm7_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm7" value="1" title="조작 습득"><button type="action" class="n" name="act_rarm7" title="조작 행동판정">조작</button><span class="t" name="attr_sk_arm7_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_body7_off" value="0"><input type="checkbox" class="own" name="attr_sk_body7" value="1" title="심장 습득"><button type="action" class="n" name="act_rbody7" title="심장 행동판정">심장</button><span class="t" name="attr_sk_body7_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg7_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg7" value="1" title="설치하기 습득"><button type="action" class="n" name="act_rleg7" title="설치하기 행동판정">설치하기</button><span class="t" name="attr_sk_leg7_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_env7_off" value="0"><input type="checkbox" class="own" name="attr_sk_env7" value="1" title="인맥 습득"><button type="action" class="n" name="act_renv7" title="인맥 행동판정">인맥</button><span class="t" name="attr_sk_env7_tn">12</span><span class="hatch"></span></div>
+    <div class="no">8</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc8_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc8" value="1" title="속이기 습득"><button type="action" class="n" name="act_rsoc8" title="속이기 행동판정">속이기</button><span class="t" name="attr_sk_soc8_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head8_off" value="0"><input type="checkbox" class="own" name="attr_sk_head8" value="1" title="직감 습득"><button type="action" class="n" name="act_rhead8" title="직감 행동판정">직감</button><span class="t" name="attr_sk_head8_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm8_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm8" value="1" title="찌르기 습득"><button type="action" class="n" name="act_rarm8" title="찌르기 행동판정">찌르기</button><span class="t" name="attr_sk_arm8_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body8_off" value="0"><input type="checkbox" class="own" name="attr_sk_body8" value="1" title="비껴내기 습득"><button type="action" class="n" name="act_rbody8" title="비껴내기 행동판정">비껴내기</button><span class="t" name="attr_sk_body8_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg8_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg8" value="1" title="밟기 습득"><button type="action" class="n" name="act_rleg8" title="밟기 행동판정">밟기</button><span class="t" name="attr_sk_leg8_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env8_off" value="0"><input type="checkbox" class="own" name="attr_sk_env8" value="1" title="포획하기 습득"><button type="action" class="n" name="act_renv8" title="포획하기 행동판정">포획하기</button><span class="t" name="attr_sk_env8_tn">12</span><span class="hatch"></span></div>
+    <div class="no">9</div>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_soc9_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc9" value="1" title="지위 습득"><button type="action" class="n" name="act_rsoc9" title="지위 행동판정">지위</button><span class="t" name="attr_sk_soc9_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head9_off" value="0"><input type="checkbox" class="own" name="attr_sk_head9" value="1" title="예감 습득"><button type="action" class="n" name="act_rhead9" title="예감 행동판정">예감</button><span class="t" name="attr_sk_head9_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_arm9_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm9" value="1" title="반대팔 습득"><button type="action" class="n" name="act_rarm9" title="반대팔 행동판정">반대팔</button><span class="t" name="attr_sk_arm9_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body9_off" value="0"><input type="checkbox" class="own" name="attr_sk_body9" value="1" title="피하기 습득"><button type="action" class="n" name="act_rbody9" title="피하기 행동판정">피하기</button><span class="t" name="attr_sk_body9_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_leg9_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg9" value="1" title="반대다리 습득"><button type="action" class="n" name="act_rleg9" title="반대다리 행동판정">반대다리</button><span class="t" name="attr_sk_leg9_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env9_off" value="0"><input type="checkbox" class="own" name="attr_sk_env9" value="1" title="열기 습득"><button type="action" class="n" name="act_renv9" title="열기 행동판정">열기</button><span class="t" name="attr_sk_env9_tn">12</span><span class="hatch"></span></div>
+    <div class="no">10</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc10_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc10" value="1" title="웃기 습득"><button type="action" class="n" name="act_rsoc10" title="웃기 행동판정">웃기</button><span class="t" name="attr_sk_soc10_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head10_off" value="0"><input type="checkbox" class="own" name="attr_sk_head10" value="1" title="외치기 습득"><button type="action" class="n" name="act_rhead10" title="외치기 행동판정">외치기</button><span class="t" name="attr_sk_head10_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm10_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm10" value="1" title="휘두르기 습득"><button type="action" class="n" name="act_rarm10" title="휘두르기 행동판정">휘두르기</button><span class="t" name="attr_sk_arm10_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body10_off" value="0"><input type="checkbox" class="own" name="attr_sk_body10" value="1" title="견디기 습득"><button type="action" class="n" name="act_rbody10" title="견디기 행동판정">견디기</button><span class="t" name="attr_sk_body10_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg10_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg10" value="1" title="기어가기 습득"><button type="action" class="n" name="act_rleg10" title="기어가기 행동판정">기어가기</button><span class="t" name="attr_sk_leg10_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env10_off" value="0"><input type="checkbox" class="own" name="attr_sk_env10" value="1" title="도망치기 습득"><button type="action" class="n" name="act_renv10" title="도망치기 행동판정">도망치기</button><span class="t" name="attr_sk_env10_tn">12</span><span class="hatch"></span></div>
+    <div class="no">11</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc11_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc11" value="1" title="말하기 습득"><button type="action" class="n" name="act_rsoc11" title="말하기 행동판정">말하기</button><span class="t" name="attr_sk_soc11_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_head11_off" value="0"><input type="checkbox" class="own" name="attr_sk_head11" value="1" title="입 습득"><button type="action" class="n" name="act_rhead11" title="입 행동판정">입</button><span class="t" name="attr_sk_head11_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm11_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm11" value="1" title="잡기 습득"><button type="action" class="n" name="act_rarm11" title="잡기 행동판정">잡기</button><span class="t" name="attr_sk_arm11_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_body11_off" value="0"><input type="checkbox" class="own" name="attr_sk_body11" value="1" title="소화기 습득"><button type="action" class="n" name="act_rbody11" title="소화기 행동판정">소화기</button><span class="t" name="attr_sk_body11_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg11_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg11" value="1" title="숙이기 습득"><button type="action" class="n" name="act_rleg11" title="숙이기 행동판정">숙이기</button><span class="t" name="attr_sk_leg11_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c part"><input type="hidden" class="offv" name="attr_sk_env11_off" value="0"><input type="checkbox" class="own" name="attr_sk_env11" value="1" title="퇴로 습득"><button type="action" class="n" name="act_renv11" title="퇴로 행동판정">퇴로</button><span class="t" name="attr_sk_env11_tn">12</span><span class="hatch"></span></div>
+    <div class="no">12</div>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_soc12_off" value="0"><input type="checkbox" class="own" name="attr_sk_soc12" value="1" title="화내기 습득"><button type="action" class="n" name="act_rsoc12" title="화내기 행동판정">화내기<span class="tri">▲</span></button><span class="t" name="attr_sk_soc12_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_a" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_head12_off" value="0"><input type="checkbox" class="own" name="attr_sk_head12" value="1" title="물기 습득"><button type="action" class="n" name="act_rhead12" title="물기 행동판정">물기</button><span class="t" name="attr_sk_head12_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_b" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_arm12_off" value="0"><input type="checkbox" class="own" name="attr_sk_arm12" value="1" title="던지기 습득"><button type="action" class="n" name="act_rarm12" title="던지기 행동판정">던지기<span class="tri">▲</span></button><span class="t" name="attr_sk_arm12_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_c" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_body12_off" value="0"><input type="checkbox" class="own" name="attr_sk_body12" value="1" title="떨어지기 습득"><button type="action" class="n" name="act_rbody12" title="떨어지기 행동판정">떨어지기</button><span class="t" name="attr_sk_body12_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_d" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_leg12_off" value="0"><input type="checkbox" class="own" name="attr_sk_leg12" value="1" title="걷기 습득"><button type="action" class="n" name="act_rleg12" title="걷기 행동판정">걷기<span class="tri">▲</span></button><span class="t" name="attr_sk_leg12_tn">12</span><span class="hatch"></span></div>
+    <label class="gap"><input type="checkbox" name="attr_gap_e" value="1"><span></span></label>
+    <div class="c"><input type="hidden" class="offv" name="attr_sk_env12_off" value="0"><input type="checkbox" class="own" name="attr_sk_env12" value="1" title="쉬지 않기 습득"><button type="action" class="n" name="act_renv12" title="쉬지 않기 행동판정">쉬지 않기</button><span class="t" name="attr_sk_env12_tn">12</span><span class="hatch"></span></div>
+  </div></div>
+  <div class="dmg"><b>부위 대미지</b><div class="parts">
+    <label><input type="checkbox" name="attr_dmg_brain" value="1"> 뇌<sub>2</sub></label>
+    <label><input type="checkbox" name="attr_dmg_armm" value="1"> 주팔<sub>3</sub></label>
+    <label><input type="checkbox" name="attr_dmg_legm" value="1"> 주다리<sub>4</sub></label>
+    <label><input type="checkbox" name="attr_dmg_digest" value="1"> 소화기<sub>5</sub></label>
+    <label><input type="checkbox" name="attr_dmg_sense" value="1"> 감각기<sub>6</sub></label>
+    <label><input type="checkbox" name="attr_dmg_mouth" value="1"> 입<sub>8</sub></label>
+    <label><input type="checkbox" name="attr_dmg_breath" value="1"> 호흡기<sub>9</sub></label>
+    <label><input type="checkbox" name="attr_dmg_lego" value="1"> 반대다리<sub>10</sub></label>
+    <label><input type="checkbox" name="attr_dmg_armo" value="1"> 반대팔<sub>11</sub></label>
+    <label><input type="checkbox" name="attr_dmg_heart" value="1"> 심장<sub>12</sub></label>
+    <span class="sep"></span>
+    <label><input type="checkbox" name="attr_dmg_conf" value="1"> 자신감</label>
+    <label><input type="checkbox" name="attr_dmg_status" value="1"> 지위</label>
+    <label><input type="checkbox" name="attr_dmg_daily" value="1"> 일상</label>
+    <label><input type="checkbox" name="attr_dmg_contact" value="1"> 인맥</label>
+    <label><input type="checkbox" name="attr_dmg_retreat" value="1"> 퇴로</label>
+  </div><div class="total">합계&nbsp;<span name="attr_dmg_total">0</span></div></div>
+
+  <!-- 어빌리티: 주사위 = 지정특기로 행동판정(공격 타입은 공격력 자동 가산), 상주 · 지정특기 없음은 효과만 출력 -->
+  <div class="list">
+    <h3>어빌리티 <small>상주 코스트 합계 <span name="attr_passive_cost">0</span></small></h3>
+    <div class="lh ab"><span></span><span>이름</span><span class="g">그룹</span><span>타입</span><span>코스트</span><span class="s">지정특기</span></div>
+    <fieldset class="repeating_abilities">
+      <div class="li ab"><button type="action" name="act_use" class="dice" title="어빌리티 사용"></button><input type="text" name="attr_name" placeholder="이름"><input class="g" type="text" name="attr_group" placeholder="그룹"><select class="pill" name="attr_type"><option value="" selected></option><option value="공격">공격</option><option value="보조">보조</option><option value="지원">지원</option><option value="상주">상주</option></select><input type="text" name="attr_cost"><input class="s" type="text" name="attr_skill" placeholder="지정특기">
+        <textarea class="eff" name="attr_effect" placeholder="효과…"></textarea><textarea class="eff fl" name="attr_flavor" placeholder="개요…"></textarea></div>
+    </fieldset>
+    <div class="adds h-only"><button type="action" name="act_addmild">+Add 경증광기</button><button type="action" name="act_addsevere">+Add 중증광기</button></div>
+  </div>
+
+  <div class="two">
+    <div class="list">
+      <h3>아이템</h3>
+      <div class="lh it"><span></span><span>아이템</span><span>분류</span><span>개수</span></div>
+      <fieldset class="repeating_items">
+        <div class="li it"><input type="hidden" name="attr_row" value=""><button type="action" name="act_say" class="say" title="채팅에 출력"></button><input type="text" name="attr_name" placeholder="아이템"><input type="text" name="attr_kind" placeholder="분류"><input type="number" name="attr_count" min="0">
+          <textarea class="eff" name="attr_effect" placeholder="효과…"></textarea></div>
+      </fieldset>
+    </div>
+    <div>
+      <!-- 헌터: 행복&배덕 / 몬스터: 지배력 — 링크는 정신 부위 다섯 중 하나 -->
+      <div class="list h-only">
+        <h3>행복&amp;배덕</h3>
+        <div class="lh hb"><span></span><span>구분</span><span>이름</span><span>링크</span><span>강도</span></div>
+        <fieldset class="repeating_happiness">
+          <div class="li hb"><button type="action" name="act_say" class="say" title="채팅에 출력"></button><select class="pill" name="attr_kind"><option value="행복" selected>행복</option><option value="배덕">배덕</option></select><input type="text" name="attr_name" placeholder="이름"><select class="pill" name="attr_link"><option value="" selected></option><option value="자신감">자신감</option><option value="지위">지위</option><option value="일상">일상</option><option value="인맥">인맥</option><option value="퇴로">퇴로</option></select><input type="number" name="attr_power" min="0">
+            <textarea class="eff fl" name="attr_flavor" placeholder="설명…"></textarea></div>
+        </fieldset>
+        <div class="tot">강도 합계 <span name="attr_power_total">0</span></div>
+      </div>
+      <div class="list m-only">
+        <h3>지배력</h3>
+        <div class="lh dp"><span></span><span>이름</span><span>링크</span><span>강도</span></div>
+        <fieldset class="repeating_dominance">
+          <div class="li dp"><button type="action" name="act_say" class="say" title="채팅에 출력"></button><input type="text" name="attr_name" placeholder="이름"><select class="pill" name="attr_link"><option value="" selected></option><option value="자신감">자신감</option><option value="지위">지위</option><option value="일상">일상</option><option value="인맥">인맥</option><option value="퇴로">퇴로</option></select><input type="number" name="attr_power" min="0">
+            <textarea class="eff fl" name="attr_flavor" placeholder="설명…"></textarea></div>
+        </fieldset>
+        <div class="tot">강도 합계 <span name="attr_dominance_total">0</span></div>
+      </div>
+      <div class="list">
+        <h3>관계</h3>
+        <div class="lh hp"><span></span><span>이름</span><span>속성</span><span>심도</span></div>
+        <fieldset class="repeating_relations">
+          <div class="li hp"><button type="action" name="act_say" class="say" title="채팅에 출력"></button><input type="text" name="attr_name" placeholder="이름"><input type="text" name="attr_attr" placeholder="속성"><input type="number" name="attr_depth" min="1" max="5" placeholder="1~5">
+            <textarea class="eff fl" name="attr_flavor" placeholder="설명…"></textarea></div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상태: 변조 | 텐션 1~30 | 격정 + 광기 1~10 (몬스터: 행동 횟수) -->
+  <div class="state">
+    <div class="vbox"><b class="vl">변조</b><div class="cgrid">
+      <label>공황<input type="checkbox" name="attr_cond_panic" value="1"></label><label>유혈<input type="checkbox" name="attr_cond_bleed" value="1"></label>
+      <label>중상<input type="checkbox" name="attr_cond_wound" value="1"></label><label>불길<input type="checkbox" name="attr_cond_omen" value="1"></label>
+      <label>포박<input type="checkbox" name="attr_cond_bind" value="1"></label><label>방해<input type="checkbox" name="attr_cond_hinder" value="1"></label>
+    </div></div>
+    <div class="track"><div class="hbar">텐션 <span><span name="attr_tension">0</span> / 30</span></div><div class="cells c10 trk">
+      <input type="radio" class="z" name="attr_tension" value="0" checked title="0으로">
+      <input type="radio" name="attr_tension" value="1">
+      <input type="radio" name="attr_tension" value="2">
+      <input type="radio" name="attr_tension" value="3">
+      <input type="radio" name="attr_tension" value="4">
+      <input type="radio" name="attr_tension" value="5">
+      <input type="radio" name="attr_tension" value="6">
+      <input type="radio" name="attr_tension" value="7">
+      <input type="radio" name="attr_tension" value="8">
+      <input type="radio" name="attr_tension" value="9">
+      <input type="radio" name="attr_tension" value="10" class="ten">
+      <input type="radio" name="attr_tension" value="11">
+      <input type="radio" name="attr_tension" value="12">
+      <input type="radio" name="attr_tension" value="13">
+      <input type="radio" name="attr_tension" value="14">
+      <input type="radio" name="attr_tension" value="15">
+      <input type="radio" name="attr_tension" value="16">
+      <input type="radio" name="attr_tension" value="17">
+      <input type="radio" name="attr_tension" value="18">
+      <input type="radio" name="attr_tension" value="19">
+      <input type="radio" name="attr_tension" value="20" class="ten">
+      <input type="radio" name="attr_tension" value="21">
+      <input type="radio" name="attr_tension" value="22">
+      <input type="radio" name="attr_tension" value="23">
+      <input type="radio" name="attr_tension" value="24">
+      <input type="radio" name="attr_tension" value="25">
+      <input type="radio" name="attr_tension" value="26">
+      <input type="radio" name="attr_tension" value="27">
+      <input type="radio" name="attr_tension" value="28">
+      <input type="radio" name="attr_tension" value="29">
+      <input type="radio" name="attr_tension" value="30" class="ten">
+    </div></div>
+    <div class="stack">
+      <div class="vbox"><b class="vl">격정</b><div class="vc xbox"><input type="checkbox" name="attr_passion1" value="1" title="격정 1"><input type="checkbox" name="attr_passion2" value="1" title="격정 2"><input type="checkbox" name="attr_passion3" value="1" title="격정 3"></div></div>
+      <div class="track h-only"><div class="hbar">광기 <span><span name="attr_madness">0</span> / 10</span></div><div class="cells c5 trk">
+      <input type="radio" class="z" name="attr_madness" value="0" checked title="0으로">
+      <input type="radio" name="attr_madness" value="1">
+      <input type="radio" name="attr_madness" value="2">
+      <input type="radio" name="attr_madness" value="3">
+      <input type="radio" name="attr_madness" value="4">
+      <input type="radio" name="attr_madness" value="5">
+      <input type="radio" name="attr_madness" value="6">
+      <input type="radio" name="attr_madness" value="7">
+      <input type="radio" name="attr_madness" value="8">
+      <input type="radio" name="attr_madness" value="9">
+      <input type="radio" name="attr_madness" value="10" class="ten">
+      </div></div>
+      <!-- 몬스터 행동 횟수: 1·2사이클 [헌터 수−2]회, 3사이클 [헌터 수−1]회 -->
+      <div class="track m-only"><div class="hbar">행동 횟수</div><div class="cells c3 acts">
+        <span><small>1사이클</small><span class="an" name="attr_acts1">—</span></span><span><small>2사이클</small><span class="an" name="attr_acts2">—</span></span><span><small>3사이클</small><span class="an" name="attr_acts3">—</span></span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- 몬스터: 팔로워 — 룰북 3.02: 판정치 [10 − 레벨](최저 5), 내구력 [2 + 레벨] (sheet worker) · 어빌리티 3칸 -->
+  <div class="list m-only">
+    <h3>팔로워</h3>
+    <div class="lh fw"><span></span><span>이름</span><span class="kd">종별</span><span>LV</span><span>판정치</span><span>내구력</span><span class="itm">아이템</span><span>사망</span></div>
+    <fieldset class="repeating_followers">
+      <div class="li fw"><button type="action" name="act_roll" class="dice" title="팔로워 판정"></button><input type="text" name="attr_name" placeholder="이름"><input class="kd" type="text" name="attr_kind" placeholder="종별"><input type="number" name="attr_lv" min="1"><span class="num" name="attr_tn">—</span><span class="num" name="attr_hp">—</span><input class="itm" type="text" name="attr_item" placeholder="아이템"><input class="ko" type="checkbox" name="attr_dead" value="1" title="사망">
+        <textarea class="eff" name="attr_special" placeholder="특수 능력…"></textarea>
+        <div class="fab">
+          <div class="fab-h"><span></span><span>어빌리티</span><span class="ag">그룹</span><span>타입</span><span>코스트</span><span class="as">지정특기</span></div>
+          <div class="fa"><button type="action" name="act_ab1" class="dice" title="팔로워 어빌리티 사용"></button><input type="text" name="attr_ab1_name" placeholder="어빌리티"><input class="ag" type="text" name="attr_ab1_group" placeholder="그룹"><select class="pill" name="attr_ab1_type"><option value="" selected></option><option value="공격">공격</option><option value="보조">보조</option><option value="지원">지원</option><option value="상주">상주</option></select><input type="text" name="attr_ab1_cost" placeholder="코스트"><input class="as" type="text" name="attr_ab1_skill" placeholder="지정특기"><textarea class="eff" name="attr_ab1_effect" placeholder="효과…"></textarea></div>
+          <div class="fa"><button type="action" name="act_ab2" class="dice" title="팔로워 어빌리티 사용"></button><input type="text" name="attr_ab2_name" placeholder="어빌리티"><input class="ag" type="text" name="attr_ab2_group" placeholder="그룹"><select class="pill" name="attr_ab2_type"><option value="" selected></option><option value="공격">공격</option><option value="보조">보조</option><option value="지원">지원</option><option value="상주">상주</option></select><input type="text" name="attr_ab2_cost" placeholder="코스트"><input class="as" type="text" name="attr_ab2_skill" placeholder="지정특기"><textarea class="eff" name="attr_ab2_effect" placeholder="효과…"></textarea></div>
+          <div class="fa"><button type="action" name="act_ab3" class="dice" title="팔로워 어빌리티 사용"></button><input type="text" name="attr_ab3_name" placeholder="어빌리티"><input class="ag" type="text" name="attr_ab3_group" placeholder="그룹"><select class="pill" name="attr_ab3_type"><option value="" selected></option><option value="공격">공격</option><option value="보조">보조</option><option value="지원">지원</option><option value="상주">상주</option></select><input type="text" name="attr_ab3_cost" placeholder="코스트"><input class="as" type="text" name="attr_ab3_skill" placeholder="지정특기"><textarea class="eff" name="attr_ab3_effect" placeholder="효과…"></textarea></div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="two memos">
+    <textarea class="memo h-only" name="attr_story" placeholder="캐릭터 스토리…"></textarea>
+    <textarea class="memo m-only" name="attr_secret" placeholder="몬스터 비밀(SECRET)…"></textarea>
+    <textarea class="memo" name="attr_memo" placeholder="메모…"></textarea>
+  </div>
+
+  <div class="foot">디자인 기조: Sad QAQ &amp; Tateck</div>
+</div>
+
+<!-- 채팅 카드: 굴림은 sheet worker 가 startRoll 로 보내고, computed:: 칸(결과 · 달성치 · 특기 · 목표치 · 분야 · 주사위 목록)은 finishRoll 로 채운다.
+     computed 칸은 매크로 앞쪽 10칸 안에 있어야 표시되므로 워커가 맨 앞에 넣는다. -->
+<rolltemplate class="sheet-rolltemplate-bloodmoon">
+  <div class="sheet-card">
+    <div class="sheet-h">{{title}}{{#sub}} <small>{{sub}}</small>{{/sub}}</div>
+    <div class="sheet-b">
+      {{#skill}}<div class="sheet-r"><span>특기</span><b>{{computed::skill}}</b></div>{{/skill}}
+      {{#field}}<div class="sheet-r"><span>분야</span><b>{{computed::field}}</b></div>{{/field}}
+      {{#target}}<div class="sheet-r"><span>목표치</span><b>{{computed::target}}</b></div>{{/target}}
+      {{#d1}}<div class="sheet-r"><span>2D6</span><b>{{d1}} · {{d2}}</b></div>{{/d1}}
+      {{#die}}<div class="sheet-r"><span>1D6</span><b>{{die}}</b></div>{{/die}}
+      {{#dice}}<div class="sheet-r"><span>주사위</span><b>{{computed::dice}}</b></div>{{/dice}}
+      {{#atk}}<div class="sheet-r"><span>공격력</span><b>+{{atk}}</b></div>{{/atk}}
+      {{#mod}}{{#^rollTotal() mod 0}}<div class="sheet-r"><span>수정</span><b>{{mod}}</b></div>{{/^rollTotal() mod 0}}{{/mod}}
+      {{#total}}<div class="sheet-r"><span>달성치</span><b>{{computed::total}}</b></div>{{/total}}
+      {{#k1}}<div class="sheet-r"><span>{{k1}}</span><b>{{v1}}</b></div>{{/k1}}
+      {{#k2}}<div class="sheet-r"><span>{{k2}}</span><b>{{v2}}</b></div>{{/k2}}
+      {{#k3}}<div class="sheet-r"><span>{{k3}}</span><b>{{v3}}</b></div>{{/k3}}
+      {{#k4}}<div class="sheet-r"><span>{{k4}}</span><b>{{v4}}</b></div>{{/k4}}
+      {{#effect}}<div class="sheet-tx">{{effect}}</div>{{/effect}}
+      {{#flavor}}<div class="sheet-fl">{{flavor}}</div>{{/flavor}}
+      {{#res}}<div class="sheet-res">{{computed::res}}</div>{{/res}}
+    </div>
+  </div>
+</rolltemplate>
+<script type="text/worker">
+// 블러드문 sheet worker — 자동 계산 (굴림은 아래 "굴림" 구역)
+'use strict';
+
+// ── 특기 리스트: 분야 id 와 2~12 특기. 속성은 sk_<분야><눈> (예: sk_head7 = 《뇌》)
+const FIELDS = ['soc', 'head', 'arm', 'body', 'leg', 'env'];
+const FIELD_NAMES = { soc: '사회', head: '머리', arm: '팔', body: '동체', leg: '다리', env: '환경' };
+const SKILLS = {
+  soc: ['두려워하기', '위협하기', '생각하지 않기', '자신감', '침묵하기', '전하기', '속이기', '지위', '웃기', '말하기', '화내기'],
+  head: ['듣기', '감각기', '보기', '반응', '생각하기', '뇌', '직감', '예감', '외치기', '입', '물기'],
+  arm: ['조이기', '때리기', '베기', '주팔', '쏘기', '조작', '찌르기', '반대팔', '휘두르기', '잡기', '던지기'],
+  body: ['막기', '호흡기', '멈추기', '받기', '재기', '심장', '비껴내기', '피하기', '견디기', '소화기', '떨어지기'],
+  leg: ['달리기', '다가가기', '차기', '주다리', '뛰어오르기', '설치하기', '밟기', '반대다리', '기어가기', '숙이기', '걷기'],
+  env: ['쉬기', '일상', '숨기', '기다리기', '나타나기', '인맥', '포획하기', '열기', '도망치기', '퇴로', '쉬지 않기'],
+};
+const GAPS = ['a', 'b', 'c', 'd', 'e'];          // gap_a = 사회|머리 사이 … gap_e = 다리|환경 사이
+const PANIC = ['soc2', 'arm2', 'leg2', 'soc12', 'arm12', 'leg12'];   // 공황: ▲특기 사용불능
+// 부위 대미지 → 그 부위 특기 칸 (십자 모양으로 사용불능)
+const PARTS = {
+  brain: 'head7', armm: 'arm5', legm: 'leg5', digest: 'body11', sense: 'head3', mouth: 'head11',
+  breath: 'body3', lego: 'leg9', armo: 'arm9', heart: 'body7',
+  conf: 'soc5', status: 'soc9', daily: 'env3', contact: 'env7', retreat: 'env11',
+};
+const SKILL_IDS = FIELDS.flatMap(f => SKILLS[f].map((_, r) => `${f}${r + 2}`));
+const pos = id => [FIELDS.indexOf(id.match(/^[a-z]+/)[0]), +id.match(/\d+$/)[0]];   // [열, 눈]
+const idAt = (c, row) => (c >= 0 && c < 6 && row >= 2 && row <= 12 ? `${FIELDS[c]}${row}` : null);
+const skillName = id => { const [c, row] = pos(id); return SKILLS[FIELDS[c]][row - 2]; };
+const on1 = v => v === '1' || v === 1 || v === 'on';
+const num = v => { const n = parseInt(v, 10); return Number.isNaN(n) ? null : n; };
+
+// 두 칸 사이 칸 수: 세로 1칸 1, 가로 1열 2(칠한 갭은 1)
+function distance(a, b, gaps) {
+  const [c1, r1] = pos(a), [c2, r2] = pos(b);
+  let d = Math.abs(r1 - r2);
+  for (let c = Math.min(c1, c2); c < Math.max(c1, c2); c++) d += gaps[c] ? 1 : 2;
+  return d;
+}
+
+// 목표치 · 사용불능 · 부위 대미지 합계
+// 목표치 = 5 + 가장 가까운 습득 특기까지 칸 수. 사용불능이거나 대용할 특기가 없으면 스페셜(12)만 성공 → 12, 12 초과도 12
+function calcSkills() {
+  const keys = [...SKILL_IDS.map(id => `sk_${id}`), ...GAPS.map(g => `gap_${g}`), ...Object.keys(PARTS).map(p => `dmg_${p}`), 'cond_panic'];
+  getAttrs(keys, v => {
+    const gaps = GAPS.map(g => on1(v[`gap_${g}`]));
+    const dead = new Set(on1(v.cond_panic) ? PANIC : []);
+    let hurt = 0;
+    Object.entries(PARTS).forEach(([p, id]) => {
+      if (!on1(v[`dmg_${p}`])) return;
+      hurt++;
+      const [c, row] = pos(id);
+      [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dc, dr]) => { const x = idAt(c + dc, row + dr); if (x) dead.add(x); });
+    });
+    const src = SKILL_IDS.filter(id => on1(v[`sk_${id}`]) && !dead.has(id));
+    const out = { dmg_total: hurt };
+    SKILL_IDS.forEach(id => {
+      const off = dead.has(id);
+      out[`sk_${id}_off`] = off ? 1 : 0;
+      out[`sk_${id}_tn`] = off || !src.length ? 12 : Math.min(12, 5 + Math.min(...src.map(s => distance(s, id, gaps))));
+    });
+    setAttrs(out, { silent: true });
+  });
+}
+on([...SKILL_IDS.map(id => `change:sk_${id}`), ...GAPS.map(g => `change:gap_${g}`), ...Object.keys(PARTS).map(p => `change:dmg_${p}`), 'change:cond_panic', 'sheet:opened'].join(' '), calcSkills);
+
+// 반복 섹션의 한 칸 값을 모두 모은다: cb({행 id: {칸: 값}})
+function readSection(section, fields, cb) {
+  getSectionIDs(section, ids => {
+    const names = ids.flatMap(id => fields.map(f => `repeating_${section}_${id}_${f}`));
+    getAttrs(names, v => cb(Object.fromEntries(ids.map(id => [id, Object.fromEntries(fields.map(f => [f, v[`repeating_${section}_${id}_${f}`]]))]))));
+  });
+}
+
+// 내구력 = 기본치(입력) + 강도 합계 (헌터: 행복·배덕, 몬스터: 지배력). 행복이 파괴되거나 줄을 지우면 그만큼 내려간다
+function calcDurability() {
+  getAttrs(['sheet_type', 'dur_base'], v => readSection('happiness', ['power'], hap => readSection('dominance', ['power'], dom => {
+    const sum = rows => Object.values(rows).reduce((a, r) => a + (num(r.power) || 0), 0);
+    const h = sum(hap), d = sum(dom), n = v.sheet_type === 'monster' ? d : h, base = num(v.dur_base);
+    setAttrs({ power_total: h, dominance_total: d, dur_sum: n, durability: base === null ? '—' : base + n }, { silent: true });
+  })));
+}
+on('change:sheet_type change:dur_base change:repeating_happiness:power remove:repeating_happiness change:repeating_dominance:power remove:repeating_dominance sheet:opened', calcDurability);
+
+// 상주 타입 어빌리티의 코스트 합계
+function calcPassiveCost() {
+  readSection('abilities', ['type', 'cost'], rows => {
+    setAttrs({ passive_cost: Object.values(rows).filter(r => r.type === '상주').reduce((a, r) => a + (num(r.cost) || 0), 0) }, { silent: true });
+  });
+}
+on('change:repeating_abilities:type change:repeating_abilities:cost remove:repeating_abilities sheet:opened', calcPassiveCost);
+
+// 팔로워 (룰북 3.02): 판정치 [10 − 레벨](최저 5), 내구력 [2 + 레벨]
+const followerTn = lv => (lv === null ? '—' : Math.max(5, 10 - lv));
+const followerHp = lv => (lv === null ? '—' : 2 + lv);
+function calcFollowers() {
+  readSection('followers', ['lv'], rows => {
+    const out = {};
+    Object.entries(rows).forEach(([id, r]) => { const lv = num(r.lv); out[`repeating_followers_${id}_tn`] = followerTn(lv); out[`repeating_followers_${id}_hp`] = followerHp(lv); });
+    setAttrs(out, { silent: true });
+  });
+}
+on('change:repeating_followers:lv sheet:opened', calcFollowers);
+
+// 몬스터 행동 횟수: 1·2사이클 [헌터 수 − 2]회, 3사이클 [헌터 수 − 1]회
+on('change:hunters sheet:opened', () => getAttrs(['hunters'], v => {
+  const p = num(v.hunters), f = k => (p === null ? '—' : Math.max(0, p - k));
+  setAttrs({ acts1: f(2), acts2: f(2), acts3: f(1) }, { silent: true });
+}));
+
+// 여유 · 혈량 ▲▼
+[['reserve', 'reserveup', 1], ['reserve', 'reservedn', -1], ['blood', 'bloodup', 1], ['blood', 'blooddn', -1]].forEach(([attr, btn, d]) => {
+  on(`clicked:${btn}`, () => getAttrs([attr], v => setAttrs({ [attr]: Math.max(0, (num(v[attr]) || 0) + d) })));
+});
+
+// 어빌리티: 광기 그룹(헌터 전용) 줄 추가
+[['addmild', '경증광기'], ['addsevere', '중증광기']].forEach(([btn, name]) => {
+  on(`clicked:${btn}`, () => {
+    const p = `repeating_abilities_${generateRowID()}_`;
+    setAttrs({ [`${p}name`]: name, [`${p}type`]: '상주', [`${p}cost`]: '×', [`${p}skill`]: '없음' });
+  });
+});
+
+// 새 캐릭터: 아이템 3칸을 펼쳐 둔다(값은 비움 — 숨은 row 칸으로 줄만 만든다)
+on('sheet:opened', () => getAttrs(['sheet_version'], v => {
+  if (v.sheet_version) return;
+  getSectionIDs('items', ids => {
+    const out = { sheet_version: 1 };
+    if (!ids.length) for (let i = 0; i < 3; i++) out[`repeating_items_${generateRowID()}_row`] = 1;
+    setAttrs(out, { silent: true });
+  });
+}));
+
+// ════════ 굴림 — Custom Roll Parsing (startRoll → finishRoll) ════════
+// 채팅 카드 템플릿은 src/rolltemplate.html. computed 칸(res · total · skill · target · field · dice)은 매크로 앞쪽 10칸 안에 둔다.
+const PART_TABLE = { 2: '뇌', 3: '주팔', 4: '주다리', 5: '소화기', 6: '감각기', 7: '공격한 자가 임의로 지정', 8: '입', 9: '호흡기', 10: '반대다리', 11: '반대팔', 12: '심장' };
+const INIT_TABLE = ['《자신감/사회5》', '《지위/사회9》', '《일상/환경3》', '《인맥/환경7》', '《퇴로/환경11》', '《심장/동체7》'];
+const NAME_TO_ID = Object.fromEntries(SKILL_IDS.map(id => [skillName(id), id]));
+
+// 매크로에 넣는 글: 템플릿 · 인라인 굴림 · 속성 호출을 깨뜨리는 문자를 바꾼다(줄바꿈은 공백)
+const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, ' ').replace(/\{/g, '｛').replace(/\}/g, '｝')
+  .replace(/\[\[/g, '[ [').replace(/\]\]/g, '] ]').replace(/([@%&])\{/g, '$1 {').trim();
+const ask = s => clean(s).replace(/[|,]/g, ' ');     // Roll20 입력창 문구
+const field = (k, v) => (v === '' || v == null ? '' : ` {{${k}=${clean(v)}}}`);
+const post = (s, computed) => startRoll(s, r => finishRoll(r.rollId, computed ? computed(r.results) : {}));
+
+// 행동판정: 2D6 + (공격력) + 수정치 ≥ 목표치. 2 는 펌블, 12 는 스페셜
+//   skill: 특기 id (목표치 · 사용불능은 sheet worker 가 계산해 둔 값), pick: 자유 · 전부일 때 고를 특기 목록
+//   follower: 팔로워 판정치(특기 없이 판정)
+function actionCheck({ title, sub, skill, pick, follower, atk, effect, flavor }) {
+  const need = ['sk_' + (skill || 'soc2') + '_tn', 'sk_' + (skill || 'soc2') + '_off', ...(pick ? SKILL_IDS.map(id => `sk_${id}_tn`) : [])];
+  getAttrs(need, v => {
+    const isF = follower !== undefined;
+    const tnOf = id => num(v[`sk_${id}_tn`]) || 12;
+    const opts = pick ? [...SKILL_IDS].sort((a, b) => tnOf(a) - tnOf(b)) : null;
+    let s = '&{template:bloodmoon} {{res=[[0]]}} {{total=[[0]]}}' + (isF ? '' : ' {{skill=[[0]]}}') + ' {{target=[[0]]}} {{d1=[[1d6]]}} {{d2=[[1d6]]}}';
+    if (opts) s += ` {{pick=[[?{판정 특기|${opts.map((id, i) => `${skillName(id)} (${tnOf(id)}),${i}`).join('|')}}]]}}`;
+    const lead = isF ? `판정치 ${follower}` : opts ? '' : `《${skillName(skill)}》 목표치 ${tnOf(skill)}${on1(v[`sk_${skill}_off`]) ? ' (사용불능 · 스페셜만 성공)' : ''}`;
+    s += ` {{mod=[[?{${ask(lead ? `${lead} — 수정치` : '수정치')}|0}]]}}`;
+    if (atk) s += ` {{atk=[[${atk}]]}}`;
+    s += field('title', title) + field('sub', sub) + field('effect', effect) + field('flavor', flavor);
+    post(s, R => {
+      const id = opts ? (opts[R.pick.result] || opts[0]) : skill;
+      const t = isF ? follower : tnOf(id), sum = R.d1.result + R.d2.result, tot = sum + (atk || 0) + R.mod.result;
+      const res = sum === 2 ? (isF ? '✗ 펌블 · 무력화' : '✗ 펌블 · 【여유】 0') : sum === 12 ? (isF ? '★ 스페셜' : '★ 스페셜 · 【여유】 +3') : tot >= t ? '✓ 성공' : '✗ 실패';
+      return Object.assign({ res, total: tot, target: t }, isF ? {} : { skill: `《${skillName(id)}》` });
+    });
+  });
+}
+
+// 특기 칸 이름 → 행동판정
+on(SKILL_IDS.map(id => `clicked:r${id}`).join(' '), e => {
+  const id = (e.triggerName || '').replace(/^clicked:r/, '');
+  if (SKILL_IDS.includes(id)) actionCheck({ title: '행동판정', skill: id });
+});
+
+// 반복 섹션 버튼 → 그 행 접두어 (repeating_<section>_<id>_)
+const rowOf = (e, sec) => { const m = `${e.sourceAttribute || ''} ${e.triggerName || ''}`.match(new RegExp(`repeating_${sec}_([^_\\s]+)_`, 'i')); return m ? `repeating_${sec}_${m[1]}_` : null; };
+const pickRow = (row, v, keys) => Object.fromEntries(keys.map(k => [k, v[row + k] || '']));
+// 목록 줄 채팅 출력(굴림 없음)
+const info = (title, sub, rows, effect, flavor) => post('&{template:bloodmoon}' + field('title', title) + field('sub', sub)
+  + rows.filter(([, val]) => val !== '').slice(0, 4).map(([k, val], i) => field(`k${i + 1}`, k) + field(`v${i + 1}`, val)).join('') + field('effect', effect) + field('flavor', flavor));
+
+// 어빌리티: 지정특기로 행동판정(공격 타입은 【공격력】 자동 가산). 상주 · 지정특기 없음은 효과만 출력
+on('clicked:repeating_abilities:use', e => {
+  const row = rowOf(e, 'abilities'); if (!row) return;
+  const keys = ['name', 'group', 'type', 'cost', 'skill', 'effect', 'flavor'];
+  getAttrs([...keys.map(k => row + k), 'attack'], v => {
+    const a = pickRow(row, v, keys), sub = [a.type, a.cost && `코스트 ${a.cost}`].filter(Boolean).join(' · ');
+    const title = a.name || '어빌리티', skill = a.skill.replace(/[《》\s]/g, '');
+    if (a.type === '상주' || !skill || skill === '없음') return info(title, sub, [['지정특기', a.skill || '-']], a.effect, a.flavor);
+    actionCheck({ title, sub, skill: NAME_TO_ID[skill], pick: !NAME_TO_ID[skill], atk: a.type === '공격' ? (num(v.attack) || 0) : 0, effect: a.effect, flavor: a.flavor });
+  });
+});
+
+// 팔로워 판정 · 팔로워 어빌리티 1~3 (판정치 = 10 − 레벨, 최저 5)
+on('clicked:repeating_followers:roll clicked:repeating_followers:ab1 clicked:repeating_followers:ab2 clicked:repeating_followers:ab3', e => {
+  const row = rowOf(e, 'followers'); if (!row) return;
+  const k = ((e.triggerName || '').match(/_(ab[123])$/) || [])[1];
+  const keys = ['name', 'lv', 'special', ...(k ? ['name', 'type', 'cost', 'skill', 'effect'].map(f => `${k}_${f}`) : [])];
+  getAttrs(keys.map(x => row + x), v => {
+    const a = pickRow(row, v, keys), who = a.name || '팔로워', lv = num(a.lv), tn = lv === null ? null : Math.max(5, 10 - lv);
+    if (!k) return tn === null ? info(`팔로워 · ${who}`, '', [['LV', '미입력']], a.special) : actionCheck({ title: `팔로워 · ${who}`, follower: tn, effect: a.special });
+    const ab = a[`${k}_name`] || '어빌리티', ty = a[`${k}_type`], sk = a[`${k}_skill`];
+    const sub = [ty, a[`${k}_cost`] && `코스트 ${a[`${k}_cost`]}`].filter(Boolean).join(' · ');
+    if (ty === '상주' || sk === '없음' || tn === null) return info(`${who} · ${ab}`, sub, [['지정특기', sk || '-'], ['LV', lv === null ? '미입력' : lv]], a[`${k}_effect`]);
+    actionCheck({ title: `${who} · ${ab}`, sub, follower: tn, effect: a[`${k}_effect`] });
+  });
+});
+
+// 목록 줄 채팅 출력: 아이템 · 행복&배덕 · 관계 · 지배력 (설명은 플레이버로)
+on('clicked:repeating_items:say', e => { const row = rowOf(e, 'items'); if (row) getAttrs(['name', 'kind', 'count', 'effect'].map(k => row + k), v => { const a = pickRow(row, v, ['name', 'kind', 'count', 'effect']); info(a.name || '아이템', '', [['분류', a.kind], ['개수', a.count]], a.effect); }); });
+on('clicked:repeating_happiness:say', e => { const row = rowOf(e, 'happiness'); if (row) getAttrs(['kind', 'name', 'link', 'power', 'flavor'].map(k => row + k), v => { const a = pickRow(row, v, ['kind', 'name', 'link', 'power', 'flavor']); info(`【${a.kind || '행복'}】 ${a.name}`, '', [['링크', a.link && `《${a.link}》`], ['강도', a.power]], '', a.flavor); }); });
+on('clicked:repeating_dominance:say', e => { const row = rowOf(e, 'dominance'); if (row) getAttrs(['name', 'link', 'power', 'flavor'].map(k => row + k), v => { const a = pickRow(row, v, ['name', 'link', 'power', 'flavor']); info(`【지배력】 ${a.name}`, '', [['링크', a.link && `《${a.link}》`], ['강도', a.power]], '', a.flavor); }); });
+on('clicked:repeating_relations:say', e => { const row = rowOf(e, 'relations'); if (row) getAttrs(['name', 'attr', 'depth', 'flavor'].map(k => row + k), v => { const a = pickRow(row, v, ['name', 'attr', 'depth', 'flavor']); info(`관계 · ${a.name}`, '', [['속성', a.attr], ['심도', a.depth]], '', a.flavor); }); });
+
+// 표 굴림: 랜덤 특기(전체면 분야 1D6 → 눈 2D6) · 신체부위 결정표 · 선제판정표
+on('clicked:rskill', () => getAttrs(['rand_field'], v => {
+  const f = FIELDS.indexOf(v.rand_field);
+  post(`&{template:bloodmoon} {{res=[[0]]}} {{field=[[0]]}} {{d1=[[1d6]]}} {{d2=[[1d6]]}}${f < 0 ? ' {{f=[[1d6]]}}' : ''} {{title=랜덤 특기}}`, R => {
+    const c = f < 0 ? R.f.result - 1 : f, row = R.d1.result + R.d2.result;
+    return { res: `《${SKILLS[FIELDS[c]][row - 2]}》`, field: f < 0 ? `1D6 ${c + 1} → ${FIELD_NAMES[FIELDS[c]]}` : FIELD_NAMES[FIELDS[c]] };
+  });
+}));
+on('clicked:rpart', () => post('&{template:bloodmoon} {{res=[[0]]}} {{d1=[[1d6]]}} {{d2=[[1d6]]}} {{title=신체부위 결정표}}', R => ({ res: PART_TABLE[R.d1.result + R.d2.result] })));
+on('clicked:rinit', () => post('&{template:bloodmoon} {{res=[[0]]}} {{die=[[1d6]]}} {{title=선제판정표}}', R => ({ res: INIT_TABLE[R.die.result - 1] })));
+
+// nD6 + 수정치 (대미지 · 회피 · 방해 등, 수정치는 마이너스 가능)
+on('clicked:rnd', () => getAttrs(['nd_count', 'nd_mod'], v => {
+  const n = Math.min(20, Math.max(1, num(v.nd_count) || 1)), m = num(v.nd_mod) || 0;
+  post(`&{template:bloodmoon} {{res=[[0]]}} {{dice=[[0]]}} {{nd=[[${n}d6]]}} {{mod=[[${m}]]}} {{title=${n}D6${m ? (m > 0 ? '+' : '') + m : ''}}}`,
+    R => ({ dice: R.nd.dice.join(', '), res: `합계 ${R.nd.result + m}` }));
+}));
+</script>

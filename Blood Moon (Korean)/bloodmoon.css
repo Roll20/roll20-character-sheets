@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+/* 블러드문 헌터 · 몬스터 시트 — 배치 기준: bloodmoon/roll20/mockup.html
+   다크 모드는 Roll20 설정을 따른다(Roll20 이 body 에 .sheet-darkmode 를 붙인다). */
+
+.bm{--bg:#fff;--ink:#222226;--sub:#8b8b93;--line:#d9d9de;--cell:#f4f4f6;--bar:#26262b;--bar-ink:#fff;--accent:#e0394b;--hatch:rgba(224,57,75,.16);--band:#1b0a0e;--band-ink:#f4e7e7;
+  max-width:860px;margin:0 auto;padding:0 20px 0;background:var(--bg);color:var(--ink);font:13px/1.45 'Noto Sans KR','Malgun Gothic',Arial,sans-serif;overflow:hidden}
+.sheet-darkmode .bm{--bg:#18181b;--ink:#ececf0;--sub:#8f8f98;--line:#3a3a42;--cell:#232328;--bar:#383840;--bar-ink:#f4e7e7;--hatch:rgba(224,57,75,.3)}
+
+/* 시트 종류: 숨은 attr_sheet_type 값으로 헌터/몬스터 칸을 가른다 */
+.bm-type[value="monster"] ~ .bm .h-only{display:none!important}
+.bm-type:not([value="monster"]) ~ .bm .m-only{display:none!important}
+
+/* ── 기본 입력 요소 (Roll20 기본 스타일 덮어쓰기) ── */
+.bm *{box-sizing:border-box}
+.bm input,.bm select,.bm textarea,.bm button{font:inherit;color:inherit;margin:0}
+.bm input[type=text],.bm input[type=number],.bm select,.bm textarea{width:100%;height:auto;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:2px 4px}
+.bm input[type=number]{text-align:center;-moz-appearance:textfield}
+.bm input::-webkit-inner-spin-button{-webkit-appearance:none}
+.bm textarea{resize:vertical}
+.bm :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.bm button[type=action]{background:none;border:0;padding:0;box-shadow:none;text-shadow:none;cursor:pointer;min-width:0;height:auto;line-height:inherit}
+.bm button.dice,.bm button.say{flex:none;width:22px;height:22px;border-radius:50%;background:var(--bar) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.6'%3E%3Cpath d='M12 3l8 4.6v8.8L12 21l-8-4.6V7.6z'/%3E%3Cpath d='M12 3v6l8-1.4M12 9l-8-1.4M12 9l5 7.4H7z'/%3E%3C/svg%3E") center/15px no-repeat}
+.bm button.say{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8'%3E%3Cpath d='M4 5h16v11H10l-5 4v-4H4z'/%3E%3C/svg%3E");background-size:13px}
+.bm button.dice.red{background-color:var(--accent)}
+.bm .pill{border:1px solid var(--line);border-radius:9em;padding:1px 4px;font-size:12px}
+
+/* ── 띠 ── */
+.bm .band{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 -20px 14px;padding:9px 20px;background:var(--band);color:var(--band-ink)}
+.bm .mark{font:900 24px/1 Georgia,'Noto Serif KR',serif;letter-spacing:2px;color:#f4e7e7;text-shadow:0 0 10px rgba(224,57,75,.9);white-space:nowrap}
+.bm .stype{display:flex;align-items:center;gap:2px;font-size:12px;border:1px solid rgba(244,231,231,.35);border-radius:9em;padding:1px 2px 1px 12px}
+.bm .stype select{width:auto;border:0;color:inherit;font-weight:700;padding:1px 4px;cursor:pointer}
+.bm .stype option{color:#222226}
+
+/* ── 상단: 일러스트(1:1) | 인적 사항 | 특성치 · 내구력 · 여유 · 혈량 — 세 칸 모두 높이 236px ── */
+.bm .top{display:grid;grid-template-columns:236px 262px minmax(0,1fr);gap:12px;height:236px}
+.bm .portrait{position:relative;aspect-ratio:1/1;border:1px solid var(--bar);background:var(--cell);display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:11px;overflow:hidden}
+.bm .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bm .idcol{display:grid;grid-auto-rows:1fr;gap:4px;min-width:0}
+.bm .statcol{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bm .res3{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:0}
+/* 검은 라벨 칸 + 테두리 입력 칸 (룰북 시트의 이름 · 레벨 · 성별 … 칸) */
+.bm .fr{display:grid;gap:3px;grid-auto-rows:minmax(26px,1fr)}
+.bm .fr>b{background:var(--bar);color:var(--bar-ink);font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 6px;white-space:nowrap}
+.bm .fr input{border:1px solid var(--line);padding:0 6px;height:100%}
+.bm .fr .two-in{display:flex;gap:3px;min-width:0}
+.bm .r1{grid-template-columns:62px minmax(0,1fr)}
+.bm .r2{grid-template-columns:62px minmax(0,1fr) 44px minmax(0,1fr)}
+.bm .r-lv{grid-template-columns:62px minmax(0,1fr) 50px minmax(0,1fr)}
+.bm-type[value="monster"] ~ .bm .r-lv{grid-template-columns:62px minmax(0,1fr)}
+.bm .st-r{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.bm .st-r input{font-weight:700;font-size:16px}
+.bm .hbar{display:flex;justify-content:center;gap:8px;background:var(--bar);color:var(--bar-ink);font-size:11.5px;font-weight:700;padding:2px 0}
+.bm .hbar>span{font-weight:400;opacity:.8}
+/* 세로 라벨 칸 (룰북 시트의 내구력 · 여유 · 혈량 · 변조 · 격정) */
+.bm .vbox{display:grid;grid-template-columns:22px minmax(0,1fr);border:1px solid var(--bar);min-height:0}
+.bm .vl{background:var(--bar);color:var(--bar-ink);writing-mode:vertical-rl;text-orientation:upright;letter-spacing:1px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.bm .vbox.red{border-color:var(--accent)}.bm .vbox.red .vl{background:var(--accent);color:#fff}
+.bm .vc{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:4px}
+.bm .vc.col{flex-direction:column;gap:0}
+.bm .vc input[type=number]{width:44px;border:0;font-weight:700;font-size:22px}
+.bm .step button{color:var(--sub);font-size:11px;padding:3px 8px;line-height:1}
+.bm .step button:hover{color:var(--accent)}
+.bm .durb{font-size:12px;color:var(--sub)}
+.bm .durb input[type=number]{width:44px;font-size:13px;font-weight:400;border-bottom:1px solid var(--line)}
+.bm .durb .big{font-size:22px;font-weight:700;color:var(--ink)}
+
+/* ── 특기 리스트 머리줄 + 굴림 ── */
+.bm .skbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--bar);color:var(--bar-ink);padding:4px 10px;margin-top:12px;font-size:12px}
+.bm .skbar>b{margin-right:auto}
+.bm .skbar .ctl{display:flex;align-items:center;gap:5px}
+.bm .skbar select,.bm .skbar input[type=number]{width:auto;background:transparent;color:inherit;border:1px solid rgba(255,255,255,.35);border-radius:9em;padding:0 6px}
+.bm .skbar input[type=number]{width:34px}
+.bm .skbar option{color:#222226}
+.bm .skbar button.dice{background-color:#55555e}.bm .skbar button.dice.red{background-color:var(--accent)}
+
+/* ── 특기표 ── */
+.bm .skwrap{overflow-x:auto;margin-top:6px}
+.bm .sk{display:grid;grid-template-columns:34px repeat(5,minmax(96px,1fr) 12px) minmax(96px,1fr);gap:4px 0;min-width:700px}
+.bm .sk .hd{background:var(--bar);color:var(--bar-ink);text-align:center;font-weight:700;padding:5px 0}
+.bm .sk .no{background:#6a6a72;color:#fff;text-align:center;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:2px}
+/* 갭: 같은 속성(attr_gap_a~e)을 머리줄 글자와 열의 막대 11개가 함께 쓴다 */
+.bm .gh,.bm .gap{position:relative;display:flex;justify-content:center;cursor:pointer}
+.bm .gh input,.bm .gap input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.bm .gh span{align-self:end;font-size:10px;font-weight:700;color:var(--sub);border-radius:2px;padding:1px 2px}
+.bm .gh input:checked+span{background:var(--bar);color:var(--bar-ink)}
+.bm .gap span{width:6px;height:100%;background:var(--line);border-radius:3px}
+.bm .gap input:checked+span{background:var(--bar)}
+.sheet-darkmode .bm .gap input:checked+span{background:var(--ink)}
+.bm .c{position:relative;display:flex;align-items:center;gap:5px;border:1px solid var(--line);padding:5px 4px;margin:0 1px;font-size:12.5px;background:var(--bg);min-width:0}
+.bm .c .own{appearance:none;-webkit-appearance:none;flex:none;width:11px;height:11px;border:1.5px solid var(--ink);transform:rotate(45deg);margin:0 2px;cursor:pointer}
+.bm .c .own:checked{background:var(--ink)}
+.bm .c .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.bm .c .n:hover{color:var(--accent)}
+.bm .c .t{flex:none;width:18px;text-align:right;font-size:11px;color:var(--sub);border-left:1px solid var(--line)}
+.bm .c.part .n{text-decoration:underline dotted var(--accent) 1.5px;text-underline-offset:3px}
+.bm .c .tri{color:var(--accent);font-size:9px;margin-left:1px}
+/* 사용불능(부위 대미지 십자 · 공황 ▲): sheet worker 가 attr_sk_*_off 를 1 로 둔다 */
+.bm .c .hatch{display:none;position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--hatch) 0 5px,transparent 5px 10px);pointer-events:none}
+.bm .c .offv[value="1"]~.hatch{display:block}
+.bm .c .offv[value="1"]~.n{text-decoration:line-through var(--accent) 2px;color:var(--sub)}
+.bm .c .offv[value="1"]~.t{color:var(--accent)}
+.bm .dmg{display:grid;grid-template-columns:86px 1fr auto;border:1px solid var(--bar);margin-top:6px}
+.bm .dmg>b{background:var(--accent);color:#fff;font-size:12px;display:flex;align-items:center;padding-left:10px}
+.bm .parts{display:flex;flex-wrap:wrap;gap:4px 12px;padding:6px 8px;align-items:center}
+.bm .parts label{white-space:nowrap;display:flex;align-items:center;gap:3px}.bm .parts sub{color:var(--sub);font-size:10px}
+.bm .parts .sep{width:1px;height:16px;background:var(--line)}
+.bm .dmg .total{padding:6px 10px;font-weight:700;border-left:1px solid var(--line);display:flex;align-items:center}
+
+/* ── 목록 (반복 섹션) ── */
+.bm .list{margin-top:16px;position:relative}
+.bm .list>h3{margin:0 0 4px;text-align:center;font-size:14px;border-top:1px solid var(--bar);padding-top:8px}
+.bm .list>h3 small{position:absolute;right:0;top:10px;font-weight:400;font-size:11px;color:var(--sub)}
+.bm .lh,.bm .li{display:grid;align-items:center;gap:6px;padding:4px 8px}
+.bm .lh{background:var(--bar);color:var(--bar-ink);font-weight:700;font-size:12px}
+.bm .li{border-bottom:1px solid var(--line)}
+.bm .li .eff{grid-column:1/-1;height:28px;font-size:12px;color:var(--sub);background:var(--cell);border:0;border-radius:4px;padding:3px 8px}
+.bm .li .eff.fl{font-style:italic}
+.bm .ab{grid-template-columns:22px minmax(0,1.6fr) minmax(0,1fr) 66px 48px minmax(0,1fr)}
+.bm .it{grid-template-columns:22px minmax(0,1.4fr) minmax(0,1fr) 44px}
+.bm .hp{grid-template-columns:22px minmax(0,1.2fr) minmax(0,1fr) 44px}
+.bm .dp{grid-template-columns:22px minmax(0,1.2fr) 76px 44px}
+.bm .hb{grid-template-columns:22px 58px minmax(0,1.2fr) 76px 44px}
+.bm .fw{grid-template-columns:22px minmax(0,1.2fr) minmax(0,1fr) 40px 40px 48px minmax(0,1fr) 36px}
+.bm .fw .num{text-align:center;font-weight:700}.bm .fw .ko{justify-self:center}
+.bm .lh.fw span{text-align:center}.bm .lh.fw span:nth-child(-n+3){text-align:left}
+.bm .fab{grid-column:1/-1;border:1px solid var(--line);border-radius:4px;margin:2px 0 4px}
+.bm .fa,.bm .fab-h{display:grid;grid-template-columns:22px minmax(0,1.3fr) minmax(0,1fr) 62px 52px minmax(0,1fr);gap:6px;align-items:center;padding:3px 6px}
+.bm .fab-h{font-size:11px;color:var(--sub);border-bottom:1px solid var(--line)}
+.bm .fa+.fa{border-top:1px dashed var(--line)}
+/* Roll20 의 +Add / Modify 막대 */
+.bm .repcontrol{display:flex;justify-content:space-between;background:var(--bar);border-radius:9em;padding:2px 12px;margin-top:4px}
+.bm .repcontrol button{background:none;border:0;box-shadow:none;color:var(--bar-ink);font-size:11px;font-weight:700;padding:0;text-shadow:none}
+.bm .adds{display:flex;gap:14px;margin-top:4px;padding:0 12px}
+.bm .adds button{font-size:11px;font-weight:700;color:var(--sub)}
+.bm .adds button:hover{color:var(--accent)}
+.bm .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bm .tot{display:flex;justify-content:flex-end;gap:6px;font-size:12px;padding:3px 8px;color:var(--sub)}
+.bm .tot span{color:var(--ink);font-weight:700}
+
+/* ── 상태: 변조 | 텐션 | 격정 + 광기(몬스터: 행동 횟수) ── */
+.bm .state{display:grid;grid-template-columns:232px minmax(0,1fr) 212px;gap:12px;margin-top:16px;height:128px}
+.bm .state>*{min-height:0}
+.bm .stack{display:flex;flex-direction:column;gap:6px;min-height:0}.bm .stack .track{flex:1;min-height:0}
+.bm .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;padding:6px 8px;align-content:center}
+.bm .cgrid label{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);padding:2px 6px;font-size:12px;cursor:pointer}
+.bm .cgrid input{appearance:none;-webkit-appearance:none;flex:none;width:13px;height:13px;border:1.5px solid var(--ink);margin:0;cursor:pointer}
+.bm .cgrid input:checked{background:var(--accent);border-color:var(--accent)}
+.bm .xbox input{appearance:none;-webkit-appearance:none;width:36px;height:28px;border:1.5px solid var(--ink);margin:0 4px;cursor:pointer;background:transparent}
+.bm .xbox input:checked{border-color:var(--accent);background:linear-gradient(to top right,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to bottom right,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px))}
+.bm .track{position:relative;display:flex;flex-direction:column;border:1px solid var(--bar)}
+.bm .cells{flex:1;display:grid;gap:3px;padding:4px;grid-auto-rows:minmax(22px,1fr)}
+.bm .c10{grid-template-columns:repeat(10,minmax(0,1fr))}.bm .c5{grid-template-columns:repeat(5,minmax(0,1fr))}.bm .c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* 텐션 · 광기 칸: 라디오. 누른 칸과 그 앞은 채워지고(:checked ~ 는 빈 칸), 0 라디오는 머리줄 오른쪽의 되돌리기 */
+.bm .trk input{appearance:none;-webkit-appearance:none;width:auto;height:auto;margin:0;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bm .trk input::before{content:attr(value)}
+.bm .trk input:checked~input{background:var(--bg);color:var(--sub);border-color:var(--line)}
+.bm .trk input.ten{font-weight:700}
+.bm .trk input:checked~input.ten{background:var(--cell);color:var(--ink)}
+.bm .trk input.z{position:absolute;top:2px;right:6px;width:16px;height:16px;border:0;background:none;color:var(--bar-ink);opacity:.6}
+.bm .trk input.z::before{content:"↺"}
+.bm .acts span{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--line)}
+.bm .acts small{font-size:10px;color:var(--sub)}.bm .acts .an{font-size:18px;font-weight:700}
+
+/* ── 메모 · 하단 ── */
+.bm .memos{margin-top:16px}
+.bm textarea.memo{min-height:110px;background:var(--cell);border:0;border-radius:2px;padding:10px}
+.bm .foot{margin:20px -20px 0;background:var(--band);color:rgba(244,231,231,.6);text-align:center;font-size:11px;padding:6px;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%)}
+
+/* ── 좁은 창 ── */
+@media (max-width:720px){
+  .bm{padding:0 12px}
+  .bm .band{margin:0 -12px 12px;padding:9px 12px}.bm .foot{margin:20px -12px 0}
+  .bm .top{grid-template-columns:1fr;height:auto}.bm .portrait{width:100%;max-width:220px;justify-self:center}.bm .res3{min-height:96px}
+  .bm .state{grid-template-columns:1fr;height:auto}.bm .cells{grid-auto-rows:28px}
+  .bm .two{grid-template-columns:1fr}
+  .bm .ab{grid-template-columns:22px 1fr 66px 48px}.bm .ab .g,.bm .ab .s{display:none}
+  .bm .fw{grid-template-columns:22px minmax(0,1fr) 40px 40px 48px 36px}.bm .fw .kd,.bm .fw .itm{display:none}
+  .bm .fa,.bm .fab-h{grid-template-columns:22px 1fr 62px 52px}.bm .fa .ag,.bm .fa .as,.bm .fab-h .ag,.bm .fab-h .as{display:none}
+}
+
+/* ── 채팅 카드 (롤 템플릿) ── */
+.sheet-rolltemplate-bloodmoon .sheet-card{--c-bg:#fff;--c-ink:#222226;--c-sub:#8b8b93;--c-line:#dddde2;background:var(--c-bg);color:var(--c-ink);border:1px solid #26262b;font:12px/1.45 'Noto Sans KR','Malgun Gothic',Arial,sans-serif;margin-left:-7px}
+.sheet-rolltemplate-darkmode .sheet-rolltemplate-bloodmoon .sheet-card{--c-bg:#1d1d21;--c-ink:#ececf0;--c-sub:#9a9aa3;--c-line:#3a3a42;border-color:#55555e}
+.sheet-rolltemplate-bloodmoon .sheet-h{background:#26262b;color:#fff;font-weight:700;padding:4px 8px;border-left:4px solid #e0394b}
+.sheet-rolltemplate-bloodmoon .sheet-h small{font-weight:400;opacity:.75;font-size:11px}
+.sheet-rolltemplate-bloodmoon .sheet-b{padding:6px 8px}
+.sheet-rolltemplate-bloodmoon .sheet-r{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--c-line);padding:2px 0}
+.sheet-rolltemplate-bloodmoon .sheet-r > span{color:var(--c-sub)}
+.sheet-rolltemplate-bloodmoon .sheet-tx{padding-top:4px}
+.sheet-rolltemplate-bloodmoon .sheet-fl{padding-top:3px;font-style:italic;opacity:.75}
+.sheet-rolltemplate-bloodmoon .sheet-res{margin-top:5px;text-align:center;font-weight:700;color:#fff;background:#e0394b;border-radius:9em;padding:1px 6px}
+.sheet-rolltemplate-bloodmoon .inlinerollresult,.sheet-rolltemplate-bloodmoon .inlinerollresult.fullcrit,.sheet-rolltemplate-bloodmoon .inlinerollresult.fullfail,.sheet-rolltemplate-bloodmoon .inlinerollresult.importantroll{background:none;border:0;padding:0;color:inherit;font-weight:700}
