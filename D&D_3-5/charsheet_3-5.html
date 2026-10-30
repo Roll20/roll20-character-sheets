@@ -13513,33 +13513,61 @@ on('change:repeating_equipment', function(){
         .execute();
 });
 
+const toNumber = (value, fallback = 0) => {
+	const number = Number(value);
+	return Number.isFinite(number) ? number : fallback;
+};
+
+const toInteger = (value, fallback = 0) => {
+	const number = parseInt(value, 10);
+	return Number.isFinite(number) ? number : fallback;
+};
+
+const sumAbilityComponents = (values, ability) => {
+	return ["base", "misc", "equi", "temp", "action"]
+		.reduce((total, component) => total + toInteger(values[`${ability}-${component}`]), 0);
+};
+
+const getAbilityModifier = value => Math.floor((toInteger(value) / 2) - 5);
+
+const getStrengthEncumbrance = value => {
+	const strength = toInteger(value);
+	return (1 - Math.round((Math.abs(strength - 10) / ((strength - 10)- 0.01) + 1) / 2)) * strength * 10 + (Math.round((Math.abs(strength - 10) / ((strength - 10) - 0.01) + 1) / 2)) * (200 - (Math.round((Math.abs((strength % 5) - 1) / (((strength % 5) - 1) - 0.01) + 1) / 2)) * (15 * (1 - Math.round((Math.abs((strength % 5) - 1) / (((strength % 5) - 1) - 0.01) + 1) / 2)) + 15 * (1 - Math.round((Math.abs((strength % 5) - 2) / (((strength % 5) - 2) - 0.01) + 1) / 2)) + 20 * (1 - Math.round((Math.abs((strength % 5) - 3) / (((strength % 5) - 3) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((strength % 5) - 4) / (((strength % 5) - 4) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((strength % 5) - 5) / (((strength % 5) - 5) - 0.01) + 1) / 2)))) * Math.pow(2,(Math.ceil(strength / 5) - 3));
+};
+
+const sumEnabledAbilityBonuses = (values, ability, sources) => {
+	return sources.reduce((total, source) => {
+		return total + toInteger(values[`${source}BonusEnabled`]) * toInteger(values[`${source}${ability}Bonus`]);
+	}, 0);
+};
+
 /* Setup for when a character sheet gets opened for the first time.  -Calc ability and ability mods as well as encumbrance. */
 function StartingSetup(version, cversion, calc) {
-   mod = version;
+	let mod = version;
    console.log('/* ----------entering StartingSetup; sheetversion:' + version + '  cversion:' + cversion + '  calc:' + calc + '------------ */');
    if ((version < cversion) || (isNaN(version)) || (calc == 1)) {
 	  mod = cversion;
       getAttrs(["str", "str-mod", "str-base", "str-misc", "str-equi", "str-temp", "str-action", "encumbrstr", "dex", "dex-mod", "dex-base", "dex-misc", "dex-equi", "dex-temp", "dex-action", "con", "con-mod", "con-base", "con-misc", "con-equi", "con-temp", "con-action", "int", "int-mod", "int-base", "int-misc", "int-equi", "int-temp", "int-action", "wis", "wis-mod", "wis-base", "wis-misc", "wis-equi", "wis-temp", "wis-action", "cha", "cha-mod", "cha-base", "cha-misc", "cha-equi", "cha-temp", "cha-action", "recalc"], function(values){
-	     strtempvar = (parseInt(values["str-base"],10) + parseInt(values["str-misc"],10) + parseInt(values["str-equi"],10) + parseInt(values["str-temp"],10) + parseInt(values["str-action"],10));
-		 dextempvar = (parseInt(values["dex-base"],10) + parseInt(values["dex-misc"],10) + parseInt(values["dex-equi"],10) + parseInt(values["dex-temp"],10) + parseInt(values["dex-action"],10))
-		 contempvar = (parseInt(values["con-base"],10) + parseInt(values["con-misc"],10) + parseInt(values["con-equi"],10) + parseInt(values["con-temp"],10) + parseInt(values["con-action"],10))
-		 inttempvar = (parseInt(values["int-base"],10) + parseInt(values["int-misc"],10) + parseInt(values["int-equi"],10) + parseInt(values["int-temp"],10) + parseInt(values["int-action"],10))
-		 wistempvar = (parseInt(values["wis-base"],10) + parseInt(values["wis-misc"],10) + parseInt(values["wis-equi"],10) + parseInt(values["wis-temp"],10) + parseInt(values["wis-action"],10))
-		 chatempvar = (parseInt(values["cha-base"],10) + parseInt(values["cha-misc"],10) + parseInt(values["cha-equi"],10) + parseInt(values["cha-temp"],10) + parseInt(values["cha-action"],10))
+		 const strtempvar = sumAbilityComponents(values, "str");
+		 const dextempvar = sumAbilityComponents(values, "dex");
+		 const contempvar = sumAbilityComponents(values, "con");
+		 const inttempvar = sumAbilityComponents(values, "int");
+		 const wistempvar = sumAbilityComponents(values, "wis");
+		 const chatempvar = sumAbilityComponents(values, "cha");
 	     setAttrs({
 	        str: strtempvar,
-		    "str-mod": Math.floor((strtempvar / 2) - 5),
-		    "encumbrstr": (1 - Math.round((Math.abs(strtempvar - 10) / ((strtempvar - 10)- 0.01) + 1) / 2)) * strtempvar * 10 + (Math.round((Math.abs(strtempvar - 10) / ((strtempvar - 10) - 0.01) + 1) / 2)) * (200 - (Math.round((Math.abs((strtempvar % 5) - 1) / (((strtempvar % 5) - 1) - 0.01) + 1) / 2)) * (15 * (1 - Math.round((Math.abs((strtempvar % 5) - 1) / (((strtempvar % 5) - 1) - 0.01) + 1) / 2)) + 15 * (1 - Math.round((Math.abs((strtempvar % 5) - 2) / (((strtempvar % 5) - 2) - 0.01) + 1) / 2)) + 20 * (1 - Math.round((Math.abs((strtempvar % 5) - 3) / (((strtempvar % 5) - 3) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((strtempvar % 5) - 4) / (((strtempvar % 5) - 4) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((strtempvar % 5) - 5) / (((strtempvar % 5) - 5) - 0.01) + 1) / 2)))) * Math.pow(2,(Math.ceil(strtempvar / 5) - 3)),
+		    "str-mod": getAbilityModifier(strtempvar),
+		    "encumbrstr": getStrengthEncumbrance(strtempvar),
 	        dex: dextempvar,
-		    "dex-mod": Math.floor((dextempvar / 2) - 5),
+		    "dex-mod": getAbilityModifier(dextempvar),
 	        con: contempvar,
-		    "con-mod": Math.floor((contempvar / 2) - 5),
+		    "con-mod": getAbilityModifier(contempvar),
 	        int: inttempvar,
-		    "int-mod": Math.floor((inttempvar / 2) - 5),
+		    "int-mod": getAbilityModifier(inttempvar),
 	        wis: wistempvar,
-		    "wis-mod": Math.floor((wistempvar / 2) - 5),
+		    "wis-mod": getAbilityModifier(wistempvar),
 	        cha: chatempvar,
-		    "cha-mod": Math.floor((chatempvar / 2) - 5),
+		    "cha-mod": getAbilityModifier(chatempvar),
 			recalc: 0
 		 });
 	  });
@@ -13564,85 +13592,85 @@ on("sheet:opened change:recalc", function() {
 on("sheet:opened change:str-base change:str-misc change:str-equi change:str-temp change:str-action", function() {
   getAttrs(["str", "str-base", "str-misc", "str-equi", "str-temp", "str-action"], function(values) {
 	setAttrs({
-	  str: (parseInt(values["str-base"],10) + parseInt(values["str-misc"],10) + parseInt(values["str-equi"],10) + parseInt(values["str-temp"],10) + parseInt(values["str-action"],10))
+	  str: sumAbilityComponents(values, "str")
 	});
   });
 });
 on("change:str", function() {
   getAttrs(["str", "encumbrstr"], function(values) {
 	setAttrs({
-	  "str-mod": Math.floor((parseInt(values.str,10) / 2) - 5),
-	  "encumbrstr": (1 - Math.round((Math.abs(parseInt(values.str,10) - 10) / ((parseInt(values.str,10) - 10)- 0.01) + 1) / 2)) * parseInt(values.str,10) * 10 + (Math.round((Math.abs(parseInt(values.str,10) - 10) / ((parseInt(values.str,10) - 10) - 0.01) + 1) / 2)) * (200 - (Math.round((Math.abs((parseInt(values.str,10) % 5) - 1) / (((parseInt(values.str,10) % 5) - 1) - 0.01) + 1) / 2)) * (15 * (1 - Math.round((Math.abs((parseInt(values.str,10) % 5) - 1) / (((parseInt(values.str,10) % 5) - 1) - 0.01) + 1) / 2)) + 15 * (1 - Math.round((Math.abs((parseInt(values.str,10) % 5) - 2) / (((parseInt(values.str,10) % 5) - 2) - 0.01) + 1) / 2)) + 20 * (1 - Math.round((Math.abs((parseInt(values.str,10) % 5) - 3) / (((parseInt(values.str,10) % 5) - 3) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((parseInt(values.str,10) % 5) - 4) / (((parseInt(values.str,10) % 5) - 4) - 0.01) + 1) / 2)) + 25 * (1 - Math.round((Math.abs((parseInt(values.str,10) % 5) - 5) / (((parseInt(values.str,10) % 5) - 5) - 0.01) + 1) / 2)))) * Math.pow(2,(Math.ceil(parseInt(values.str,10) / 5) - 3))
+	  "str-mod": getAbilityModifier(values.str),
+	  "encumbrstr": getStrengthEncumbrance(values.str)
 	});
   });
 });
 on("sheet:opened change:dex-base change:dex-misc change:dex-equi change:dex-temp change:dex-action", function() {
   getAttrs(["dex", "dex-base", "dex-misc", "dex-equi", "dex-temp", "dex-action"], function(values) {
 	setAttrs({
-	  dex: (parseInt(values["dex-base"],10) + parseInt(values["dex-misc"],10) + parseInt(values["dex-equi"],10) + parseInt(values["dex-temp"],10) + parseInt(values["dex-action"],10))
+	  dex: sumAbilityComponents(values, "dex")
 	});
   });
 });
 on("change:dex", function() {
   getAttrs(["dex", "dex-mod"], function(values) {
 	setAttrs({
-	  "dex-mod": Math.floor((parseInt(values.dex,10) / 2) - 5)
+	  "dex-mod": getAbilityModifier(values.dex)
 	});
   });
 });
 on("sheet:opened change:con-base change:con-misc change:con-equi change:con-temp change:con-action", function() {
   getAttrs(["con", "con-base", "con-misc", "con-equi", "con-temp", "con-action"], function(values) {
 	setAttrs({
-	  con: (parseInt(values["con-base"],10) + parseInt(values["con-misc"],10) + parseInt(values["con-equi"],10) + parseInt(values["con-temp"],10) + parseInt(values["con-action"],10))
+	  con: sumAbilityComponents(values, "con")
 	});
   });
 });
 on("change:con", function() {
   getAttrs(["con", "con-mod"], function(values) {
 	setAttrs({
-	  "con-mod": Math.floor((parseInt(values.con,10) / 2) - 5)
+	  "con-mod": getAbilityModifier(values.con)
 	});
   });
 });
 on("sheet:opened change:int-base change:int-misc change:int-equi change:int-temp change:int-action", function() {
   getAttrs(["int", "int-base", "int-misc", "int-equi", "int-temp", "int-action"], function(values) {
 	setAttrs({
-	  int: (parseInt(values["int-base"],10) + parseInt(values["int-misc"],10) + parseInt(values["int-equi"],10) + parseInt(values["int-temp"],10) + parseInt(values["int-action"],10))
+	  int: sumAbilityComponents(values, "int")
 	});
   });
 });
 on("change:int", function() {
   getAttrs(["int", "int-mod"], function(values) {
 	setAttrs({
-	  "int-mod": Math.floor((parseInt(values.int,10) / 2) - 5)
+	  "int-mod": getAbilityModifier(values.int)
 	});
   });
 });
 on("sheet:opened change:wis-base change:wis-misc change:wis-equi change:wis-temp change:wis-action", function() {
   getAttrs(["wis", "wis-base", "wis-misc", "wis-equi", "wis-temp", "wis-action"], function(values) {
 	setAttrs({
-	  wis: (parseInt(values["wis-base"],10) + parseInt(values["wis-misc"],10) + parseInt(values["wis-equi"],10) + parseInt(values["wis-temp"],10) + parseInt(values["wis-action"],10))
+	  wis: sumAbilityComponents(values, "wis")
 	});
   });
 });
 on("change:wis", function() {
   getAttrs(["wis", "wis-mod"], function(values) {
 	setAttrs({
-	  "wis-mod": Math.floor((parseInt(values.wis,10) / 2) - 5)
+	  "wis-mod": getAbilityModifier(values.wis)
 	});
   });
 });
 on("sheet:opened change:cha-base change:cha-misc change:cha-equi change:cha-temp change:cha-action", function() {
   getAttrs(["cha", "cha-base", "cha-misc", "cha-equi", "cha-temp", "cha-action"], function(values) {
 	setAttrs({
-	  cha: (parseInt(values["cha-base"],10) + parseInt(values["cha-misc"],10) + parseInt(values["cha-equi"],10) + parseInt(values["cha-temp"],10) + parseInt(values["cha-action"],10))
+	  cha: sumAbilityComponents(values, "cha")
 	});
   });
 });
 on("change:cha", function() {
   getAttrs(["cha", "cha-mod"], function(values) {
 	setAttrs({
-	  "cha-mod": Math.floor((parseInt(values.cha,10) / 2) - 5)
+	  "cha-mod": getAbilityModifier(values.cha)
 	});
   });
 });
@@ -13710,8 +13738,9 @@ on("change:npccha", function() {
 //  <!---- Copy weight from total equipment weight to total carried weight if wanted ---->
 on("change:totalequipmentweight change:equipmentweightcopy", function() {
   getAttrs(["totalequipmentweight", "equipmentweightcopy", "totalcarriedweight"], function(values) {
+	 const copyEquipmentWeight = toNumber(values.equipmentweightcopy);
      setAttrs({
-		"totalcarriedweight": (parseInt(values.equipmentweightcopy,10) * parseFloat(values.totalequipmentweight)) + ((1 - parseInt(values.equipmentweightcopy,10)) * parseFloat(values.totalcarriedweight))
+		"totalcarriedweight": copyEquipmentWeight * toNumber(values.totalequipmentweight) + (1 - copyEquipmentWeight) * toNumber(values.totalcarriedweight)
 	 });
   });
 });
@@ -13837,11 +13866,6 @@ const SHEET_MIGRATIONS = new Map([
 	[LEGACY_SPELLS_SCHEMA_VERSION, migrateLegacyRepeatingSpells]
 ]);
 // ======================================
-
-const toNumber = (value, fallback = 0) => {
-	const number = Number(value);
-	return Number.isFinite(number) ? number : fallback;
-};
 
 const sumNumberedAttributes = (values, prefix, count = 10) => {
 	return Array.from({length: count}, (unused, index) => index + 1)
@@ -15455,7 +15479,7 @@ on('clicked:resetConditionsBonus', info => {
 on("sheet:opened change:rageBonusEnabled change:rageStrBonus change:spellsBonusEnabled change:spellsStrBonus change:powersBonusEnabled change:powersStrBonus change:maneuversStancesBonusEnabled change:maneuversStancesStrBonus change:conditionsBonusEnabled change:exhaustedEnabled change:fatiguedEnabled", function() {
 	getAttrs(["str-action", "rageBonusEnabled", "rageStrBonus", "spellsBonusEnabled", "spellsStrBonus", "powersBonusEnabled", "powersStrBonus", "maneuversStancesBonusEnabled", "maneuversStancesStrBonus", "conditionsBonusEnabled", "exhaustedEnabled", "fatiguedEnabled"], function(values) {
 		setAttrs({
-			"str-action": (parseInt(values["rageBonusEnabled"],10) * parseInt(values["rageStrBonus"],10) + parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsStrBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersStrBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesStrBonus"],10) + parseInt(values["conditionsBonusEnabled"],10) * (parseInt(values["exhaustedEnabled"],10) + parseInt(values["fatiguedEnabled"],10)))
+			"str-action": sumEnabledAbilityBonuses(values, "Str", ["rage", "spells", "powers", "maneuversStances"]) + toInteger(values.conditionsBonusEnabled) * (toInteger(values.exhaustedEnabled) + toInteger(values.fatiguedEnabled))
 		});
 	});
 });
@@ -15463,7 +15487,7 @@ on("sheet:opened change:rageBonusEnabled change:rageStrBonus change:spellsBonusE
 on("sheet:opened change:spellsBonusEnabled change:spellsDexBonus change:powersBonusEnabled change:powersDexBonus change:maneuversStancesBonusEnabled change:maneuversStancesDexBonus change:conditionsBonusEnabled change:entangledEnabled change:exhaustedEnabled change:fatiguedEnabled", function() {
 	getAttrs(["dex-action", "spellsBonusEnabled", "spellsDexBonus", "powersBonusEnabled", "powersDexBonus", "maneuversStancesBonusEnabled", "maneuversStancesDexBonus", "conditionsBonusEnabled", "entangledEnabled", "exhaustedEnabled", "fatiguedEnabled"], function(values) {
 		setAttrs({
-			"dex-action": (parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsDexBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersDexBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesDexBonus"],10) + parseInt(values["conditionsBonusEnabled"],10) * (2 * parseInt(values["entangledEnabled"],10) + parseInt(values["exhaustedEnabled"],10) + parseInt(values["fatiguedEnabled"],10)))
+			"dex-action": sumEnabledAbilityBonuses(values, "Dex", ["spells", "powers", "maneuversStances"]) + toInteger(values.conditionsBonusEnabled) * (2 * toInteger(values.entangledEnabled) + toInteger(values.exhaustedEnabled) + toInteger(values.fatiguedEnabled))
 		});
 	});
 });
@@ -15471,7 +15495,7 @@ on("sheet:opened change:spellsBonusEnabled change:spellsDexBonus change:powersBo
 on("sheet:opened change:rageBonusEnabled change:rageConBonus change:spellsBonusEnabled change:spellsConBonus change:powersBonusEnabled change:powersConBonus change:maneuversStancesBonusEnabled change:maneuversStancesConBonus", function() {
 	getAttrs(["con-action", "rageBonusEnabled", "rageConBonus", "spellsBonusEnabled", "spellsConBonus", "powersBonusEnabled", "powersConBonus", "maneuversStancesBonusEnabled", "maneuversStancesConBonus"], function(values) {
 		setAttrs({
-			"con-action": (parseInt(values["rageBonusEnabled"],10) * parseInt(values["rageConBonus"],10) + parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsConBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersConBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesConBonus"],10))
+			"con-action": sumEnabledAbilityBonuses(values, "Con", ["rage", "spells", "powers", "maneuversStances"])
 		});
 	});
 });
@@ -15479,7 +15503,7 @@ on("sheet:opened change:rageBonusEnabled change:rageConBonus change:spellsBonusE
 on("sheet:opened change:spellsBonusEnabled change:spellsIntBonus change:powersBonusEnabled change:powersIntBonus change:maneuversStancesBonusEnabled change:maneuversStancesIntBonus", function() {
 	getAttrs(["int-action", "spellsBonusEnabled", "spellsIntBonus", "powersBonusEnabled", "powersIntBonus", "maneuversStancesBonusEnabled", "maneuversStancesIntBonus"], function(values) {
 		setAttrs({
-			"int-action": (parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsIntBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersIntBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesIntBonus"],10))
+			"int-action": sumEnabledAbilityBonuses(values, "Int", ["spells", "powers", "maneuversStances"])
 		});
 	});
 });
@@ -15487,7 +15511,7 @@ on("sheet:opened change:spellsBonusEnabled change:spellsIntBonus change:powersBo
 on("sheet:opened change:spellsBonusEnabled change:spellsWisBonus change:powersBonusEnabled change:powersWisBonus change:maneuversStancesBonusEnabled change:maneuversStancesWisBonus", function() {
 	getAttrs(["wis-action", "spellsBonusEnabled", "spellsWisBonus", "powersBonusEnabled", "powersWisBonus", "maneuversStancesBonusEnabled", "maneuversStancesWisBonus"], function(values) {
 		setAttrs({
-			"wis-action": (parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsWisBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersWisBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesWisBonus"],10))
+			"wis-action": sumEnabledAbilityBonuses(values, "Wis", ["spells", "powers", "maneuversStances"])
 		});
 	});
 });
@@ -15495,7 +15519,7 @@ on("sheet:opened change:spellsBonusEnabled change:spellsWisBonus change:powersBo
 on("sheet:opened change:spellsBonusEnabled change:spellsChaBonus change:powersBonusEnabled change:powersChaBonus change:maneuversStancesBonusEnabled change:maneuversStancesChaBonus", function() {
 	getAttrs(["cha-action", "spellsBonusEnabled", "spellsChaBonus", "powersBonusEnabled", "powersChaBonus", "maneuversStancesBonusEnabled", "maneuversStancesChaBonus"], function(values) {
 		setAttrs({
-			"cha-action": (parseInt(values["spellsBonusEnabled"],10) * parseInt(values["spellsChaBonus"],10) + parseInt(values["powersBonusEnabled"],10) * parseInt(values["powersChaBonus"],10) + parseInt(values["maneuversStancesBonusEnabled"],10) * parseInt(values["maneuversStancesChaBonus"],10))
+			"cha-action": sumEnabledAbilityBonuses(values, "Cha", ["spells", "powers", "maneuversStances"])
 		});
 	});
 });
