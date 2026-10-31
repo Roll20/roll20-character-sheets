@@ -1,0 +1,5393 @@
+/* Scheda di FARSIGHT per Roll20, versione 1.1.0+3.647a54a */
+/* Stile della scheda di FARSIGHT, ispirato alla scheda del personaggio ufficiale:
+   pagina bianca, linee nere, pannelli con angoli smussati, esagoni, bande nei colori dei capitoli del manuale.
+   Le forme sono fatte con clip-path sui pseudo-elementi: clip-path taglia anche i figli,
+   quindi non va mai messo su un elemento che contiene testo. */
+
+@import url('https://fonts.googleapis.com/css?family=Jost:300,400,500&display=swap');
+
+.scheda {
+  /* Colori dei capitoli del manuale, gli stessi delle card in chat (rolltemplate.css: lì le variabili sono
+     della card, perché in chat .scheda non c'è): pieno, chiaro e scuro. Le pagine li usano in palette.css. */
+  --celeste: #9ccae9;
+  --celeste-chiaro: #d8edfb;
+  --celeste-scuro: #3f7eb3;
+  --kaki: #c8b5a2;
+  --kaki-chiaro: #f5f0e1;
+  --kaki-scuro: #7a6a58;
+  --viola: #bcb4da;
+  --viola-chiaro: #e0dcee;
+  --viola-scuro: #6a5ca6;
+  --grigio-fascia: #b2b2b1;
+  --grigio-chiaro: #e8e8e8;
+  --grigio-scuro: #5d5d5c;
+  --rosso: #e2726c;
+  --rosso-chiaro: #f6d5d3;
+
+  --inchiostro: #111;
+  /* Palette della pagina (palette.css): --banda il colore pieno, --tinta il chiaro, --accento lo scuro.
+     Fuori dalle pagine (intestazione, modali) restano neutri. */
+  --banda: #e3e3e3;
+  --tinta: #f3f3f3;
+  --accento: #5d5d5c;
+  --grigio: #8c8c8c;
+  --riga: #a9a9a9;
+  --logo: #4e4e4e;
+  --bordo: 1.5px;
+  --smusso: 7px;
+  --esagono: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+
+  min-width: 880px;
+  max-width: 960px;
+  padding: 8px 10px 16px;
+  font-family: "Jost", sans-serif;
+  font-weight: 300;
+  color: var(--inchiostro);
+  background: #fff;
+}
+.scheda,
+.scheda *,
+.scheda *::before,
+.scheda *::after {
+  box-sizing: border-box;
+}
+
+/* Campi: niente sfondo né bordi di Roll20, il disegno lo fa la scheda. */
+.scheda input[type="text"],
+.scheda input[type="number"] {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0 2px;
+  font: 400 13px/1.2 "Jost", sans-serif;
+  color: var(--inchiostro);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+/* Larghezza dei campi numerici con [name] in più: Roll20 ha ".ui-dialog .charsheet input[type="number"]
+   { width: 3.5em }" (charsheet.css), che pesa (0,3,1) e batte ".scheda input[type="number"]" (0,2,1); qui il
+   peso è pari e vince la scheda, che viene dopo. Le regole di un componente che cambiano la larghezza di
+   un campo numerico devono pesare almeno così (per esempio ".scheda .esagono input[type="number"]"). */
+.scheda input[type="number"][name] {
+  width: 100%;
+}
+.scheda input[type="number"] {
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.scheda input[type="number"]::-webkit-inner-spin-button,
+.scheda input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.scheda input:focus,
+.scheda textarea:focus {
+  outline: 1px dotted var(--grigio);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+/* Campi scritti a mano con override (abilità, vitalità, stats). L'input nascosto .bandiera-override
+   ha il valore dell'override: se è vuoto si vede il campo normale, altrimenti l'override, in corsivo
+   e in sola lettura (si cambia nella pagina Variabili). */
+.bandiera-override:not([value=""]) ~ .valore-base,
+.bandiera-override[value=""] ~ .valore-override {
+  display: none;
+}
+.scheda .valore-override {
+  font-style: italic;
+}
+/* Valori calcolati quando la scheda può (punti psi massimi, limite psionico): .bandiera-calcolo ha il calcolo; se c'è, il
+   campo scritto sparisce e resta il valore in sola lettura, a sua volta nascosto dall'override. */
+.bandiera-calcolo:not([value=""]) ~ .valore-base,
+.bandiera-calcolo[value=""] ~ .valore-calcolato,
+.bandiera-override:not([value=""]) ~ .valore-calcolato {
+  display: none;
+}
+/* Abilità con gli effetti attivi (passo O2): .bandiera-effetti ha la somma; se c'è, al posto del campo scritto
+   si vede il valore usato, in sola lettura (la base si scrive nella pagina Variabili). L'override vince. */
+.bandiera-effetti:not([value=""]) ~ .valore-base,
+.bandiera-effetti[value=""] ~ .valore-effetti,
+.bandiera-override:not([value=""]) ~ .valore-effetti {
+  display: none;
+}
+/* Riquadro delle modifiche (passo O): passando il mouse su un valore cambiato dagli effetti, "Base 3 +2
+   Poliderma". Solo se c'è un dettaglio e non c'è l'override (che vince e ha il suo segno). Il lato e l'altezza
+   li sceglie il pannello (stats.css), dentro la sua cornice. */
+.riquadro-modifiche {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--inchiostro);
+  background: #fff;
+  border: 1px solid var(--inchiostro);
+  pointer-events: none;
+}
+.esagono:hover .bandiera-override[value=""] ~ .bandiera-modifiche:not([value=""]) ~ .riquadro-modifiche,
+.totale:hover .bandiera-override[value=""] ~ .bandiera-modifiche:not([value=""]) ~ .riquadro-modifiche {
+  display: block;
+}
+
+/* Campi calcolati dalla scheda (totali, attacco e forza psionica): non si scrivono a mano. */
+.scheda input[readonly] {
+  cursor: default;
+}
+.scheda input[readonly]:focus {
+  outline: none;
+  background: none;
+}
+
+/* Textarea a righe, come le righe stampate. */
+.scheda .righe {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0 2px;
+  font: 400 12px/20px "Jost", sans-serif;
+  color: var(--inchiostro);
+  background: repeating-linear-gradient(to bottom, transparent 0 19px, var(--riga) 19px 20px);
+  background-attachment: local;
+  border: 0;
+  border-radius: 0;
+  resize: none;
+  overflow: auto;
+}
+/* ------------------------------------------------------------------ palette delle pagine */
+
+/* Ogni pagina ha i colori di un capitolo del manuale, gli stessi delle card in chat che partono da lì: pagina 1
+   celeste (capitolo 1: prove e attacchi), pagina 2 kaki (capitolo 3: equipaggiamento e cyberware), Psionica
+   viola (capitolo 6: praxis e poteri), Variabili grigia. Tratti e privilegi è grigio come le card di
+   consultazione. --banda colora bande e + Aggiungi; --tinta Modifica, card e intestazioni delle liste;
+   --accento il passaggio del mouse (+ Aggiungi, nomi che tirano, + e −). Testo, linee, cornici ed esagoni
+   restano neri e bianchi. */
+.pagina-1 { --banda: var(--celeste); --tinta: var(--celeste-chiaro); --accento: var(--celeste-scuro); }
+.pagina-2 { --banda: var(--kaki); --tinta: var(--kaki-chiaro); --accento: var(--kaki-scuro); }
+.pagina-4 { --banda: var(--viola); --tinta: var(--viola-chiaro); --accento: var(--viola-scuro); }
+.pagina-3,
+.pannello-tratti { --banda: var(--grigio-fascia); --tinta: var(--grigio-chiaro); --accento: var(--grigio-scuro); }
+
+/* Ogni linguetta ha i colori della sua pagina, chiari e pieni quando è attiva (linguette.css); i selettori in
+   alto hanno colori fissi, uguali in tutte le pagine (linguette.css). */
+.linguetta-1 { --linguetta-piena: var(--celeste); --linguetta-chiara: var(--celeste-chiaro); }
+.linguetta-2 { --linguetta-piena: var(--kaki); --linguetta-chiara: var(--kaki-chiaro); }
+.linguetta-3 { --linguetta-piena: var(--grigio-fascia); --linguetta-chiara: var(--grigio-chiaro); }
+.linguetta-4 { --linguetta-piena: var(--viola); --linguetta-chiara: var(--viola-chiaro); }
+/* ------------------------------------------------------------------ linguette e pagine */
+
+/* Switch di pagina: l'input nascosto .pagina-scelta (attr_pagina) precede linguette e pagine,
+   e il suo valore decide quale pagina si vede e quale linguetta è attiva. */
+.pagina {
+  display: none;
+}
+.pagina-scelta[value="1"] ~ .pagina-1,
+.pagina-scelta[value="2"] ~ .pagina-2,
+.pagina-scelta[value="3"] ~ .pagina-3,
+.pagina-scelta[value="4"] ~ .pagina-4 {
+  display: block;
+}
+
+/* La riga delle linguette fa da barra degli strumenti: resta in alto mentre la scheda scorre
+   (la scheda scorre dentro il suo iframe, su Roll20 come nell'emulatore). */
+.linguette {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  gap: 4px;
+  margin: -8px 0 12px;
+  padding: 8px 0 0 10px;
+  background: #fff;
+  border-bottom: var(--bordo) solid var(--inchiostro);
+}
+
+/* Opzioni dei tiri, a destra delle linguette: due selettori a segmenti (radio button). La radio vera è
+   trasparente sopra l'etichetta; l'opzione scelta è piena. Il fondo nero del contenitore fa da bordo
+   e da separatore fra le opzioni. */
+/* Con la scheda stretta (880px, la finestra di Roll20 non allargata) "Solo GM" andava a capo: il selettore
+   diventava più alto delle altre opzioni, che lasciavano scoperto sotto il fondo nero, e l'altro selettore si
+   allungava con lui (01/10/2026). Ora le scritte restano su una riga (nowrap), i selettori non si allungano
+   a vicenda (align-items) e ogni opzione riempie l'altezza del suo selettore (flex). */
+.opzioni-tiro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: center;
+  margin: 0 0 4px auto;
+}
+.interruttore {
+  display: inline-flex;
+  gap: 1.5px;
+  padding: 1.5px;
+  background: var(--inchiostro);
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+}
+.scheda .opzione {
+  position: relative;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.scheda .opzione input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.opzione span {
+  display: block;
+  flex: 1;
+  padding: 5px 10px 4px;
+  white-space: nowrap;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: #fff;
+}
+/* Colori fissi, uguali in tutte le pagine (01/10/2026: Pubblico e il passaggio del mouse seguivano la pagina).
+   Opzione scelta: Pubblico e Normale celesti (le scelte di base), Solo GM e Svantaggio rossi, Vantaggio viola.
+   Al passaggio del mouse la versione chiara del colore che l'opzione prende se la scegli. Le regole della
+   scelta vengono dopo: su un'opzione scelta il mouse non cambia niente. */
+.opzione:hover span {
+  background: var(--celeste-chiaro);
+}
+.opzione:hover input[value="gm"] + span,
+.opzione:hover input[value="svantaggio"] + span {
+  background: var(--rosso-chiaro);
+}
+.opzione:hover input[value="vantaggio"] + span {
+  background: var(--viola-chiaro);
+}
+.opzione input:checked + span {
+  color: var(--inchiostro);
+  background: var(--celeste);
+}
+.opzione input[value="gm"]:checked + span,
+.opzione input[value="svantaggio"]:checked + span {
+  background: var(--rosso);
+}
+.opzione input[value="normale"]:checked + span {
+  background: var(--celeste);
+}
+.opzione input[value="vantaggio"]:checked + span {
+  background: var(--viola);
+}
+.opzione input:focus-visible + span {
+  outline: 1px dotted var(--inchiostro);
+  outline-offset: -3px;
+}
+/* Linguetta a trapezio, come i titoli dei pannelli: contorno nero, nel colore chiaro della sua pagina, pieno
+   se è attiva (palette.css). */
+.scheda .linguetta {
+  position: relative;
+  isolation: isolate;
+  width: 118px;
+  height: 24px;
+  margin: 0;
+  padding: 3px 0 0;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.linguetta::before,
+.linguetta::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+.linguetta::before {
+  inset: 0;
+  background: var(--inchiostro);
+}
+.linguetta::after {
+  inset: var(--bordo) 1.6px 0;
+  background: var(--linguetta-chiara);
+}
+.linguetta:hover::after,
+.pagina-scelta[value="1"] ~ .linguette .linguetta-1::after,
+.pagina-scelta[value="2"] ~ .linguette .linguetta-2::after,
+.pagina-scelta[value="3"] ~ .linguette .linguetta-3::after,
+.pagina-scelta[value="4"] ~ .linguette .linguetta-4::after {
+  background: var(--linguetta-piena);
+}
+/* ------------------------------------------------------------------ riquadri con la rotella */
+
+/* Un riquadro .modificabile si legge soltanto; la rotella (macro modifica) apre la modifica. La checkbox
+   precede il contenuto: .solo-lettura si vede a rotella chiusa, .solo-modifica in modifica. In modifica
+   il riquadro prende la lingua del pannello dei dettagli delle card (sfondo grigio chiaro, barra nera a
+   sinistra), i campi diventano caselle bianche e la rotella diventa il pulsante "✓ Fatto", come
+   Modifica/Fatto delle liste. Ogni riquadro sceglie dove stanno rotella, pulsante e sfondo con le
+   variabili --modifica-alto/--modifica-destra, --fatto-alto/--fatto-destra e --modifica-sfondo (inset).
+   Lo sfondo è un elemento a parte dietro il contenuto (z-index -1 nel contesto del riquadro), così
+   l'impaginazione non cambia. */
+.modificabile {
+  position: relative;
+  z-index: 0;
+}
+.scheda .modifica-interruttore:not(:checked) ~ .solo-modifica,
+.scheda .modifica-interruttore:not(:checked) ~ * .solo-modifica,
+.scheda .modifica-interruttore:checked ~ .solo-lettura,
+.scheda .modifica-interruttore:checked ~ * .solo-lettura {
+  display: none;
+}
+
+/* Rotella: la checkbox vera è trasparente sopra l'icona. Si vede passando il mouse sul riquadro. */
+.modifica-icona {
+  position: absolute;
+  top: var(--modifica-alto);
+  right: var(--modifica-destra);
+  z-index: 1;
+  font-size: 17px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Come la rotella delle righe (dettagli.css): il ⚙ ispessito; la scritta «Fatto» no. */
+.icona-rotella {
+  -webkit-text-stroke: 0.6px currentColor;
+}
+.icona-fatto {
+  display: none;
+}
+.scheda .modifica-interruttore {
+  position: absolute;
+  top: calc(var(--modifica-alto) - 2px);
+  right: calc(var(--modifica-destra) - 2px);
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.modificabile:hover > .modifica-icona,
+.modifica-interruttore:checked + .modifica-icona,
+.modifica-interruttore:focus-visible + .modifica-icona {
+  opacity: 1;
+}
+
+/* In modifica. */
+.modifica-sfondo {
+  position: absolute;
+  inset: var(--modifica-sfondo);
+  z-index: -1;
+  background: #f6f6f6;
+  border-left: 3px solid var(--inchiostro);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+.modifica-interruttore:checked ~ .modifica-sfondo {
+  opacity: 1;
+}
+.scheda .modificabile input[type="text"].solo-modifica,
+.scheda .modificabile textarea.solo-modifica {
+  background-color: #fff;
+}
+.modifica-interruttore:checked + .modifica-icona {
+  top: var(--fatto-alto);
+  right: var(--fatto-destra);
+}
+.modifica-interruttore:checked + .modifica-icona .icona-rotella {
+  display: none;
+}
+.modifica-interruttore:checked + .modifica-icona .icona-fatto {
+  display: block;
+  padding: 4px 10px 3px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--inchiostro);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+.scheda .modifica-interruttore:checked {
+  top: var(--fatto-alto);
+  right: var(--fatto-destra);
+  width: 70px;
+  height: 17px;
+}
+.modifica-interruttore:checked:hover + .modifica-icona .icona-fatto {
+  background: #444;
+}
+/* ------------------------------------------------------------------ intestazione */
+
+.intestazione {
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 18px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+.intestazione-campi {
+  display: grid;
+  /* minmax(0, …): un valore lungo in sola lettura finisce con "…" invece di allargare la colonna. */
+  grid-template-columns: minmax(0, 175fr) minmax(0, 28fr) minmax(0, 44fr) minmax(0, 50fr) minmax(0, 23fr);
+  column-gap: 5px;
+  row-gap: 12px;
+}
+.campo-nome { grid-column: 1 / span 2; }
+.campo-giocatore { grid-column: 3 / span 3; }
+.campo-concetto { grid-column: 1; }
+.campo-specie { grid-column: 2 / span 2; }
+.campo-classe { grid-column: 4; }
+.campo-livello { grid-column: 5; }
+.campo input[type="number"] {
+  font-size: 14px;
+  border-bottom: 1px solid var(--inchiostro);
+}
+.campo input[type="text"] {
+  font-size: 14px;
+  border-bottom: 1px solid var(--inchiostro);
+}
+/* Sola lettura e modifica: ogni campo ha il valore (.campo-valore, uno span) e l'input; quale si vede
+   lo decide la rotella (stili/modifica.css). */
+.campo-valore {
+  display: block;
+  height: 18px;
+  padding: 0 2px;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--inchiostro);
+}
+.campo-livello .campo-valore,
+.campo-livello input {
+  text-align: center;
+}
+.scheda .intestazione-campi .campo input {
+  display: block;
+}
+/* Livello in modifica: menu da 1 a 20 e "Altro…"; con "Altro…" sotto il menu il campo per scriverlo a mano,
+   sopra il resto della pagina (la colonna è stretta e l'intestazione non cambia altezza). */
+.campo-livello {
+  position: relative;
+}
+.scheda .intestazione-campi .livello-menu {
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0 8px 0 0;
+  font: 400 14px "Jost", sans-serif;
+  color: var(--inchiostro);
+  text-align: center;
+  text-align-last: center;
+  /* Freccia piccola al posto di quella del browser: la colonna è stretta (circa 40 px). */
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff;
+  background-image: linear-gradient(45deg, transparent 50%, var(--inchiostro) 50%), linear-gradient(135deg, var(--inchiostro) 50%, transparent 50%);
+  background-position: calc(100% - 6px) 8px, calc(100% - 2px) 8px;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  border: 0;
+  border-bottom: 2px solid var(--inchiostro);
+  border-radius: 0;
+}
+.scheda .intestazione-campi .livello-altro-bandiera[value="altro"] ~ .livello-menu {
+  font-size: 11px;
+}
+.scheda .livello-altro-bandiera:not([value="altro"]) ~ .livello-altro {
+  display: none;
+}
+.scheda .intestazione-campi .campo .livello-altro {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  z-index: 3;
+  width: 170px;
+  padding: 0 4px;
+  text-align: left;
+  border: 1px solid var(--inchiostro);
+  border-bottom-width: 2px;
+}
+/* Specie, classe e background: un menu con l'id come valore (macro voce_manuale), così il nome si traduce anche in sola
+   lettura. A rotella chiusa lo stesso menu sembra testo e non si clicca; con «Altro…» al suo posto il nome scritto. */
+.campo-specie,
+.campo-classe {
+  position: relative;
+}
+.scheda .scelta-menu {
+  display: block;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  padding: 0 2px;
+  overflow: hidden;
+  font: 400 14px "Jost", sans-serif;
+  line-height: 17px;
+  color: var(--inchiostro);
+  text-overflow: ellipsis;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--inchiostro);
+  border-radius: 0;
+}
+.scheda .modifica-interruttore:not(:checked) ~ .scelta-menu,
+.scheda .modifica-interruttore:not(:checked) ~ * .scelta-menu,
+.scheda .scelta-menu.scelta-fissa {
+  pointer-events: none;
+}
+.scheda .modifica-interruttore:checked ~ .scelta-menu,
+.scheda .modifica-interruttore:checked ~ * .scelta-menu {
+  padding-right: 12px;
+  background: #fff;
+  background-image: linear-gradient(45deg, transparent 50%, var(--inchiostro) 50%), linear-gradient(135deg, var(--inchiostro) 50%, transparent 50%);
+  background-position: calc(100% - 6px) 8px, calc(100% - 2px) 8px;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  border-bottom-width: 2px;
+}
+.scheda .scelta-bandiera:not([value="altro"]) ~ .scelta-altra-valore,
+.scheda .scelta-bandiera:not([value="altro"]) ~ .scelta-altra,
+.scheda .modifica-interruttore:not(:checked) ~ .scelta-bandiera[value="altro"] ~ .scelta-menu,
+.scheda .modifica-interruttore:not(:checked) ~ * .scelta-bandiera[value="altro"] ~ .scelta-menu,
+.scheda .scelta-bandiera[value="altro"] ~ .scelta-menu.scelta-fissa {
+  display: none;
+}
+.scheda .intestazione-campi .campo .scelta-altra {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  z-index: 3;
+  width: 170px;
+  padding: 0 4px;
+  border: 1px solid var(--inchiostro);
+  border-bottom-width: 2px;
+}
+.scelta-riga {
+  flex: 1;
+  min-width: 0;
+}
+/* Rotella, pulsante "✓ Fatto" e sfondo della modifica (stili/modifica.css): sopra i campi, a destra. */
+.intestazione-campi {
+  --modifica-alto: -14px;
+  --modifica-destra: 0px;
+  --fatto-alto: -17px;
+  --fatto-destra: -8px;
+  --modifica-sfondo: -8px -8px -6px -10px;
+}
+.scheda .intestazione-campi .modifica-interruttore:checked ~ .campo input {
+  height: 18px;
+  border-bottom-width: 2px;
+}
+.etichetta {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.intestazione-logo {
+  display: flex;
+  flex-direction: column;
+}
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.sottotitolo {
+  margin-top: 6px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--logo);
+  text-align: justify;
+  text-align-last: justify;
+}
+/* ------------------------------------------------------------------ impaginazione */
+
+/* Pagina 1: abilità a sinistra per tutta l'altezza; a destra salute e stats, attacchi, risorse e tratti. I tratti
+   prendono l'altezza che resta e scorrono dentro; con molti contatori si accorciano fino a min-height, poi si
+   allunga la pagina. */
+.corpo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto auto 1fr;
+  gap: 10px;
+}
+.pannello-abilita { grid-column: 1; grid-row: 1 / span 4; }
+.pannello-salute { grid-column: 2; grid-row: 1; }
+.pannello-stats { grid-column: 3; grid-row: 1; }
+.pannello-attacchi { grid-column: 2 / span 2; grid-row: 2; }
+.pannello-risorse { grid-column: 2 / span 2; grid-row: 3; }
+.pannello-tratti { grid-column: 2 / span 2; grid-row: 4; min-height: 250px; }
+/* ------------------------------------------------------------------ pannelli */
+
+/* Cornice: fondo nero con gli angoli smussati, fondo bianco rientrato dello spessore del bordo
+   e una seconda linea sottile sui lati, come nella scheda stampata. */
+.pannello {
+  position: relative;
+  isolation: isolate;
+  padding: 26px 12px 12px;
+  background: var(--inchiostro);
+  clip-path: polygon(var(--smusso) 0, calc(100% - var(--smusso)) 0, 100% var(--smusso), 100% calc(100% - var(--smusso)), calc(100% - var(--smusso)) 100%, var(--smusso) 100%, 0 calc(100% - var(--smusso)), 0 var(--smusso));
+}
+.pannello::before {
+  content: "";
+  position: absolute;
+  inset: var(--bordo);
+  z-index: -1;
+  background: #fff;
+  clip-path: polygon(var(--smusso) 0, calc(100% - var(--smusso)) 0, 100% var(--smusso), 100% calc(100% - var(--smusso)), calc(100% - var(--smusso)) 100%, var(--smusso) 100%, 0 calc(100% - var(--smusso)), 0 var(--smusso));
+}
+.pannello::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 4px;
+  right: 4px;
+  z-index: -1;
+  border-left: 1px solid var(--inchiostro);
+  border-right: 1px solid var(--inchiostro);
+  pointer-events: none;
+}
+
+/* Titolo: linguetta a trapezio appesa al bordo superiore, con il testo sulla linea di fondo. */
+.pannello-titolo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--larghezza-titolo, 58%);
+  height: 10px;
+  transform: translateX(-50%);
+}
+.pannello-attacchi,
+.pannello-tratti {
+  --larghezza-titolo: 32%;
+}
+.pannello-titolo::before,
+.pannello-titolo::after {
+  content: "";
+  position: absolute;
+}
+.pannello-titolo::before {
+  inset: 0;
+  background: var(--inchiostro);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 9px 100%);
+}
+.pannello-titolo::after {
+  inset: var(--bordo) 1.6px 1.2px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8.4px) 100%, 8.4px 100%);
+}
+.pannello-titolo span {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #fff;
+  transform: translate(-50%, 50%);
+}
+/* ------------------------------------------------------------------ bande ed esagoni */
+
+.banda {
+  position: relative;
+  z-index: 0;
+  height: 22px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.banda::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--banda);
+}
+
+.esagono {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--lato, 52px);
+  aspect-ratio: 0.866;
+}
+.esagono::before,
+.esagono::after {
+  content: "";
+  position: absolute;
+  clip-path: var(--esagono);
+}
+.esagono::before {
+  inset: 0;
+  background: var(--inchiostro);
+}
+.esagono::after {
+  inset: 1.3px;
+  background: #fff;
+}
+/* .scheda davanti: la larghezza deve battere quella di Roll20 per i campi numerici (vedi base.css). */
+.scheda .esagono input[type="number"] {
+  position: relative;
+  z-index: 1;
+  width: 70%;
+  font-size: 18px;
+}
+
+/* Caselle che si riempiono in ordine (TS contro morte, sfinimento, colpi consumati).
+   Ogni casella è un pulsante d'azione; il numero salvato sta nell'input nascosto .contatore,
+   che precede i pulsanti: con valore N si riempiono i primi N (--piena: 1). */
+.scheda .casella-esagono,
+.scheda .casella-quadrata {
+  position: relative;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  line-height: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.contatore[value="1"] ~ button:nth-of-type(-n+1),
+.contatore[value="2"] ~ button:nth-of-type(-n+2),
+.contatore[value="3"] ~ button:nth-of-type(-n+3),
+.contatore[value="4"] ~ button:nth-of-type(-n+4),
+.contatore[value="5"] ~ button:nth-of-type(-n+5),
+.contatore[value="6"] ~ button:nth-of-type(-n+6),
+.contatore[value="7"] ~ button:nth-of-type(-n+7),
+.contatore[value="8"] ~ button:nth-of-type(-n+8),
+.contatore[value="9"] ~ button:nth-of-type(-n+9),
+.contatore[value="10"] ~ button:nth-of-type(-n+10),
+.contatore[value="11"] ~ button:nth-of-type(-n+11),
+.contatore[value="12"] ~ button:nth-of-type(-n+12),
+.contatore[value="13"] ~ button:nth-of-type(-n+13),
+.contatore[value="14"] ~ button:nth-of-type(-n+14),
+.contatore[value="15"] ~ button:nth-of-type(-n+15),
+.contatore[value="16"] ~ button:nth-of-type(-n+16),
+.contatore[value="17"] ~ button:nth-of-type(-n+17),
+.contatore[value="18"] ~ button:nth-of-type(-n+18),
+.contatore[value="19"] ~ button:nth-of-type(-n+19),
+.contatore[value="20"] ~ button:nth-of-type(-n+20) {
+  --piena: 1;
+}
+
+.scheda .casella-esagono {
+  display: inline-block;
+  width: 17px;
+  aspect-ratio: 0.866;
+}
+.casella-esagono span,
+.casella-esagono span::before,
+.casella-esagono span::after {
+  position: absolute;
+  clip-path: var(--esagono);
+}
+.casella-esagono span {
+  inset: 0;
+  background: var(--inchiostro);
+}
+.casella-esagono span::before {
+  content: "";
+  inset: 1.2px;
+  background: #fff;
+}
+.casella-esagono span::after {
+  content: "";
+  inset: 3.5px;
+  background: var(--inchiostro);
+  opacity: var(--piena, 0);
+}
+
+.etichetta-media {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.etichetta-piccola {
+  margin-right: 3px;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.riga-caselle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+/* ------------------------------------------------------------------ abilità */
+
+.caratteristica {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  column-gap: 8px;
+  margin: 14px 0 20px;
+}
+.pannello-titolo + .caratteristica {
+  margin-top: 18px;
+}
+.esagono-caratteristica {
+  --lato: 58px;
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  align-self: start;
+  margin: -22px 0 0 2px;
+}
+/* Riquadro delle modifiche (passo O2): dall'esagono verso destra, sopra le qualifiche; dal totale di una
+   qualifica verso sinistra, sopra il suo nome. */
+.esagono-caratteristica .riquadro-modifiche {
+  top: 40px;
+  left: calc(100% + 6px);
+}
+.totale .riquadro-modifiche {
+  top: -2px;
+  right: calc(100% + 4px);
+}
+.banda-caratteristica {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  padding-left: 68px;
+}
+/* Tacca bianca in basso a destra, dove stanno "Gradi" e "Totale". */
+.banda-caratteristica::before {
+  clip-path: polygon(0 0, 100% 0, 100% 45%, calc(100% - 80px) 45%, calc(100% - 86px) 100%, 0 100%);
+}
+.colonne {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 34px 44px;
+  width: 78px;
+  font-size: 7.5px;
+  line-height: 10px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  color: var(--grigio);
+}
+.abilita {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr 34px 44px;
+  align-items: end;
+  height: 19px;
+}
+/* Nomi di qualifiche e abilità: sono pulsanti d'azione che tirano la prova, ma si presentano come testo;
+   al passaggio del mouse si evidenziano. */
+.scheda .abilita-nome,
+.scheda .tiro-abilita {
+  height: auto;
+  margin: 0;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+  text-align: left;
+  text-shadow: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.scheda .abilita-nome {
+  padding: 0 0 1px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--inchiostro);
+}
+.scheda .tiro-abilita {
+  padding: 0 4px;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+/* Etichetta che tira (per esempio "TS contro morte"): tiene lo stile dell'etichetta, si evidenzia al passaggio. */
+.scheda .tiro-etichetta {
+  height: auto;
+  margin: 0 0 0 auto;
+  padding: 0 3px;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+  text-align: inherit;
+  text-shadow: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+/* Al passaggio del mouse il colore scuro della palette della pagina (palette.css), testo bianco. */
+.scheda .abilita-nome:hover,
+.scheda .tiro-abilita:hover,
+.scheda .tiro-etichetta:hover {
+  color: #fff;
+  background: var(--accento);
+}
+/* Gradi fra parentesi tonde, sulla stessa linea del nome. */
+.grado {
+  position: relative;
+  height: 17px;
+  padding: 0 7px;
+  border-bottom: 1px solid var(--inchiostro);
+}
+.grado::before,
+.grado::after {
+  position: absolute;
+  top: -2px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1;
+}
+.grado::before { content: "("; left: 0; }
+.grado::after { content: ")"; right: 0; }
+.grado input[type="number"],
+.totale input[type="number"] {
+  height: 100%;
+  font-size: 12px;
+}
+/* Totale fra parentesi quadre. */
+.totale {
+  position: relative;
+  height: 17px;
+  margin-left: 5px;
+  padding: 0 5px;
+}
+.totale::before,
+.totale::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 0;
+  width: 4px;
+  border: 1px solid var(--inchiostro);
+}
+.totale::before { left: 0; border-right: 0; }
+.totale::after { right: 0; border-left: 0; }
+/* ------------------------------------------------------------------ salute */
+
+/* In alto a sinistra: PV massimi e temporanei affiancati sulla banda, sotto la soglia di morte
+   e i PV attuali, con i pulsanti + e − dentro l'esagono. "Punti vitalità" è a destra nella banda. */
+.salute-alto {
+  position: relative;
+  height: 158px;
+  margin-bottom: 6px;
+}
+.banda-vitalita {
+  position: absolute;
+  top: 6px;
+  left: -7px;
+  right: -7px;
+  padding-right: 6px;
+  text-align: right;
+}
+.esagono-pv-max,
+.esagono-pv-temp {
+  --lato: 54px;
+  position: absolute;
+  top: -6px;
+}
+.esagono-pv-max { left: 6px; }
+.esagono-pv-temp { left: 64px; }
+.esagono-pv-max input[type="number"],
+.esagono-pv-temp input[type="number"] {
+  margin-bottom: 10px;
+}
+.filigrana {
+  position: absolute;
+  bottom: 12%;
+  z-index: 1;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b5b5b5;
+  pointer-events: none;
+}
+.esagono-soglia {
+  --lato: 38px;
+  position: absolute;
+  top: 76px;
+  left: 0;
+}
+.esagono-pv-attuali {
+  --lato: 64px;
+  position: absolute;
+  top: 62px;
+  left: 44px;
+}
+.soglia-etichetta {
+  position: absolute;
+  top: 124px;
+  left: 2px;
+  /* L'a capo sta nel testo della traduzione ("Soglia\ndi morte"): chi traduce sceglie dove andare a capo. */
+  white-space: pre-line;
+}
+/* + in cima e − in fondo all'esagono dei valori attuali (PV e punti psi), il numero al centro. */
+.scheda .risorsa-pulsante {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  width: 18px;
+  height: 14px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  font-family: "Jost", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 14px;
+  text-align: center;
+  color: var(--inchiostro);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.scheda .risorsa-pulsante:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.risorsa-piu { top: 4px; }
+.risorsa-meno { bottom: 4px; }
+.ts-morte {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  text-align: right;
+}
+.sfinimento {
+  position: absolute;
+  top: 96px;
+  right: 0;
+  text-align: right;
+}
+/* Effetti dello sfinimento: una riga per grado, a destra sotto le caselle; si vedono le prime N righe,
+   con N il valore del campo nascosto (lo stesso attributo sfinimento). Con 0 gradi l'elenco non occupa
+   spazio; quando c'è, spinge in basso "Condizioni e traumi". */
+.effetti-sfinimento {
+  display: none;
+  width: 60%;
+  margin: -20px 0 8px auto;
+  padding: 0;
+  list-style: none;
+  counter-reset: grado;
+}
+.contatore-sfinimento:not([value="0"]):not([value=""]) ~ .effetti-sfinimento {
+  display: block;
+}
+.effetti-sfinimento li {
+  display: none;
+  font-size: 9.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  text-align: right;
+  cursor: help;
+  counter-increment: grado;
+}
+.effetti-sfinimento li::before {
+  content: counter(grado) " ∙ ";
+  font-weight: 500;
+}
+.contatore-sfinimento[value="1"] ~ .effetti-sfinimento li:nth-child(-n+1),
+.contatore-sfinimento[value="2"] ~ .effetti-sfinimento li:nth-child(-n+2),
+.contatore-sfinimento[value="3"] ~ .effetti-sfinimento li:nth-child(-n+3),
+.contatore-sfinimento[value="4"] ~ .effetti-sfinimento li:nth-child(-n+4),
+.contatore-sfinimento[value="5"] ~ .effetti-sfinimento li:nth-child(-n+5),
+.contatore-sfinimento[value="6"] ~ .effetti-sfinimento li:nth-child(-n+6) {
+  display: block;
+}
+/* Il pannello Salute è una colonna: "Condizioni e traumi" prende lo spazio che resta, così quando
+   compare l'elenco dello sfinimento le righe si accorciano e il pannello non si allunga. */
+.pannello-salute {
+  display: flex;
+  flex-direction: column;
+}
+.scheda .condizioni {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 40px;
+  margin-top: 2px;
+}
+/* ------------------------------------------------------------------ stats */
+
+.stat {
+  position: relative;
+  height: 74px;
+}
+.banda-stat {
+  position: absolute;
+  top: 12px;
+  left: -7px;
+  right: -7px;
+}
+.stat-destra .banda-stat { padding-right: 70px; text-align: right; }
+.stat-sinistra .banda-stat { padding-left: 70px; }
+.esagono-stat {
+  --lato: 54px;
+  position: absolute;
+  top: 0;
+}
+.stat-destra .esagono-stat { right: 2px; }
+.stat-sinistra .esagono-stat { left: 2px; }
+/* Il riquadro delle modifiche verso l'interno del pannello, sopra le note. */
+.esagono-stat .riquadro-modifiche { top: 34px; }
+.stat-destra .esagono-stat .riquadro-modifiche { right: calc(100% + 4px); }
+.stat-sinistra .esagono-stat .riquadro-modifiche { left: calc(100% + 4px); }
+/* width: auto toglie il 100% di .righe (base.css), che vince su left e right: le note sbordavano a destra. */
+.scheda .stat-note {
+  position: absolute;
+  top: 36px;
+  width: auto;
+  height: 36px;
+  line-height: 18px;
+  background: repeating-linear-gradient(to bottom, transparent 0 17px, var(--riga) 17px 18px);
+  background-attachment: local;
+}
+.stat-destra .stat-note { left: 0; right: 62px; }
+.stat-sinistra .stat-note { left: 62px; right: 0; }
+/* "Iniziativa" è il pulsante del tiro (tiro-abilita, come i nomi delle abilità): il margine negativo toglie il
+   suo padding, così il testo resta allineato a quello delle altre stats. */
+.scheda .stat-sinistra .banda-stat .tiro-abilita { margin-left: -4px; }
+.scheda .stat-destra .banda-stat .tiro-abilita { margin-right: -4px; }
+/* ------------------------------------------------------------------ attacchi */
+
+/* Gli attacchi sono le righe di una tabella, una sotto l'altra: niente spazio fra una riga e l'altra, così le linee
+   verticali delle celle arrivano fino alla linea dell'attacco seguente. Lo spazio sta dentro le celle (48 px), o
+   nella striscia delle munizioni quando c'è (celle di 32 px più la striscia). */
+.attacco {
+  margin-bottom: 0;
+}
+/* La tabella si chiude con una linea sotto l'ultimo attacco (se la striscia c'è, coincide con la sua). */
+.pannello-attacchi .repcontainer[data-groupname="repeating_armi"] > .repitem:last-child .attacco {
+  border-bottom: 1px solid var(--inchiostro);
+}
+.attacco-principale {
+  display: grid;
+  /* minmax(0, …): le colonne sono uguali in tutte le righe, anche se un valore lungo («DES CD 16») va a capo. */
+  grid-template-columns: minmax(0, 48fr) minmax(0, 10fr) minmax(0, 28fr) minmax(0, 14fr);
+  border-top: 1px solid var(--inchiostro);
+}
+.cella {
+  display: flex;
+  flex-direction: column;
+  min-height: 48px;
+  padding: 1px 3px 0;
+  border-right: 1px solid var(--inchiostro);
+}
+.cella:last-child {
+  border-right: 0;
+}
+/* Con la striscia delle munizioni (stessa condizione che la mostra, più sotto) le celle tornano di 32 px. */
+.mun-numero:not([value=""]) ~ .attacco-principale .cella,
+.mun-colpi:not([value=""]) ~ .attacco-principale .cella,
+.mun-consumati:not([value="0"]) ~ .attacco-principale .cella,
+.dettagli-interruttore:checked ~ .attacco-principale .cella {
+  min-height: 32px;
+}
+/* La rotella della riga sta in alto a destra: l'ultima colonna (Portata/Gittata) le lascia il posto. */
+.attacco-principale .cella:last-child {
+  padding-right: 22px;
+}
+.etichetta-cella {
+  white-space: nowrap;
+  font-size: 7.5px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #555;
+}
+.cella input[type="text"],
+.cella input[type="number"] {
+  flex: 1;
+}
+.attacco-munizioni {
+  display: grid;
+  /* Le colonne della striscia seguono quelle della riga (48 | 10 28 14): le prime quattro fanno 48 come la colonna Nome,
+     le ultime due 52 come le altre tre, così il divisore cade sullo stesso pixel a qualunque larghezza. */
+  grid-template-columns: minmax(0, 18fr) minmax(0, 7fr) minmax(0, 15fr) minmax(0, 8fr) minmax(0, 13fr) minmax(0, 39fr);
+  /* Una riga alta quanto lo spazio fra le due linee: senza, il contenuto usciva sotto la striscia. */
+  grid-template-rows: minmax(0, 1fr);
+  height: 22px;
+  /* La linea sotto la striscia coincide con quella sopra l'attacco seguente: una linea sola. */
+  margin-bottom: -1px;
+  border-top: 1px solid var(--inchiostro);
+  border-bottom: 1px solid var(--inchiostro);
+}
+.etichetta-riquadro {
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  overflow: hidden;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Sopra e sotto c'è già la linea della striscia: solo i lati, o la riga avrebbe il doppio bordo. Il lato sinistro
+     sta sul pixel prima, come il divisore di una cella (disegnato dentro il suo lato destro): così i divisori della
+     striscia e della riga sopra sono sulla stessa colonna di pixel. Il primo non ha lato sinistro. */
+  margin-left: -1px;
+  border: 1px solid var(--grigio);
+  border-top: 0;
+  border-bottom: 0;
+}
+.etichetta-riquadro:first-child {
+  margin-left: 0;
+  border-left: 0;
+}
+.attacco-munizioni input[type="text"],
+.attacco-munizioni input[type="number"] {
+  height: 100%;
+  font-size: 11px;
+}
+/* Senza munizioni, colpi per munizione e colpi segnati il riquadro non c'è (raffica, esplosivi, armi da
+   mischia); con i dettagli aperti c'è sempre, per poterli scrivere (i [value] servono a pesare di più
+   della regola che lo nasconde). */
+.mun-numero[value=""] ~ .mun-colpi[value=""] ~ .mun-consumati[value="0"] ~ .attacco-munizioni {
+  display: none;
+}
+.dettagli-interruttore:checked ~ .mun-numero[value] ~ .mun-colpi[value] ~ .mun-consumati[value] ~ .attacco-munizioni {
+  display: grid;
+}
+/* Colpi consumati: 20 caselle quadrate contigue, come la fila della scheda stampata.
+   Stesso schema delle caselle esagonali, con il quadrato al posto dell'esagono. */
+.colpi {
+  display: flex;
+  height: 100%;
+}
+.scheda .casella-quadrata {
+  flex: 1;
+  margin-left: -1px;
+}
+.scheda .contatore + .casella-quadrata {
+  margin-left: 0;
+}
+.casella-quadrata span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--inchiostro);
+}
+/* Nella striscia delle munizioni le caselle dei colpi hanno solo i lati: sopra e sotto c'è la linea della
+   striscia (con il bordo intero la riga avrebbe il doppio bordo). */
+.attacco-munizioni .casella-quadrata span {
+  border-top: 0;
+  border-bottom: 0;
+}
+.casella-quadrata span::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--inchiostro);
+  opacity: var(--piena, 0);
+}
+
+/* Dettagli dell'attacco (bug in produzione, punti 1 e 2, 30/09/2026): testata con nome e Tipo, poi tre
+   sezioni bianche (Per colpire, Effetto, Dettagli) con il titolo in maiuscoletto e i pulsanti a destra, e
+   le etichette sopra i campi. I campi nascosti delle scelte precedono testata e sezioni: da lì il CSS
+   evidenzia i pulsanti scelti e mostra solo i campi della risoluzione e dell'effetto. */
+/* .dettagli-riga in più: batte ".dettagli-interruttore:checked ~ .dettagli-riga" (griglia), che viene dopo. */
+.dettagli-interruttore:checked ~ .dettagli-riga.dettagli-attacco {
+  display: block;
+}
+.attacco-testa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scheda .dettagli-riga .attacco-nome {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+}
+.sezione-attacco {
+  margin-top: 8px;
+  padding: 7px 10px 9px;
+  background: #fff;
+  border: 1px solid var(--riga);
+  border-radius: 3px;
+}
+.sezione-testa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.sezione-titolo {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.campi-riga {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+.campi-riga + .campi-riga {
+  margin-top: 6px;
+}
+.campo-etichettato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.campo-largo {
+  min-width: 160px;
+}
+.campo-pieno {
+  flex: 1;
+  min-width: 110px;
+}
+.etichetta-campo {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+.piu {
+  padding-bottom: 3px;
+  font-size: 12px;
+  color: var(--grigio);
+}
+/* [type="number"] e il tipo di elemento: devono battere la larghezza dei campi numerici di Roll20
+   (".ui-dialog .charsheet input[type=number]", (0,3,1)). */
+.scheda .dettagli-attacco input[type="number"].campo-numero {
+  width: 46px;
+}
+.scheda .dettagli-attacco input[type="text"].campo-dadi {
+  width: 64px;
+}
+.scheda .dettagli-attacco .campo-pieno input[type="text"],
+.scheda .dettagli-attacco .campo-pieno select,
+.scheda .dettagli-attacco .campo-largo select {
+  width: 100%;
+}
+.campo-note {
+  margin-top: 6px;
+}
+.scheda .dettagli-attacco textarea {
+  height: 46px;
+  margin: 0;
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.tipo-scelto[value="mischia"] ~ * .opzione-tipomischia span,
+.tipo-scelto[value="distanza"] ~ * .opzione-tipodistanza span,
+.tipo-scelto[value="psionico"] ~ * .opzione-tipopsionico span,
+.tipo-scelto[value="altro"] ~ * .opzione-tipoaltro span,
+.risoluzione-scelta[value="attacco"] ~ * .opzione-risoluzioneattacco span,
+.risoluzione-scelta[value="ts"] ~ * .opzione-risoluzionets span,
+.risoluzione-scelta[value="nessuno"] ~ * .opzione-risoluzionenessuno span,
+.effetto-scelto[value="danni"] ~ * .opzione-effettodanni span,
+.effetto-scelto[value="cura"] ~ * .opzione-effettocura span {
+  color: #fff;
+  background: var(--inchiostro);
+}
+.dettagli-attacco .solo-attacco,
+.dettagli-attacco .solo-ts,
+.dettagli-attacco .solo-nessuno {
+  display: none;
+}
+.risoluzione-scelta[value="attacco"] ~ .sezione-colpire .solo-attacco,
+.risoluzione-scelta[value="ts"] ~ .sezione-colpire .solo-ts {
+  display: flex;
+}
+.risoluzione-scelta[value="nessuno"] ~ .sezione-colpire .solo-nessuno {
+  display: block;
+}
+.effetto-scelto[value="cura"] ~ .sezione-effetto .solo-danni {
+  display: none;
+}
+/* Controlli delle sezioni ripetibili, creati da Roll20: .repcontrol (dopo le righe) con +Add e
+   Modify/Done, e in modifica su ogni riga .repcontrol_del (cestino) e .repcontrol_move (maniglia).
+   I testi sono quelli di Roll20 (+Add, Modify, Done): il CSS non si traduce, quindi non si riscrivono.
+   Il .repcontrol segue il .repcontainer, quindi .editmode ~ .repcontrol riconosce la modalità modifica. */
+.scheda .repcontrol {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.scheda .repcontrol .repcontrol_add,
+.scheda .repcontrol .repcontrol_edit {
+  float: none;
+  height: auto;
+  margin: 0;
+  padding: 6px 16px 5px;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--inchiostro);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+}
+/* +Add nel colore pieno della pagina, Modify nel chiaro; Done (lista in modifica) resta nero. */
+.scheda .repcontrol .repcontrol_add {
+  color: var(--inchiostro);
+  background: var(--banda);
+}
+/* Roll20 mette Modify prima di +Add: +Add va a sinistra, Modify a destra. */
+.scheda .repcontrol .repcontrol_add { order: -1; }
+.scheda .repcontrol .repcontrol_edit {
+  color: var(--inchiostro);
+  background: var(--tinta);
+}
+.scheda .repcontainer.editmode ~ .repcontrol .repcontrol_edit {
+  color: #fff;
+  background: var(--inchiostro);
+}
+.scheda .repcontrol .repcontrol_add:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.scheda .repcontainer.editmode ~ .repcontrol .repcontrol_edit:hover {
+  background: #444;
+}
+.scheda .repcontrol .repcontrol_edit:hover {
+  background: var(--banda);
+}
+
+/* Trascinamento. Su Roll20 lo fa jQuery UI: la riga presa riceve .ui-sortable-helper e segue il cursore,
+   al suo posto c'è un segnaposto vuoto .ui-sortable-placeholder che indica dove cadrà. La riga presa
+   diventa una card; il segnaposto, che jQuery nasconde con visibility: hidden scritto sull'elemento,
+   si mostra (serve !important) come fascia tratteggiata, senza scritta (il CSS non si traduce). */
+.scheda .repitem.ui-sortable-helper {
+  background: #fff;
+  outline: 1.5px solid var(--inchiostro);
+  outline-offset: 3px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  cursor: grabbing;
+}
+.scheda .repcontainer.editmode .repitem.ui-sortable-helper .itemcontrol,
+.scheda .repcontainer.editmode .repitem.ui-sortable-helper:hover .itemcontrol {
+  background: none;
+}
+.scheda .repitem.ui-sortable-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: visible !important;
+  background: repeating-linear-gradient(135deg, var(--banda) 0 10px, #f1f1f1 10px 20px);
+  border: 1.5px dashed var(--inchiostro);
+}
+/* Negli attacchi le righe sono una sotto l'altra, senza spazio (attacchi.css): anche il segnaposto. */
+.pannello-attacchi .repitem.ui-sortable-placeholder {
+  margin-bottom: 0;
+}
+
+/* Cestino: quello di Roll20 elimina senza chiedere, quindi è nascosto; al suo posto c'è quello della scheda
+   (.elimina-riga), che apre la modale di conferma. Si vede solo in "Modifica", sopra il velo della riga. */
+.scheda .repcontainer .repitem .itemcontrol .repcontrol_del {
+  display: none;
+}
+.scheda .elimina-riga {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 11;
+  display: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  color: #fff;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+.scheda .repcontainer.editmode .elimina-riga {
+  display: grid;
+}
+/* In "Modifica" la riga mostra solo il ✕ della scheda: rotella, fumetto e (i) spariscono, anche passando il mouse e
+   con la rotella aperta (stanno sotto il ✕), in tutte le liste (richiesta dell'utente del 22/10/2026). */
+.scheda .repcontainer.editmode .repitem .dettagli-icona,
+.scheda .repcontainer.editmode .repitem .dettagli-interruttore,
+.scheda .repcontainer.editmode .repitem .info-icona,
+.scheda .repcontainer.editmode .repitem .info-interruttore,
+.scheda .repcontainer.editmode .repitem:hover .voce-chat[type="action"],
+.scheda .repcontainer.editmode .repitem .voce-chat[type="action"] {
+  display: none;
+}
+/* Le righe di inventario e cyberware sono basse: cestino più piccolo, dentro la riga. */
+.scheda .repcontainer[data-groupname="repeating_inventario"] .elimina-riga,
+.scheda .repcontainer[data-groupname="repeating_cyberware"] .elimina-riga {
+  top: 1px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+}
+.scheda .elimina-riga:hover {
+  background: #444;
+}
+
+/* In modifica: velo grigio sulla riga (Roll20 lo fa giallo) e i due comandi della riga. */
+.scheda .repcontainer.editmode .repitem .itemcontrol {
+  background: rgba(255, 255, 255, 0.45);
+}
+.scheda .repcontainer.editmode .repitem:hover .itemcontrol {
+  background: rgba(227, 227, 227, 0.6);
+}
+.scheda .repitem .itemcontrol .repcontrol_del,
+.scheda .repitem .itemcontrol .repcontrol_move {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 6px;
+  padding: 0;
+  font-size: 0;
+  line-height: 1;
+  color: #fff;
+  background: var(--inchiostro);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+.scheda .repitem .itemcontrol .repcontrol_del::before {
+  content: "✕";
+  font-size: 13px;
+}
+.scheda .repitem .itemcontrol .repcontrol_move::before {
+  content: "≡";
+  font-family: "Jost", sans-serif;
+  font-size: 18px;
+}
+.scheda .repitem .itemcontrol .repcontrol_move::after {
+  content: none;
+}
+.scheda .repitem .itemcontrol .repcontrol_del:hover,
+.scheda .repitem .itemcontrol .repcontrol_move:hover {
+  background: #444;
+}
+/* ------------------------------------------------------------------ attacchi: riepilogo, rotella, dettagli */
+
+/* Riepilogo della riga: nome e danni sono pulsanti (tiro di attacco e tiro dei danni) che sembrano
+   testo; bonus e portata sono in sola lettura. Si scrive tutto nel pannello dei dettagli. */
+.attacco {
+  position: relative;
+}
+.scheda .tiro-arma {
+  align-self: flex-start;
+  min-height: 18px;
+  height: auto;
+  margin: 0;
+  padding: 0 3px;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--inchiostro);
+  text-align: left;
+  text-shadow: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.scheda .tiro-arma:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.valore-cella {
+  display: block;
+  min-height: 18px;
+  padding: 0 3px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* Rotella delle impostazioni, come nella scheda D&D: la checkbox vera è trasparente sopra l'icona.
+   Si vede passando il mouse sulla riga, o sempre quando il pannello è aperto.
+   Icone delle righe: tre posti da 18px, uguali in tutte le liste, da destra rotella (2px), fumetto (22px) e
+   (i) (42px). L'altezza è --icone-alto della riga (.tratto, .psi-card, .voce), centrata sulla prima riga. */
+.dettagli-icona {
+  position: absolute;
+  top: var(--icone-alto, 1px);
+  right: 2px;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  /* Il ⚙ dei font di sistema ha tratti sottili: più grande e ispessito pesa come il fumetto accanto. */
+  font-size: 17px;
+  -webkit-text-stroke: 0.6px currentColor;
+  line-height: 18px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+.scheda .dettagli-interruttore {
+  position: absolute;
+  top: var(--icone-alto, 1px);
+  right: 2px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.repitem:hover .dettagli-icona,
+.dettagli-interruttore:checked + .dettagli-icona,
+.dettagli-interruttore:focus-visible + .dettagli-icona {
+  opacity: 1;
+}
+
+/* Pannello dei dettagli: etichetta a sinistra, campi a destra. Il campo nascosto .tipo-scelto
+   (attr_tipo) mostra solo i campi del tipo scelto. */
+.dettagli-riga {
+  display: none;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px 8px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #f6f6f6;
+  border-left: 3px solid var(--inchiostro);
+}
+.dettagli-interruttore:checked ~ .dettagli-riga {
+  display: grid;
+}
+.dettagli-riga .interruttore {
+  justify-self: start;
+}
+/* Selettori della riga: pulsanti d'azione con l'aspetto delle opzioni; quella scelta la indica il campo
+   nascosto che li precede (tipo, risoluzione, effetto). */
+.scheda .dettagli-riga button.opzione {
+  height: auto;
+  font-size: 0;
+  line-height: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+}
+.risoluzione-scelta[value="attacco"] ~ .interruttore .opzione-risoluzioneattacco span,
+.risoluzione-scelta[value="ts"] ~ .interruttore .opzione-risoluzionets span,
+.risoluzione-scelta[value="nessuno"] ~ .interruttore .opzione-risoluzionenessuno span,
+.effetto-scelto[value="danni"] ~ .interruttore .opzione-effettodanni span,
+.effetto-scelto[value="cura"] ~ .interruttore .opzione-effettocura span {
+  color: #fff;
+  background: var(--inchiostro);
+}
+.etichetta-dettaglio {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.nota-dettaglio {
+  font-size: 10.5px;
+  color: #555;
+}
+.scheda .dettagli-riga input[type="text"],
+.scheda .dettagli-riga input[type="number"],
+.scheda .dettagli-riga select {
+  height: 22px;
+  font-size: 12px;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid var(--riga);
+  border-radius: 0;
+}
+.scheda .dettagli-riga select {
+  width: auto;
+  margin: 0;
+  padding: 0 4px;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+}
+.danni-dettaglio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.scheda .danni-dettaglio input[name="attr_danni_dadi"] { width: 70px; }
+.scheda .danni-dettaglio input[name="attr_danni_tipo"] { flex: 1; min-width: 0; }
+.solo-ts {
+  display: none;
+}
+/* Card di praxis e poteri: i campi del TS solo con il TS; il tipo di danno solo per i danni. Il pannello
+   degli attacchi ha le sue regole (stili/attacchi.css). */
+.risoluzione-scelta[value="ts"] ~ .solo-ts {
+  display: block;
+}
+.risoluzione-scelta[value="ts"] ~ .riga-ts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.effetto-scelto[value="cura"] ~ .danni-dettaglio .solo-danni {
+  display: none;
+}
+.scheda .riga-ts input[name="attr_ts_qualifica"] { flex: 1; min-width: 0; }
+.scheda .riga-ts input[name="attr_ts_cd"] { width: 44px; }
+/* ------------------------------------------------------------------ tratti e privilegi */
+
+/* Tratti e privilegi: una lista di card (repeating_tratti) che occupa il pannello e, se serve, scorre. */
+.pannello-tratti {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card di un tratto, come nella scheda D&D: in lettura nome, fonte ("Specie · Terran") e descrizione.
+   La checkbox trasparente .tratto-interruttore copre la card e apre o chiude la descrizione; con i
+   dettagli aperti sparisce, così i campi restano cliccabili. Rotella e fumetto stanno sopra (z-index 2). */
+/* Come le card di consultazione in chat (template voce): nome in maiuscolo sulla fascia grigia con le barre
+   oblique, sotto fonte in corsivo e descrizione sul grigio chiaro (palette grigia, palette.css). */
+.tratto {
+  --icone-alto: 4px;
+  position: relative;
+  margin-bottom: 8px;
+  padding: 0 0 6px;
+  background: var(--tinta);
+}
+.tratto-nome {
+  position: relative;
+  display: block;
+  padding: 5px 60px 4px 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--banda);
+}
+.tratto-nome::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 46px;
+  bottom: 0;
+  width: 34px;
+  background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255, 255, 255, 0.5) 5px 9px);
+}
+/* Senza nome: la fascia del nome vuota lascia il posto a quella con «Senza nome» (chat.card.default_unnamed). */
+.tratto-nome:empty,
+.tratto-nome:not(:empty) + .senza-nome {
+  display: none;
+}
+.tratto-nome.senza-nome {
+  font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+  color: #555;
+}
+/* La fonte salvata è il testo italiano del menu: si mostra la voce tradotta che corrisponde al valore (fonti_tratti
+   di src/modello/elenchi.json), e il valore com'è solo se non è nell'elenco. */
+.tratto-fonte .fonte-voce,
+.fonte-bandiera[value="Specie"] ~ .fonte-scritta,
+.fonte-bandiera[value="Background"] ~ .fonte-scritta,
+.fonte-bandiera[value="Classe"] ~ .fonte-scritta,
+.fonte-bandiera[value="Talento"] ~ .fonte-scritta,
+.fonte-bandiera[value="Oggetto"] ~ .fonte-scritta,
+.fonte-bandiera[value="Altro"] ~ .fonte-scritta {
+  display: none;
+}
+.fonte-bandiera[value="Specie"] ~ .fonte-specie,
+.fonte-bandiera[value="Background"] ~ .fonte-background,
+.fonte-bandiera[value="Classe"] ~ .fonte-classe,
+.fonte-bandiera[value="Talento"] ~ .fonte-talento,
+.fonte-bandiera[value="Oggetto"] ~ .fonte-oggetto,
+.fonte-bandiera[value="Altro"] ~ .fonte-altro {
+  display: inline;
+}
+.tratto-fonte {
+  display: block;
+  padding: 4px 8px 0;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.3;
+  color: #444;
+}
+.fonte-bandiera:not([value=""]) ~ .fonte-dettaglio:not(:empty)::before {
+  content: " ∙ ";
+}
+.tratto-descrizione {
+  display: block;
+  margin-top: 3px;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre-line;
+}
+.tratto-interruttore:checked ~ .tratto-descrizione,
+.dettagli-interruttore:checked ~ .tratto-descrizione {
+  display: none;
+}
+.scheda .tratto .tratto-interruttore {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.dettagli-interruttore:checked ~ .tratto-interruttore {
+  display: none;
+}
+
+/* Fumetto: manda il tratto o l'oggetto in chat (act_chat, worker/tiri/fumetto.ts). Si vede passando il mouse sulla
+   riga, a sinistra della rotella. Roll20 dà ai pulsanti margine, padding e sfondo ((0,3,1)): con [type="action"] le
+   regole della scheda pesano di più e li tolgono. */
+.scheda .repitem .voce-chat[type="action"] {
+  position: absolute;
+  top: var(--icone-alto, 1px);
+  right: 22px;
+  z-index: 2;
+  display: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.scheda .repitem:hover .voce-chat[type="action"] {
+  display: block;
+}
+.voce-chat span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 9px;
+  border: 1.5px solid var(--inchiostro);
+  border-radius: 3px;
+}
+.voce-chat span::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 2px;
+  border-top: 4px solid var(--inchiostro);
+  border-right: 4px solid transparent;
+}
+.voce-chat:hover span {
+  background: var(--inchiostro);
+}
+.dettagli-riga .etichetta-textarea {
+  align-self: start;
+  padding-top: 4px;
+}
+.scheda .dettagli-riga textarea {
+  height: 90px;
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  background: #fff;
+  resize: vertical;
+}
+/* Dettagli del tratto dentro la card, staccati dai bordi come il testo. */
+.tratto .dettagli-riga {
+  margin: 6px 8px 0;
+}
+/* ------------------------------------------------------------------ liste dinamiche */
+
+/* Sezioni ripetibili nei pannelli ad altezza fissa (tratti, inventario, poteri, praxis): la lista
+   prende lo spazio che resta nel pannello e scorre quando le righe non ci stanno più. Dentro .lista
+   ci sono la fieldset (il modello), il .repcontainer con le righe e il .repcontrol con i pulsanti. */
+.lista {
+  flex: 1 1 0;
+  min-height: 60px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+/* Card di testo: una textarea a righe, alta tre righe; si allunga a mano dall'angolo in basso. */
+.scheda .scheda-card {
+  height: 62px;
+  margin-bottom: 8px;
+  background-color: var(--tinta);
+  border-top: 1px solid var(--inchiostro);
+  resize: vertical;
+}
+.lista .repitem.ui-sortable-placeholder {
+  margin-bottom: 8px;
+}
+/* ------------------------------------------------------------------ risorse: contatori e riposi */
+
+/* Layout solo con il CSS, senza contare le righe: l'area dei contatori prende lo spazio che le serve, fino a 3/4
+   della larghezza; i pulsanti del riposo il resto, affiancati se ci stanno, altrimenti uno sotto l'altro. Con
+   2 contatori si dividono a metà, dal terzo i contatori vanno a 3/4 e vanno a capo tre per riga. La larghezza
+   naturale dei contatori la dà la lista delle righe (.repcontainer); i controlli di Roll20 (.repcontrol) stanno
+   sotto e non la allargano. Misure pensate per la scheda più stretta (880px, la finestra di Roll20 non allargata:
+   pannello largo 546px dentro): tre contatori da 128px stanno nei 3/4, due pulsanti da 110px accanto a due
+   contatori. */
+.pannello-risorse {
+  --larghezza-titolo: 32%;
+}
+.risorse-corpo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.contatori {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  max-width: 75%;
+}
+.scheda .contatori .repcontainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.contatori .repitem {
+  flex: none;
+  width: 128px;
+}
+.riposi {
+  display: flex;
+  flex: 1 1 0;
+  flex-flow: row wrap;
+  align-content: center;
+  gap: 10px;
+}
+
+/* Contatore: esagono con + e − (come i PV attuali, salute.css) e, a destra, il nome su una banda e sotto
+   "su N ∙ ricarica". Le icone (✕ in modifica, rotella) stanno sopra a destra. */
+.contatore {
+  --icone-alto: 0;
+  position: relative;
+}
+.contatore-riga {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 58px;
+}
+.esagono-contatore {
+  --lato: 50px;
+  position: relative;
+  flex: none;
+}
+.scheda .esagono-contatore .risorsa-piu { top: 1px; }
+.scheda .esagono-contatore .risorsa-meno { bottom: 1px; }
+.contatore-testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.contatore-nome {
+  margin-bottom: 1px;
+  padding: 2px 6px 1px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  background: var(--banda);
+}
+/* Nome vuoto: «Nuova risorsa» (resources.counter.new) al suo posto. */
+.contatore-nome:empty,
+.contatore-nome:not(:empty) + .contatore-nuova {
+  display: none;
+}
+.contatore-nuova {
+  opacity: 0.55;
+}
+.contatore-dettaglio {
+  margin-top: 3px;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #777;
+}
+/* «su» (resources.counter.of_max) solo con il massimo; la ricarica salvata è il testo italiano del menu (vuoto = Mai):
+   si mostra la voce tradotta (ricariche_risorse di src/modello/elenchi.json), il valore com'è se non è nell'elenco. */
+.massimo-bandiera[value=""] ~ .massimo-su,
+.contatore-dettaglio .ricarica-voce,
+.ricarica-bandiera[value=""] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Mai"] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Ogni riposo"] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Riposo completo"] ~ .ricarica-scritta {
+  display: none;
+}
+.massimo-su::after {
+  content: " ";
+}
+.ricarica-bandiera[value=""] ~ .ricarica-mai,
+.ricarica-bandiera[value="Mai"] ~ .ricarica-mai,
+.ricarica-bandiera[value="Ogni riposo"] ~ .ricarica-ogni_riposo,
+.ricarica-bandiera[value="Riposo completo"] ~ .ricarica-riposo_completo {
+  display: inline;
+}
+.massimo-bandiera:not([value=""]) ~ .ricarica-voce::before,
+.massimo-bandiera:not([value=""]) ~ .ricarica-scritta:not(:empty)::before {
+  content: " ∙ ";
+}
+/* Dettagli: nella colonna stretta del contatore le etichette vanno sopra i campi. */
+.contatore .dettagli-riga {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  padding: 6px;
+}
+
+/* Pulsanti del riposo: colore chiaro della pagina, contorno nero anche sugli angoli smussati (il fondo del
+   pulsante fa da contorno, l'interno è uno span). [type="action"] per pesare più degli stili di Roll20. */
+.scheda .riposo[type="action"] {
+  display: flex;
+  flex: 1 1 110px;
+  height: auto;
+  margin: 0;
+  padding: 1.5px;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+  text-align: center;
+  text-shadow: none;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+}
+.riposo-dentro {
+  display: block;
+  flex: 1;
+  padding: 8px 8px 7px;
+  background: var(--tinta);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+.riposo:hover .riposo-dentro {
+  background: var(--banda);
+}
+.riposo-nome {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.riposo-cosa {
+  display: block;
+  margin-top: 3px;
+  font-size: 8.5px;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+  color: #444;
+}
+/* ------------------------------------------------------------------ pagina 2 */
+
+/* Tre colonne flex alte quanto il corpo della pagina 1: le textarea .riempie si dividono lo spazio
+   che resta; Background e Altre informazioni hanno la stessa altezza, così restano allineati. */
+.corpo-2 {
+  --altezza-basso: 320px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  height: var(--altezza-corpo, 1224px);
+}
+.colonna {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.corpo-2 .pannello,
+.corpo-4 .pannello {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.pannello-inventario,
+.pannello-aspetto,
+.pannello-personalita,
+.pannello-cyberware {
+  flex: 1 1 0;
+}
+.pannello-aspetto { flex-grow: 147; }
+.pannello-personalita { flex-grow: 330; }
+.pannello-finanze { flex: 0 0 180px; }
+.pannello-background,
+.pannello-altro {
+  flex: 0 0 var(--altezza-basso);
+  /* "Altre informazioni" è il titolo più lungo: con il 58% di base le linee ai lati quasi sparivano. */
+  --larghezza-titolo: 72%;
+}
+.scheda .riempie {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 40px;
+}
+.scheda .righe-2 { flex-grow: 2; }
+.scheda .righe-3 { flex-grow: 3; }
+.corpo-2 .etichetta-media {
+  margin-top: 4px;
+}
+.formula {
+  display: block;
+  font-size: 7.5px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--grigio);
+}
+
+/* Inventario: quantità, oggetto e peso sulla stessa riga; l'ultima colonna tiene fumetto e rotella. Come le
+   tabelle del manuale (capitolo 3): intestazione sulla fascia scura, righe alternate chiare e bianche, senza
+   linee fra una riga e l'altra (anche il cyberware, cyberware.css). */
+.inventario-intestazione {
+  display: grid;
+  grid-template-columns: 34px 1fr 48px 64px;
+  padding: 3px 0 2px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: var(--banda);
+}
+.pannello-inventario .repcontainer > .repitem:nth-child(even) .voce,
+.pannello-cyberware .repcontainer > .repitem:nth-child(even) .voce {
+  background: var(--tinta);
+}
+.inventario-intestazione span:nth-child(3) {
+  text-align: right;
+}
+/* Riga bassa (22px): rotella e fumetto al centro, nella colonna libera a destra (dettagli.css). */
+.voce {
+  --icone-alto: 2px;
+  position: relative;
+}
+.oggetto {
+  display: grid;
+  grid-template-columns: 34px 1fr 48px 64px;
+  height: 22px;
+}
+.scheda .oggetto input[type="text"],
+.scheda .oggetto input[type="number"] {
+  height: 100%;
+  font-size: 12px;
+}
+.scheda .oggetto input[type="number"] {
+  text-align: right;
+}
+.scheda .oggetto input[name="attr_quantita"] {
+  padding-right: 6px;
+}
+/* Nomi lunghi del manuale ("Armatura da guerriero della strada, leggera") con i puntini invece che tagliati
+   di netto (bug in produzione, punto 3): il nome intero si vede cliccando nel campo e nella card in chat. */
+.scheda .oggetto input[name="attr_inventario"] {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+/* Dettagli dell'oggetto: solo i campi della categoria scelta, uno per riga (il pannello è stretto). */
+.voce .dettagli-riga {
+  grid-template-columns: 84px minmax(0, 1fr);
+  margin: 2px 0 6px;
+}
+.scheda .voce .dettagli-riga input[type="number"] {
+  justify-self: start;
+  width: 50px;
+}
+.scheda .voce .dettagli-riga input[type="checkbox"] {
+  justify-self: start;
+  margin: 0;
+  accent-color: var(--inchiostro);
+}
+.scheda .voce .dettagli-riga textarea {
+  height: 60px;
+}
+.solo-equipaggiabile,
+.solo-attacco,
+.solo-armatura,
+.solo-scudo {
+  display: none;
+}
+/* Equipaggiato: armature, scudi, armi ed esplosivi; Può attaccare: armi, esplosivi e scudi (passo N2). */
+.categoria-scelta[value="Arma"] ~ .solo-equipaggiabile,
+.categoria-scelta[value="Esplosivo"] ~ .solo-equipaggiabile,
+.categoria-scelta[value="Armatura"] ~ .solo-equipaggiabile,
+.categoria-scelta[value="Scudo"] ~ .solo-equipaggiabile,
+.categoria-scelta[value="Arma"] ~ .solo-attacco,
+.categoria-scelta[value="Esplosivo"] ~ .solo-attacco,
+.categoria-scelta[value="Scudo"] ~ .solo-attacco,
+.categoria-scelta[value="Armatura"] ~ .solo-armatura,
+.categoria-scelta[value="Scudo"] ~ .solo-scudo {
+  display: block;
+}
+/* Può attaccare si spunta solo con Equipaggiato: senza, è velata e non si clicca. */
+.casella-equipaggiato:not(:checked) ~ .casella-puo-attaccare,
+.casella-equipaggiato:not(:checked) ~ .etichetta-puo-attaccare {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.carico {
+  position: relative;
+  flex: none;
+  height: 92px;
+  margin-top: 6px;
+}
+.banda-carico {
+  position: absolute;
+  top: 16px;
+  left: -7px;
+  right: -7px;
+  padding-right: 74px;
+  text-align: right;
+}
+.esagono-carico-totale {
+  --lato: 58px;
+  position: absolute;
+  top: 0;
+  right: 2px;
+}
+.esagono-capacita {
+  --lato: 38px;
+  position: absolute;
+  top: 46px;
+  left: 2px;
+}
+/* Sovraccarico: oltre la capacità l'esagono del carico si riempie di nero (.carico-oltre, attr_carico_oltre),
+   come quello dei cyber-punti oltre il massimo. */
+.carico-oltre[value="1"] ~ .esagono-carico-totale::after {
+  background: var(--inchiostro);
+}
+.scheda .carico-oltre[value="1"] ~ .esagono-carico-totale input[type="number"] {
+  color: #fff;
+}
+.capacita-etichetta {
+  position: absolute;
+  top: 54px;
+  left: 46px;
+}
+
+/* Finanze */
+.finanze {
+  position: relative;
+  flex: none;
+  height: 86px;
+}
+.banda-crediti {
+  position: absolute;
+  top: 12px;
+  left: -7px;
+  right: -7px;
+  padding-left: 72px;
+}
+.esagono-crediti {
+  --lato: 58px;
+  position: absolute;
+  top: 0;
+  left: 2px;
+}
+.esagono-rendita,
+.esagono-oneri {
+  --lato: 34px;
+  position: absolute;
+  top: 42px;
+}
+.esagono-rendita { right: 96px; }
+.esagono-oneri { right: 2px; }
+.rendita-etichetta,
+.oneri-etichetta {
+  position: absolute;
+  top: 50px;
+  margin: 0;
+  line-height: 1.1;
+  text-align: right;
+  white-space: pre-line;
+}
+.rendita-etichetta { right: 134px; }
+.oneri-etichetta { right: 40px; }
+.scheda .finanze-note {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 40px;
+}
+
+/* Aspetto fisico: dati brevi in riga, poi righe libere. */
+.riga-dati {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  height: 20px;
+  border-bottom: 1px solid var(--riga);
+}
+.corpo-2 .riga-dati .etichetta-media {
+  margin-top: 0;
+  white-space: nowrap;
+}
+.riga-dati input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+.scheda input[type="text"].riga-singola {
+  flex: none;
+  height: 20px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--riga);
+}
+/* Background (stili/modifica.css): rotella e "✓ Fatto" a destra dell'etichetta Background, sotto la linea
+   del titolo; sfondo dentro la cornice. */
+.pannello-background {
+  --modifica-alto: 26px;
+  --modifica-destra: 13px;
+  --fatto-alto: 25px;
+  --fatto-destra: 12px;
+  --modifica-sfondo: 20px 7px 7px 7px;
+}
+.pannello-background .modifica-icona { z-index: 5; }
+.scheda .pannello-background .modifica-interruttore { z-index: 6; }
+.riga-lettura {
+  display: block;
+  flex: none;
+  height: 20px;
+  padding: 0 2px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--riga);
+}
+.scheda .testo-lettura {
+  white-space: pre-wrap;
+}
+/* Linguaggi in lettura: un'etichetta grigia per linguaggio scelto, poi gli altri scritti a mano. */
+.lingue-scelte {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-height: 20px;
+  padding: 2px 0 3px;
+  border-bottom: 1px solid var(--riga);
+}
+.lingua-scelta {
+  display: none;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 14px;
+  background: var(--banda);
+  clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);
+}
+.bandiera-lingua[value="1"] + .lingua-scelta {
+  display: block;
+}
+.lingue-altre {
+  font-size: 12px;
+  font-weight: 400;
+}
+/* Linguaggi in modifica: multiselect. Il campo, bianco come gli altri in modifica, mostra le etichette
+   dei linguaggi scelti (o "Scegli…" se non ce ne sono: lo nasconde un input nascosto a 1 che lo precede)
+   e la freccia; la checkbox trasparente sopra il campo apre la tendina, che si sovrappone al resto del
+   riquadro. Il velo (.multiselect-fuori) copre il riquadro sotto la tendina e sopra i campi: un clic lì
+   la chiude; rotella e "✓ Fatto" restano sopra il velo. */
+.multiselect {
+  position: relative;
+  flex: none;
+}
+.multiselect-campo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
+  padding: 2px 20px 3px 2px;
+  background: #fff;
+  border-bottom: 1px solid var(--riga);
+}
+.multiselect-vuoto {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--grigio);
+}
+.bandiera-lingua[value="1"] ~ .multiselect-vuoto {
+  display: none;
+}
+.multiselect-freccia {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 13px;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+.scheda .multiselect-interruttore {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.multiselect-interruttore:checked ~ .multiselect-campo {
+  border-bottom: 2px solid var(--inchiostro);
+}
+.multiselect-interruttore:checked ~ .multiselect-campo .multiselect-freccia {
+  transform: rotate(180deg);
+}
+.scheda .multiselect-fuori {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: default;
+}
+.scheda .multiselect-fuori:checked {
+  display: block;
+}
+.multiselect-tendina {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  max-height: 200px;
+  padding: 2px 0 4px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--inchiostro);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.multiselect-interruttore:checked ~ .multiselect-tendina {
+  display: block;
+}
+.lingue-gruppo {
+  display: block;
+  padding: 5px 8px 2px;
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+/* .scheda davanti: lo stile di base di Roll20 dà alle label blocco, grassetto e 10px di margine sotto. */
+.scheda .lingua {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.scheda .lingua:hover {
+  background: #f0f0f0;
+}
+.scheda .lingua input[type="checkbox"] {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: var(--inchiostro);
+  cursor: pointer;
+}
+.lingua-nota {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--grigio);
+}
+.lingue-altri {
+  margin-top: 4px;
+}
+.scheda .linguaggi {
+  flex: none;
+  height: 20px;
+}
+/* Punti psi (pagina Psionica): stessa disposizione della scheda stampata. */
+.psi-alto {
+  position: relative;
+  flex: none;
+  height: 136px;
+  margin-bottom: 4px;
+}
+.banda-psi {
+  position: absolute;
+  top: 10px;
+  left: -7px;
+  right: -7px;
+  padding-right: 72px;
+  text-align: right;
+}
+.esagono-psi-max {
+  --lato: 58px;
+  position: absolute;
+  top: -8px;
+  right: 2px;
+}
+.esagono-psi-max input[type="number"] {
+  margin-bottom: 10px;
+}
+.esagono-psi-attuali {
+  --lato: 60px;
+  position: absolute;
+  top: 50px;
+  right: 40px;
+}
+.esagono-limite {
+  --lato: 36px;
+  position: absolute;
+  top: 64px;
+  right: 2px;
+}
+.limite-etichetta {
+  position: absolute;
+  top: 108px;
+  right: 2px;
+  margin: 0;
+  line-height: 1.1;
+  text-align: right;
+  white-space: pre-line;
+}
+.esagono-attacco-psi,
+.esagono-forza-psi {
+  --lato: 36px;
+  position: absolute;
+}
+.esagono-attacco-psi { top: 38px; left: 2px; }
+.esagono-forza-psi { top: 80px; left: 22px; }
+.psi-alto .attacco-psi-etichetta,
+.psi-alto .forza-psi-etichetta {
+  position: absolute;
+  margin: 0;
+}
+.attacco-psi-etichetta { top: 46px; left: 42px; }
+.forza-psi-etichetta { top: 88px; left: 62px; }
+/* Cyberware: nome e cyber-punti sulla stessa riga, come l'inventario; sotto, il totale su 10. */
+.cyberware-intestazione {
+  display: grid;
+  grid-template-columns: 1fr 40px 64px;
+  padding: 3px 0 2px 3px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: var(--banda);
+}
+.cyberware-intestazione span:nth-child(2) {
+  text-align: right;
+}
+.impianto {
+  display: grid;
+  grid-template-columns: 1fr 40px 64px;
+  height: 22px;
+}
+.scheda .impianto input[type="text"],
+.scheda .impianto input[type="number"] {
+  height: 100%;
+  font-size: 12px;
+}
+.scheda .impianto input[type="number"] {
+  text-align: right;
+}
+/* Nomi lunghi con i puntini, come nell'inventario (bug in produzione, punto 3). */
+.scheda .impianto input[name="attr_nome"] {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+/* In alto, come i punti psi: banda "Cyber-punti", esagono degli installati (calcolato) e del massimo.
+   Oltre il massimo l'esagono degli installati si riempie di nero (.cyber-oltre, attr_cyber_punti_oltre). */
+.cyber-alto {
+  position: relative;
+  flex: none;
+  height: 70px;
+  margin-bottom: 4px;
+}
+.banda-cyber {
+  position: absolute;
+  top: 18px;
+  left: -7px;
+  right: -7px;
+  padding-right: 136px;
+  text-align: right;
+}
+.esagono-cyber-attuali,
+.esagono-cyber-max {
+  --lato: 58px;
+  position: absolute;
+  top: 2px;
+}
+.esagono-cyber-attuali { right: 66px; }
+.esagono-cyber-max { right: 2px; }
+.esagono-cyber-attuali input[type="number"],
+.esagono-cyber-max input[type="number"] {
+  margin-bottom: 10px;
+}
+/* Card del cyberware: nell'ultima colonna (i), fumetto e rotella; sotto il nome l'aggiunta ("↳ Impianto
+   neurale") e il riepilogo degli effetti; la carta in sola lettura (.psi-info) come nelle card psioniche. */
+.voce-cyber .cyber-riepilogo {
+  margin: -2px 0 3px;
+}
+.voce-cyber .cyber-aggiunta:not(:empty)::before {
+  content: "↳ ";
+}
+.voce-cyber .psi-info {
+  margin: 2px 0 6px;
+}
+.cyber-oltre[value="1"] ~ .esagono-cyber-attuali::after {
+  background: var(--inchiostro);
+}
+.scheda .cyber-oltre[value="1"] ~ .esagono-cyber-attuali input[type="number"],
+.cyber-oltre[value="1"] ~ .esagono-cyber-attuali .filigrana {
+  color: #fff;
+}
+
+/* Cyber-punti illimitati (specie sintetiche, attr_cyber_punti_illimitati = 1): «∞» al posto del massimo. */
+.cyber-infinito {
+  display: none;
+}
+.cyber-illimitati[value="1"] + .esagono-cyber-max input[type="number"] {
+  display: none;
+}
+.cyber-illimitati[value="1"] + .esagono-cyber-max .cyber-infinito {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+}
+/* ------------------------------------------------------------------ potenziamenti ed effetti */
+
+/* Nella riga (dettagli di armi, armature e scudi dell'inventario, e del cyberware): il pulsante che apre la modale,
+   con il numero delle voci fra parentesi. Le voci stanno in campi nascosti (macro effetti_riga). */
+.scheda .apri-effetti[type="action"] {
+  grid-column: 1 / -1;
+  justify-self: start;
+  height: auto;
+  margin: 4px 0 0;
+  padding: 5px 12px 4px;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: var(--banda);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+}
+.scheda .apri-effetti[type="action"]:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.effetti-conteggio:not(:empty)::before {
+  content: " (";
+}
+.effetti-conteggio:not(:empty)::after {
+  content: ")";
+}
+.effetti-numero[value="0"] ~ .apri-effetti .effetti-conteggio,
+.effetti-numero[value=""] ~ .apri-effetti .effetti-conteggio {
+  display: none;
+}
+/* Inventario: solo per armi, armature e scudi (le categorie con potenziamenti). */
+.dettagli-riga .apri-effetti {
+  display: none;
+}
+.categoria-scelta[value="Arma"] ~ .apri-effetti,
+.categoria-scelta[value="Armatura"] ~ .apri-effetti,
+.categoria-scelta[value="Scudo"] ~ .apri-effetti,
+.voce-cyber .dettagli-riga .apri-effetti {
+  display: block;
+}
+
+/* Modale degli effetti (modali/effetti.njk): nella palette della pagina 2, larga. La lista: fino a 8 voci, si vedono
+   le prime N con N il campo nascosto .effetti-numero (attr_mod_effetti_n). Ogni voce: numero, nome e ✕; sotto
+   tipo, su cosa, valore e Sempre. */
+.modale-effetti {
+  --banda: var(--kaki);
+  --tinta: var(--kaki-chiaro);
+  --accento: var(--kaki-scuro);
+}
+.modale-effetti-aperta[value="1"] ~ .modale-effetti {
+  display: block;
+}
+/* .modale-finestra (modali.css, che viene dopo) la vorrebbe larga 420px. */
+.modale-finestra.effetti-finestra {
+  width: 620px;
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
+}
+.effetti-finestra .modale-testo {
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.voce-effetto {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 5px;
+  padding: 5px 6px 6px;
+  background: var(--tinta);
+}
+.effetti-numero[value=""] ~ .voce-effetto,
+.effetti-numero[value="0"] ~ .voce-effetto,
+.effetti-numero[value="1"] ~ .voce-effetto:nth-of-type(n+2),
+.effetti-numero[value="2"] ~ .voce-effetto:nth-of-type(n+3),
+.effetti-numero[value="3"] ~ .voce-effetto:nth-of-type(n+4),
+.effetti-numero[value="4"] ~ .voce-effetto:nth-of-type(n+5),
+.effetti-numero[value="5"] ~ .voce-effetto:nth-of-type(n+6),
+.effetti-numero[value="6"] ~ .voce-effetto:nth-of-type(n+7),
+.effetti-numero[value="7"] ~ .voce-effetto:nth-of-type(n+8),
+.effetti-numero[value="8"] ~ .aggiungi-effetto {
+  display: none;
+}
+.voce-effetto-testa {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.voce-effetto-numero {
+  flex: none;
+  width: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accento);
+}
+.voce-effetto-cosa {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px;
+  padding-left: 20px;
+}
+/* Come i campi dei dettagli (dettagli.css); su Roll20 un select sarebbe largo 220px, con margine e bordo. */
+.scheda .voce-effetto input[type="text"],
+.scheda .voce-effetto select {
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+  margin: 0;
+  font-size: 12px;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid var(--riga);
+  border-radius: 0;
+}
+.scheda .voce-effetto select {
+  padding: 0 4px;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+}
+.scheda .voce-effetto-testa input[type="text"] {
+  flex: 1 1 0;
+  font-weight: 500;
+}
+/* ✕: piccola e nera. [type="action"] per pesare più degli stili di Roll20. */
+.scheda .voce-effetto-togli[type="action"] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  color: #fff;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.scheda .voce-effetto-togli[type="action"]:hover {
+  background: var(--accento);
+}
+.scheda .voce-effetto-sempre {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  cursor: pointer;
+}
+.scheda .voce-effetto-sempre input[type="checkbox"] {
+  margin: 0;
+}
+/* + Aggiungi: come quello delle liste (ripetibili.css). */
+.scheda .aggiungi-effetto[type="action"] {
+  height: auto;
+  margin: 2px 0 0;
+  padding: 5px 14px 4px;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: var(--banda);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+}
+.scheda .aggiungi-effetto[type="action"]:hover {
+  color: #fff;
+  background: var(--accento);
+}
+
+/* Riepilogo sotto il nome dell'oggetto: note e potenziamenti, separati da un punto. Senza niente da mostrare la
+   riga resta alta zero (solo span vuoti); la freccia va sul primo dei due che c'è. */
+.voce-riepilogo {
+  display: block;
+  padding: 0 4px 0 34px;
+  font-size: 10px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #444;
+}
+.voce-riepilogo span:first-child:not(:empty)::before,
+.voce-riepilogo span:first-child:empty + span:not(:empty)::before {
+  content: "↳ ";
+  font-style: normal;
+}
+.voce-riepilogo span:not(:empty) + span:not(:empty)::before {
+  content: " ∙ ";
+}
+/* Cyberware spento (Attivo tolto): riga sbiadita. */
+.attivo-voce[value="0"] ~ .impianto,
+.attivo-voce[value="0"] ~ .cyber-riepilogo {
+  opacity: 0.45;
+}
+/* ------------------------------------------------------------------ pagina 4: psionica */
+
+/* Due colonne uguali alte quanto il corpo della pagina 1: a sinistra i punti psi e le praxis, a destra
+   i poteri (con tre colonne le card delle praxis erano troppo strette). Le liste occupano lo spazio che
+   resta e scorrono. */
+.corpo-4 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  height: var(--altezza-corpo, 1224px);
+}
+.corpo-4 .pannello-psionica {
+  flex: none;
+}
+.pannello-praxis,
+.pannello-poteri {
+  flex: 1 1 0;
+}
+
+/* Card di praxis e poteri, come i Tratti e le carte in chat: sulla fascia viola con le barre oblique il nome
+   (manifesta), il segno C della concentrazione e il costo in psi; sotto, sul viola chiaro, il riepilogo del tiro
+   e dell'effetto in corsivo. Al passaggio del mouse (i), fumetto e rotella, da destra sulla fascia: la (i) apre
+   la carta in sola lettura (.psi-info), la rotella la modifica. */
+.psi-card {
+  --icone-alto: 4px;
+  position: relative;
+  margin-bottom: 8px;
+  padding: 0 0 6px;
+  background: var(--tinta);
+}
+.psi-testa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 25px;
+  padding: 2px 100px 2px 5px;
+  background: var(--banda);
+}
+.psi-testa::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 64px;
+  bottom: 0;
+  width: 34px;
+  background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255, 255, 255, 0.5) 5px 9px);
+  pointer-events: none;
+}
+.scheda .psi-nome {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* «Senza nome» (chat.card.default_unnamed) solo quando il nome è vuoto. */
+.psi-nome span:not(:empty) + .senza-nome {
+  display: none;
+}
+.psi-nome .senza-nome {
+  font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+  color: #555;
+}
+.segno-c {
+  display: none;
+  padding: 0 3px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 13px;
+  border: 1px solid var(--inchiostro);
+}
+.bandiera-c[value="1"] ~ .segno-c {
+  display: inline-block;
+}
+.psi-testa .psi-costo {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #333;
+}
+.psi-costo:not(:empty)::after {
+  content: " psi";
+}
+.psi-riepilogo {
+  display: block;
+  padding: 4px 8px 0;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.3;
+  color: #444;
+}
+.psi-riepilogo span:not(:empty) + span:not(:empty)::before {
+  content: " ∙ ";
+}
+/* (i): cerchio da 14px al centro del terzo posto delle icone (dettagli.css). */
+.info-icona {
+  position: absolute;
+  top: calc(var(--icone-alto, 1px) + 2px);
+  right: 44px;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  font-family: Georgia, serif;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 12px;
+  text-align: center;
+  border: 1.2px solid var(--inchiostro);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.scheda .info-interruttore {
+  position: absolute;
+  top: var(--icone-alto, 1px);
+  right: 42px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.repitem:hover .info-icona,
+.info-interruttore:checked + .info-icona,
+.info-interruttore:focus-visible + .info-icona {
+  opacity: 1;
+}
+.info-interruttore:checked + .info-icona {
+  color: #fff;
+  background: var(--inchiostro);
+}
+.psi-info {
+  display: none;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 3px 8px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-left: 3px solid var(--banda);
+}
+.info-interruttore:checked ~ .psi-info {
+  display: grid;
+}
+.psi-info .valore:empty::before,
+.psi-info .valore .tiro-arma span:empty::before {
+  content: "—";
+  color: #aaa;
+}
+/* Categoria del cyberware e disciplina: il valore salvato è il testo italiano del menu, quindi in lettura c'è lo
+   stesso menu, non cliccabile e senza aspetto da menu, che mostra la voce nella lingua della scheda («—» se vuoto). */
+.scheda .psi-info .valore-menu {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+.psi-info .psi-descrizione {
+  grid-column: 1 / -1;
+  margin: 4px 0;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+.scheda .psi-info .tiro-arma {
+  padding: 0;
+  font-size: 12px;
+}
+.psi-info .psi-costo {
+  font-size: 12px;
+  color: inherit;
+}
+.scheda .dettagli-riga textarea.testo-breve {
+  height: 50px;
+}
+.psi-card .dettagli-riga input[type="checkbox"] {
+  justify-self: start;
+  margin: 0;
+  accent-color: var(--inchiostro);
+}
+.scheda .psi-card .dettagli-riga input[name="attr_costo"] {
+  justify-self: start;
+  width: 50px;
+}
+.psi-card .dettagli-riga select {
+  justify-self: start;
+}
+/* Carta in sola lettura e dettagli dentro la card, staccati dai bordi come il riepilogo. */
+.psi-card .psi-info,
+.psi-card .dettagli-riga {
+  margin: 6px 8px 0;
+}
+/* ------------------------------------------------------------------ pagina 3: variabili */
+
+/* Tre colonne di pannelli, uno per abilità più la psionica; in ogni pannello una tabella
+   Nome / Valore (calcolato, sola lettura) / Override (se compilato, vale nelle altre pagine). */
+.variabili-nota {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #555;
+}
+.corpo-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+.variabili {
+  display: grid;
+  grid-template-columns: 1fr 58px 66px;
+  align-items: end;
+}
+.variabili > * {
+  height: 22px;
+  border-bottom: 1px solid var(--riga);
+}
+.variabili-intestazione {
+  display: flex;
+  align-items: end;
+  padding-bottom: 2px;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grigio);
+  border-bottom-color: var(--inchiostro);
+}
+.variabili-intestazione:nth-child(n+2) {
+  justify-content: center;
+}
+.variabile-nome {
+  display: flex;
+  align-items: end;
+  padding-bottom: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.scheda .variabili input[type="number"] {
+  height: 22px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--riga);
+}
+.scheda .variabili input[type="number"]:not([readonly]) {
+  background: var(--tinta);
+  border-left: 3px solid #fff;
+}
+/* ------------------------------------------------------------------ piede e modali */
+
+/* Piede: la nota della licenza (piede.njk) e, in sviluppo, il pulsante Svuota scheda. */
+.piede {
+  margin-top: 12px;
+  text-align: right;
+}
+.scheda .piede-licenza {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--grigio);
+  text-align: left;
+}
+/* La versione della scheda (base/versione.ts), in piccolo a destra sotto la licenza. */
+.scheda .piede-versione {
+  margin: 6px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--grigio);
+}
+
+/* Finestre sopra la scheda (eliminazione, Svuota scheda), mostrate quando il loro campo vale 1. Sono fixed:
+   restano al centro della parte visibile dell'iframe anche se la scheda è stata scorsa. */
+.modale {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+.modale-elimina-aperta[value="1"] ~ .modale-elimina,
+.modale-svuota-aperta[value="1"] ~ .modale-svuota {
+  display: block;
+}
+.scheda .modale-sfondo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: rgba(17, 17, 17, 0.45);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.modale-finestra {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 420px;
+  max-width: calc(100% - 40px);
+  transform: translate(-50%, -50%);
+}
+.modale-testo {
+  margin: 4px 0 16px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+/* Il nome della riga o della voce su una riga sua, sopra le frasi: ogni chiave di traduzione è una frase intera. */
+.modale-testo.modale-nome {
+  margin-bottom: 4px;
+}
+.modale-azioni {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+/* Pulsante pieno con gli angoli smussati, come i pannelli. */
+.scheda .pulsante {
+  height: auto;
+  margin: 0;
+  padding: 7px 22px 6px;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+.scheda .pulsante:hover {
+  background: #444;
+}
+.modale-azioni {
+  gap: 8px;
+}
+.elimina-nome {
+  font-weight: 600;
+}
+.scheda .pulsante-secondario {
+  color: var(--inchiostro);
+  background: var(--banda);
+}
+.scheda .pulsante-secondario:hover {
+  background: #cfcfcf;
+}
+/* ------------------------------------------------------------------ modale "Scegli dal manuale" */
+
+/* Finestra larga, divisa in due: a sinistra i risultati (scorrono), a destra la voce in lettura. Si apre
+   come le altre modali (stili/modali.css) quando attr_scelta_aperta vale 1. */
+.modale-scelta-aperta[value="1"] ~ .modale-scelta {
+  display: block;
+}
+/* Si apre anche sopra la modale degli effetti (Dal manuale nella lista), che nella pagina viene dopo. */
+.modale.modale-scelta {
+  z-index: 110;
+}
+.scelta-finestra {
+  width: 760px;
+  --larghezza-titolo: 44%;
+}
+/* Colonna di sinistra: ricerca in cima, risultati sotto (scorrono). */
+.scelta-colonna {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+.scelta-ricerca {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+}
+.scheda .scelta-ricerca input[type="text"] {
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  background: #fff;
+  font-size: 13px;
+  border-bottom: 2px solid var(--inchiostro);
+}
+.scelta-conteggio {
+  font-size: 10px;
+  color: var(--grigio);
+}
+.scelta-corpo {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 12px;
+  height: min(60vh, 460px);
+}
+
+/* Risultati: righe di repeating_risultati. I controlli Aggiungi/Modifica di Roll20 non servono. */
+.scelta-risultati {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  border-top: 1px solid var(--inchiostro);
+  border-bottom: 1px solid var(--inchiostro);
+}
+.modale-scelta .repcontrol {
+  display: none;
+}
+.risultato {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  border-bottom: 1px solid #e6e6e6;
+}
+.scheda .risultato-scelto {
+  display: none;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--inchiostro);
+  cursor: pointer;
+}
+.scelta-multipla[value="1"] ~ .scelta-corpo .risultato-scelto {
+  display: block;
+}
+/* Base 0: resta accanto alla casella anche con un sottotitolo lungo (i potenziamenti), che finisce con i puntini. */
+.scheda .risultato-voce {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 5px 2px;
+  font-family: "Jost", sans-serif;
+  text-align: left;
+  color: var(--inchiostro);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.risultato:hover {
+  background: #f3f3f3;
+}
+.scheda .risultato-in-lettura[value="1"] ~ .risultato-voce {
+  padding-left: 8px;
+  background: var(--banda);
+  box-shadow: inset 3px 0 0 var(--inchiostro);
+}
+.risultato-nome {
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.risultato-sottotitolo {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--grigio);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Gradi (talenti): sotto la voce, come un accordion che si apre spuntandola. Un grado che richiede il
+   precedente ha la casella velata e bloccata, e il nome velato ma leggibile (si può ancora leggere). */
+.gradi {
+  display: none;
+  flex-basis: 100%;
+  padding: 0 0 6px 22px;
+}
+.scheda .risultato-scelto:checked ~ .gradi {
+  display: block;
+}
+.grado-presente[value="0"] + .grado {
+  display: none;
+}
+.grado {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 1px solid #d6d6d6;
+  padding-left: 8px;
+}
+.scheda .grado-scelto {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: var(--inchiostro);
+  cursor: pointer;
+}
+.scheda .grado-voce {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 3px 2px;
+  font: 400 11.5px/1.3 "Jost", sans-serif;
+  text-align: left;
+  color: var(--inchiostro);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.scheda .grado-voce:hover {
+  text-decoration: underline;
+}
+.scheda .grado-bloccato[value="1"] ~ .grado-scelto {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.scheda .grado-bloccato[value="1"] ~ .grado-voce {
+  opacity: 0.5;
+}
+
+/* Lettura: la voce scelta, o un invito se non ce n'è una (attr_scelta_lettura vuoto). */
+/* Due zone che scorrono ognuna per sé: la voce e, sotto, i compatibili (al massimo poco più di metà altezza). */
+.scelta-lettura {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 2px 4px 2px 12px;
+  border-left: 3px solid var(--inchiostro);
+  background: #f6f6f6;
+}
+.lettura-vuota {
+  display: none;
+  margin: auto;
+  font-size: 12px;
+  color: var(--grigio);
+}
+.scelta-in-lettura[value=""] ~ .scelta-corpo .lettura-vuota {
+  display: block;
+}
+.lettura-nome {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.lettura-dettagli {
+  margin: 2px 0 8px;
+  font-size: 10.5px;
+  color: var(--grigio);
+}
+.lettura-testo {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.lettura-voce {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Compatibili: potenziamenti e accessori dell'oggetto in lettura, o aggiunte del cyberware, con le caselle. Il
+   blocco c'è solo se ce ne sono (attr_scelta_compatibili diverso da 0). */
+.scelta-compatibili {
+  display: none;
+  flex: 0 1 auto;
+  max-height: 55%;
+  margin: 6px 0 4px;
+  padding-top: 5px;
+  overflow-y: auto;
+  border-top: 1.5px solid var(--inchiostro);
+}
+.scelta-compatibili-numero:not([value="0"]):not([value=""]) ~ .scelta-compatibili {
+  display: block;
+}
+.compatibili-titolo {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.scheda .compatibile {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr);
+  column-gap: 6px;
+  align-items: baseline;
+  margin: 0;
+  padding: 3px 2px;
+  font-weight: 400;
+  border-bottom: 1px solid #e3e3e3;
+  cursor: pointer;
+}
+.scheda .compatibile-scelto {
+  grid-row: 1 / 3;
+  width: 13px;
+  height: 13px;
+  margin: 1px 0 0;
+  accent-color: var(--inchiostro);
+  cursor: pointer;
+}
+.compatibile-nome {
+  font-size: 12px;
+  font-weight: 500;
+}
+.compatibile-sottotitolo {
+  grid-column: 2;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--grigio);
+}
+/* Aggiungi resta spento senza una voce: nella scelta singola quella in lettura, nella multipla le spuntate. */
+.scelta-multipla[value="0"] ~ .scelta-in-lettura[value=""] ~ .modale-azioni .scelta-aggiungi,
+.scelta-multipla[value="1"] ~ .scelta-scelte[value=""] ~ .modale-azioni .scelta-aggiungi {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Pulsante "Dal manuale" nelle liste: dopo la riga dei controlli di Roll20 (+ Aggiungi, Modifica), che la
+   lista mette subito dopo le righe; il margine negativo lo porta al centro di quella riga. Negli Attacchi
+   le righe non stanno in una .lista: il pulsante segue il fieldset nel pannello. */
+.scheda .lista > .dal-manuale,
+.scheda .pannello-attacchi > .dal-manuale,
+.scheda .lista-effetti > .dal-manuale {
+  display: block;
+  position: relative;
+  height: auto;
+  margin: -22px auto 0;
+  padding: 6px 14px 5px;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: var(--inchiostro);
+  border: 0;
+  isolation: isolate;
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+/* Bianco con il contorno nero, con gli angoli smussati di + Aggiungi e Modifica: il fondo del pulsante fa da
+   contorno, l'interno bianco è un pseudo-elemento sotto il testo. */
+.scheda .lista > .dal-manuale::after,
+.scheda .pannello-attacchi > .dal-manuale::after,
+.scheda .lista-effetti > .dal-manuale::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: #fff;
+  clip-path: polygon(4.6px 0, calc(100% - 4.6px) 0, 100% 4.6px, 100% calc(100% - 4.6px), calc(100% - 4.6px) 100%, 4.6px 100%, 0 calc(100% - 4.6px), 0 4.6px);
+}
+/* Nei pannelli stretti (inventario, cyberware) i tre pulsanti non stanno in una riga: Dal manuale va sotto. */
+.scheda .pannello-inventario .lista > .dal-manuale,
+.scheda .pannello-cyberware .lista > .dal-manuale {
+  margin-top: 6px;
+}
+.scheda .lista > .dal-manuale:hover::after,
+.scheda .pannello-attacchi > .dal-manuale:hover::after,
+.scheda .lista-effetti > .dal-manuale:hover::after {
+  background: var(--banda);
+}
+/* Nella lista della modale degli effetti: accanto a + Aggiungi, alto uguale; solo per armi e armature
+   dell'inventario (attr_effetti_potenziabile = 1). */
+.scheda .lista-effetti > .dal-manuale {
+  display: none;
+  margin: 2px 0 0 8px;
+  padding: 5px 14px 4px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  vertical-align: top;
+}
+.effetti-potenziabile[value="1"] ~ .lista-effetti > .dal-manuale {
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------------ tratto di background */
+
+/* Modale: i tre tratti del background, ognuno con un radio button e il suo testo. OK resta spento finché
+   non se ne sceglie uno (l'input nascosto .bg-scelto ha lo stesso attributo dei radio). */
+.modale-bg-aperta[value="1"] ~ .modale-bg {
+  display: block;
+}
+.bg-finestra {
+  width: 620px;
+  --larghezza-titolo: 50%;
+}
+.bg-modale-nome {
+  font-weight: 600;
+}
+.bg-opzioni {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(60vh, 460px);
+  overflow-y: auto;
+}
+.scheda .bg-opzione {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  background: #f6f6f6;
+  cursor: pointer;
+}
+.scheda .bg-opzione:hover {
+  background: #eeeeee;
+}
+.scheda .bg-opzione input[type="radio"] {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 2px 0 0;
+  accent-color: var(--inchiostro);
+}
+/* Il tratto scelto: nome sottolineato (senza :has, che non sappiamo se Roll20 accetta). */
+.bg-opzione input[type="radio"]:checked + .bg-opzione-corpo .bg-opzione-nome {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.bg-opzione-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bg-opzione-nome {
+  font-size: 13px;
+  font-weight: 500;
+}
+.bg-opzione-testo {
+  font-size: 11.5px;
+  white-space: pre-wrap;
+}
+.bg-scelto[value=""] ~ .modale-azioni .bg-ok {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Nel riquadro Background: la sintesi del tratto scelto sotto il background, nascosta se non ce n'è uno. */
+.bg-tratto {
+  flex: none;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bg-tratto-bandiera[value=""] + .bg-tratto {
+  display: none;
+}
+.bg-tratto-nome {
+  font-weight: 600;
+}
+.bg-tratto-nome::after {
+  content: " ∙ ";
+  font-weight: 400;
+}
+.bg-tratto-riassunto {
+  color: #444;
+}
+.scheda .bg-tratto-cambia,
+.scheda .intestazione-applica .pulsante-applica {
+  align-self: flex-end;
+  height: auto;
+  margin: 3px 0 0;
+  padding: 2px 8px;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  background: #fff;
+  border: 1px solid var(--inchiostro);
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ specie e classe */
+
+.modale-specie-aperta[value="1"] ~ .modale-specie,
+.modale-classe-aperta[value="1"] ~ .modale-classe {
+  display: block;
+}
+.intestazione-finestra {
+  width: 620px;
+  --larghezza-titolo: 34%;
+}
+.modale-evidenza {
+  font-weight: 600;
+}
+.riepilogo {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 6px 12px;
+  max-height: min(40vh, 320px);
+  overflow-y: auto;
+  padding: 8px 10px;
+  background: #f6f6f6;
+  border-left: 3px solid var(--inchiostro);
+}
+.riepilogo-etichetta {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+.riepilogo-valore {
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+.riepilogo-testo {
+  white-space: pre-wrap;
+}
+/* Il tratto di background in più: solo per le specie che ce l'hanno (attr_sp_eclettica = 1). */
+.eclettica {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--inchiostro);
+}
+.sp-eclettica[value="1"] + .eclettica {
+  display: flex;
+}
+/* Incrementi delle abilità della specie: i fissi se ci sono, i menu solo quanti sono quelli a scelta. */
+.incrementi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+.sp-fissi[value=""] + .incrementi-fissi,
+.sp-incrementi[value="0"] + .incrementi-scelta,
+.sp-incrementi[value="1"] + .incrementi-scelta .incremento2 {
+  display: none;
+}
+.incrementi-scelta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.scheda .incrementi-scelta select {
+  width: 160px;
+  height: 24px;
+  font: 400 12.5px "Jost", sans-serif;
+}
+.scheda .eclettica select {
+  width: 100%;
+  height: 24px;
+  font: 400 12.5px "Jost", sans-serif;
+}
+.eclettica-testo {
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.modale-specie .modale-azioni,
+.modale-classe .modale-azioni {
+  flex-wrap: wrap;
+}
+/* Intestazione in modifica: cosa si applicherà al «Fatto». */
+.intestazione-attesa {
+  grid-column: 1 / -1;
+  margin-top: -4px;
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 400;
+}
+.attesa-bandiera[value=""] + .intestazione-attesa {
+  display: none;
+}
+/* Intestazione in modifica: «Applica la specie» e «Applica la classe», a destra. */
+.intestazione-applica {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: -6px;
+}
+/* ------------------------------------------------------------------ pagina vuota e scelta del tipo di scheda */
+
+/* Un personaggio nuovo (attr_scelta_tipo_aperta = 1, comune/vuota.njk) non vede la scheda: tutto quello che segue il
+   campo si nasconde, tranne il foglio con la modale. !important perché le pagine si mostrano con selettori più forti. */
+.pagina-vuota {
+  display: none;
+}
+.scelta-tipo-aperta[value="1"] ~ *:not(.pagina-vuota) {
+  display: none !important;
+}
+.scelta-tipo-aperta[value="1"] ~ .pagina-vuota {
+  display: flex;
+}
+
+/* Il foglio: bianco, in proporzione A4, con il logo in alto come la copertina della scheda stampata. */
+.pagina-vuota {
+  position: relative;
+  justify-content: center;
+  aspect-ratio: 210 / 297;
+  padding-top: 7%;
+  background: #fff;
+  border: 1px solid var(--riga);
+  box-shadow: 0 2px 12px rgba(17, 17, 17, 0.12);
+}
+.pagina-vuota-logo {
+  display: flex;
+  flex-direction: column;
+  width: 62%;
+  height: max-content;
+}
+
+/* La modale sta nel foglio, sotto il logo (non al centro della finestra, che su Roll20 è bassa), su un velo leggero
+   che copre il foglio e non chiude niente. */
+.pagina-vuota-velo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(17, 17, 17, 0.16);
+}
+.modale-finestra.tipo-finestra {
+  top: 270px;
+  z-index: 2;
+  width: 460px;
+  transform: translateX(-50%);
+}
+.tipi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+/* Un riquadro per tipo, con gli angoli smussati dei pulsanti. */
+.scheda .tipo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 86px;
+  margin: 0;
+  padding: 10px;
+  font-family: "Jost", sans-serif;
+  color: #fff;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  cursor: pointer;
+}
+.scheda .tipo:hover {
+  background: #444;
+}
+.tipo-nome {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+/* ------------------------------------------------------------------ scheda del PNG */
+
+/* Tipo di scheda (attr_sheetTemplate, comune/vuota.njk): con npc si vede la pagina del PNG e si nascondono intestazione,
+   pagine e linguette del personaggio; la barra delle opzioni dei tiri resta (comune/linguette.njk). Le linguette del
+   personaggio sono in un gruppo (display: contents) che lascia la barra com'era. */
+.linguette-pg {
+  display: contents;
+}
+.tipo-png {
+  display: none;
+}
+.tipo-scheda[value="npc"] ~ .tipo-png {
+  display: block;
+}
+.tipo-scheda[value="npc"] ~ .intestazione,
+.tipo-scheda[value="npc"] ~ .pagina,
+.tipo-scheda[value="npc"] ~ .linguette .linguette-pg {
+  display: none !important;
+}
+
+/* La tinta rossa della scheda (base.css), per gli avversari. */
+.pagina-png {
+  --banda: var(--rosso);
+  --tinta: var(--rosso-chiaro);
+  --accento: #a4413b;
+  position: relative;
+}
+.png-titolo-parte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accento);
+}
+.png-titolo-parte::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--riga);
+}
+
+/* Modulo: la rotella (checkbox trasparente sopra l'icona) a sinistra del titolo lo chiude. */
+.png-modulo-icona {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 17px;
+  line-height: 18px;
+  text-align: center;
+  -webkit-text-stroke: 0.6px currentColor;
+  pointer-events: none;
+}
+.scheda .png-modulo-chiuso {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.png-modulo-chiuso + .png-modulo-icona + .png-titolo-parte {
+  margin-top: 0;
+  padding-left: 26px;
+}
+.png-modulo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+.png-modulo-chiuso:checked ~ .png-modulo {
+  display: none;
+}
+.png-tabella {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: end;
+}
+.png-tabella > * {
+  min-height: 22px;
+  border-bottom: 1px solid var(--riga);
+}
+.png-nome {
+  display: flex;
+  align-items: end;
+  padding-bottom: 3px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.scheda .png-tabella input,
+.scheda .png-tabella select {
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  padding: 0 4px;
+  font-size: 12.5px;
+  background: var(--tinta);
+  border: 0;
+  border-left: 2px solid #fff;
+  border-radius: 0;
+  box-shadow: none;
+}
+.scheda .png-tabella input[type="number"] {
+  text-align: center;
+}
+.png-coppia {
+  display: flex;
+  align-items: end;
+  gap: 4px;
+}
+.png-coppia > span {
+  padding-bottom: 3px;
+}
+/* Iniziativa: il calcolo e accanto, piccolo, l'override (come la pagina Variabili). */
+.png-calcolato {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.png-calcolato-valore {
+  flex: 1;
+  text-align: center;
+  color: #555;
+}
+.scheda .png-calcolato input {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 18px;
+  font-size: 11.5px;
+  border-bottom: 1px solid var(--accento);
+}
+.scheda .png-calcolato input::placeholder {
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+
+/* Blocco statistiche, come nel manuale. */
+.png-blocco {
+  padding: 12px 16px 14px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  border: var(--bordo) solid var(--inchiostro);
+}
+.png-testa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px -6px 6px;
+  padding: 4px 8px;
+  background: var(--banda);
+}
+.png-blocco-nome {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.scheda .png-iniziativa {
+  height: auto;
+  margin: 0;
+  padding: 6px 14px 5px;
+  font-family: "Jost", sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--inchiostro);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+.scheda .png-iniziativa:hover {
+  background: var(--accento);
+}
+.png-iniziativa-valore {
+  margin-left: 6px;
+  font-size: 13px;
+}
+.png-corsivo {
+  display: block;
+  font-style: italic;
+  color: #444;
+}
+.png-descrittori:not(:empty)::before {
+  content: "[";
+}
+.png-descrittori:not(:empty)::after {
+  content: "]";
+}
+.png-separatore {
+  margin: 8px 0;
+  border-top: 1px solid var(--banda);
+}
+.png-due-colonne {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+.png-due-colonne b {
+  font-weight: 600;
+}
+.png-nota:not(:empty)::before {
+  content: "(";
+}
+.png-nota:not(:empty)::after {
+  content: ")";
+}
+.png-abilita {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin: 6px 0 2px;
+}
+.scheda .png-abilita-tiro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  margin: 0;
+  padding: 3px 0;
+  font-family: "Jost", sans-serif;
+  color: var(--inchiostro);
+  background: #fff;
+  border: 1px solid var(--riga);
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.png-abilita-sigla {
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--grigio);
+}
+.png-abilita-valore {
+  font-size: 15px;
+  font-weight: 500;
+}
+/* Quello che tira: nome di una qualifica o di un'azione, i danni, le abilità. */
+.scheda .png-tira {
+  display: inline;
+  height: auto;
+  margin: 0;
+  padding: 0 3px;
+  font-family: "Jost", sans-serif;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--inchiostro);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.scheda .png-tira:hover,
+.scheda .png-abilita-tiro:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.png-voce-nome {
+  font-weight: 600;
+  font-style: italic;
+}
+.png-voce-nome:not(:empty)::after {
+  content: ".";
+}
+/* I danni senza margini interni: il punto della frase viene subito dopo. */
+.scheda .png-danni {
+  padding: 0;
+  text-decoration: underline dotted;
+}
+/* I campi nascosti con i valori (Roll20 ne aggiorna l'attributo value): il segno del totale di una qualifica («+5»), se
+   non è vuoto né negativo; il pulsante dei danni dell'azione, nascosto se la riga non ne ha. */
+.png-segno[value]:not([value=""]):not([value^="-"]) + .png-tira .png-bonus::before {
+  content: "+";
+}
+.png-ha-danni[value=""] + .png-danni {
+  display: none;
+}
+.png-metri:not(:empty)::after {
+  content: " m";
+}
+
+/* Sezioni con le liste: titolo come nel manuale, «+ Aggiungi» e «Modifica» di Roll20 a destra del titolo. */
+.png-sezione {
+  position: relative;
+}
+.png-sezione-titolo {
+  margin: 12px -6px 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accento);
+  border-bottom: 1.5px solid var(--accento);
+}
+.scheda .png-sezione > .repcontrol {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  gap: 6px;
+  margin: 0;
+}
+.scheda .png-sezione > .repcontrol .repcontrol_add,
+.scheda .png-sezione > .repcontrol .repcontrol_edit {
+  padding: 3px 10px 2px;
+}
+.scheda .png-sezione > .repcontrol .repcontrol_add::before,
+.scheda .png-sezione > .repcontrol .repcontrol_edit::before {
+  font-size: 9px;
+}
+.png-riga {
+  position: relative;
+  min-height: 20px;
+  margin: 3px 0;
+  padding-right: 24px;
+}
+.png-riga .dettagli-riga {
+  margin-right: -24px;
+}
+/* Nei dettagli i numeri sono stretti e le coppie (dadi e tipo di danno, tiro salvezza e CD) hanno i campi della riga. */
+.scheda .png-riga .dettagli-riga input[type="number"] {
+  justify-self: start;
+  width: 60px;
+}
+.dettagli-riga .png-coppia {
+  align-items: center;
+  gap: 8px;
+}
+.scheda .dettagli-riga .png-coppia > * {
+  flex: 1;
+  min-width: 0;
+}
+.scheda .dettagli-riga .png-coppia > input[type="number"] {
+  flex: 0 0 60px;
+}
+/* Qualifiche su due colonne, come un elenco. */
+.scheda .png-sezione .repcontainer[data-groupname="repeating_qualifiche"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+/* Resistenze, immunità, sensi, linguaggi: l'etichetta prima, e la riga sparisce se il campo è vuoto. */
+.png-righe-difese {
+  margin: 4px 0;
+}
+.png-riga-difesa {
+  display: flex;
+  gap: 6px;
+}
+.png-riga-difesa b {
+  order: -1;
+  font-weight: 600;
+}
+.png-riga-valore:empty,
+.png-riga-valore:empty + b {
+  display: none;
+}
+/* ------------------------------------------------------------------ veicolo e astronave */
+
+/* Tipo di scheda (attr_sheetTemplate, comune/vuota.njk): con vehicle o ship si vede la pagina del mezzo e si nascondono
+   intestazione, pagine e linguette del personaggio; la barra delle opzioni dei tiri resta (come il PNG, png.css). */
+.tipo-veicolo,
+.tipo-astronave {
+  display: none;
+}
+.tipo-scheda[value="vehicle"] ~ .tipo-veicolo,
+.tipo-scheda[value="ship"] ~ .tipo-astronave {
+  display: block;
+}
+.tipo-scheda[value="vehicle"] ~ .intestazione,
+.tipo-scheda[value="vehicle"] ~ .pagina,
+.tipo-scheda[value="vehicle"] ~ .linguette .linguette-pg,
+.tipo-scheda[value="ship"] ~ .intestazione,
+.tipo-scheda[value="ship"] ~ .pagina,
+.tipo-scheda[value="ship"] ~ .linguette .linguette-pg {
+  display: none !important;
+}
+
+/* I colori del capitolo 4 del manuale (veicoli e astronavi): lo stesso kaki del capitolo 3, come la pagina 2. */
+.pagina-mezzo {
+  --banda: var(--kaki);
+  --tinta: var(--kaki-chiaro);
+  --accento: var(--kaki-scuro);
+  margin-top: 10px;
+}
+
+/* Impaginazione delle schede ufficiali, tre colonne. Veicolo (MB p. 341): Stats e Prestazioni a sinistra; Dati e
+   Dotazioni al centro; testata e Stivaggio a destra; sotto, al centro e a destra, gli Armamenti. Astronave (MB p. 342):
+   Stats, Risorse e Armamenti; testata, Dati, Equipaggio e Note; Dotazioni e Stiva. */
+.mezzo-corpo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+.mezzo-destra-alto {
+  grid-column: 2 / span 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+.mezzo-armamenti-largo {
+  grid-column: 1 / span 2;
+}
+.mezzo-testata {
+  padding: 4px 6px 6px;
+}
+.scheda .mezzo-iniziativa {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+/* Stat: banda con il nome e, dal lato opposto, uno o due esagoni; la formula in piccolo sotto la banda. */
+.mezzo-stat {
+  --spazio-esagoni: 64px;
+  position: relative;
+  height: 62px;
+}
+.mezzo-stat-doppio {
+  --spazio-esagoni: 122px;
+}
+.mezzo-stat .banda-stat {
+  position: absolute;
+  top: 12px;
+  left: -7px;
+  right: -7px;
+}
+.mezzo-stat-destra .banda-stat {
+  padding-right: var(--spazio-esagoni);
+  text-align: right;
+}
+.mezzo-stat-sinistra .banda-stat {
+  padding-left: var(--spazio-esagoni);
+}
+.mezzo-esagoni {
+  position: absolute;
+  top: 0;
+  display: flex;
+  gap: 4px;
+}
+.mezzo-stat-destra .mezzo-esagoni { right: 2px; }
+.mezzo-stat-sinistra .mezzo-esagoni { left: 2px; }
+.mezzo-esagoni .esagono {
+  --lato: 54px;
+}
+.mezzo-esagoni .filigrana,
+.mezzo-ps .filigrana {
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+.scheda .mezzo-esagoni .filigrana + input,
+.scheda .mezzo-esagoni input[type="number"] {
+  margin-bottom: 8px;
+}
+.mezzo-formula {
+  position: absolute;
+  top: 37px;
+  font-size: 7.5px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+.mezzo-stat-destra .mezzo-formula { right: var(--spazio-esagoni); left: 0; text-align: right; }
+.mezzo-stat-sinistra .mezzo-formula { left: var(--spazio-esagoni); right: 0; }
+
+/* Sotto la Difesa: il DES (Pilotare) del pilota, che la scheda usa per Difesa e iniziativa, e l'override. */
+.mezzo-pilota {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0 0 2px;
+}
+.mezzo-pilota-sinistra {
+  justify-content: flex-start;
+}
+.scheda .mezzo-pilota input[type="number"][name] {
+  width: 38px;
+  height: 20px;
+  font-size: 12px;
+  background: var(--tinta);
+  border-bottom: 1px solid var(--riga);
+}
+
+/* Punti struttura come i PV del personaggio (salute.css): il massimo in alto a sinistra con la banda, sotto la soglia
+   del danno e i punti attuali. */
+.mezzo-ps {
+  position: relative;
+  height: 150px;
+  margin-bottom: 4px;
+}
+.banda-ps {
+  position: absolute;
+  top: 6px;
+  left: -7px;
+  right: -7px;
+  padding-left: 70px;
+}
+.esagono-ps-max {
+  --lato: 54px;
+  position: absolute;
+  top: -6px;
+  left: 6px;
+}
+.scheda .esagono-ps-max input[type="number"] {
+  margin-bottom: 10px;
+}
+.esagono-soglia-danno {
+  --lato: 38px;
+  position: absolute;
+  top: 76px;
+  left: 0;
+}
+.esagono-ps-attuali {
+  --lato: 64px;
+  position: absolute;
+  top: 62px;
+  left: 44px;
+}
+.mezzo-soglia-etichetta {
+  position: absolute;
+  top: 120px;
+  left: 2px;
+  white-space: pre-line;
+}
+
+/* Dati ed Equipaggio: etichette in maiuscoletto e campi sulle linee, come nelle schede stampate. */
+.mezzo-righe {
+  display: flex;
+  flex-direction: column;
+}
+.mezzo-riga {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 24px;
+  border-bottom: 1px solid var(--riga);
+}
+.mezzo-campo {
+  display: flex;
+  align-items: baseline;
+  flex: 1 1 0;
+  gap: 4px;
+  min-width: 0;
+}
+/* I campi stretti (classe, costo, restante) larghi quanto l'etichetta e una decina di caratteri: il resto della riga va
+   al campo principale. Un valore più lungo del campo finisce con i puntini. */
+.mezzo-campo.mezzo-stretto {
+  flex: 0 0 auto;
+}
+.scheda .mezzo-stretto input[type="text"] {
+  flex: 0 0 auto;
+  width: 9ch;
+}
+/* La classe dell'astronave è una cifra. */
+.scheda .mezzo-cifra input[type="text"] {
+  width: 3ch;
+}
+.mezzo-etichetta {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.scheda .mezzo-campo input[type="text"] {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+}
+.mezzo-grande .mezzo-etichetta {
+  font-size: 14px;
+}
+.scheda .mezzo-grande input[type="text"] {
+  font-size: 15px;
+  font-weight: 400;
+}
+.mezzo-suggerimento {
+  display: block;
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--grigio);
+}
+.mezzo-suggerimento:empty {
+  display: none;
+}
+
+/* Liste (armamenti, dotazioni, stiva): intestazione sulla fascia e righe alternate, come l'inventario (pagina-2.css). */
+.mezzo-intestazione {
+  display: grid;
+  padding: 3px 0 2px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--banda);
+}
+.mezzo-intestazione span {
+  padding: 0 3px;
+}
+.mezzo-colonne-armamenti {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.4fr) minmax(0, 0.9fr) 46px 24px;
+  align-items: center;
+}
+/* Astronave: armamenti nella colonna stretta, energia e carico sono numeri; intestazioni più piccole perché «Energia» e
+   «Carico» non si tocchino. */
+.mezzo-colonne-armamenti.mezzo-colonne-energia {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr) 50px 44px 24px;
+}
+.mezzo-intestazione.mezzo-colonne-energia span {
+  padding: 0 2px;
+  letter-spacing: 0.02em;
+}
+.mezzo-intestazione.mezzo-colonne-energia .mezzo-numero {
+  font-size: 8.5px;
+}
+.mezzo-colonne-dotazioni {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px 24px;
+  align-items: center;
+}
+.mezzo-colonne-dotazioni-energia {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px 52px 24px;
+  align-items: center;
+}
+.mezzo-colonne-stiva {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 24px;
+  align-items: center;
+}
+.pagina-mezzo .repcontainer > .repitem:nth-child(even) .mezzo-voce {
+  background: var(--tinta);
+}
+.mezzo-voce {
+  --icone-alto: 2px;
+  position: relative;
+  min-height: 22px;
+}
+.scheda .mezzo-voce-riga input[type="text"],
+.scheda .mezzo-voce-riga input[type="number"] {
+  height: 22px;
+  font-size: 12px;
+}
+.scheda .mezzo-voce-riga input[type="text"] {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+.mezzo-cella {
+  display: block;
+  min-height: 18px;
+  padding: 0 3px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.mezzo-numero {
+  text-align: center;
+}
+/* Quello che tira: il nome (tiro per colpire) e i danni, testo che si colora passando il mouse (come gli attacchi). */
+.scheda .mezzo-tira {
+  height: auto;
+  min-height: 18px;
+  margin: 0;
+  padding: 0 3px;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--inchiostro);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: pointer;
+}
+.scheda .mezzo-tira:hover {
+  color: #fff;
+  background: var(--accento);
+}
+.mezzo-voce-nome {
+  font-weight: 500;
+}
+.scheda .mezzo-danni {
+  text-decoration: underline dotted;
+}
+.mezzo-ha-danni[value=""] + .mezzo-danni {
+  visibility: hidden;
+}
+.mezzo-coppia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.scheda .mezzo-coppia > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Stiva: capacità e carico totale in fondo, negli esagoni, calcolati dalla scheda. */
+.mezzo-stiva-totali {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.mezzo-stiva-totali .esagono {
+  --lato: 56px;
+}
+/* Numeri che possono essere lunghi (le astronavi più grandi hanno 120.000 punti carico): più piccoli e più larghi. */
+.scheda .mezzo-stiva-totali .esagono input[type="number"],
+.scheda .mezzo-esagoni input[name^="attr_mezzo_punti_carico"] {
+  width: 94%;
+  font-size: 13px;
+}
+.scheda .mezzo-stiva-totali .esagono input[type="number"] {
+  font-size: 12px;
+}
+/* Stiva oltre la capacità: l'esagono del carico nero, come il carico del personaggio (pagina-2.css). */
+.mezzo-stiva-oltre[value="1"] ~ .esagono-stiva-carico::after {
+  background: var(--inchiostro);
+}
+.scheda .mezzo-stiva-oltre[value="1"] ~ .esagono-stiva-carico input[type="number"] {
+  color: #fff;
+}
+.mezzo-stiva-etichetta {
+  flex: 1 1 0;
+  white-space: pre-line;
+}
+.mezzo-stiva-etichetta.mezzo-destra {
+  text-align: right;
+}
+
+/* Note: righe come le note delle stats del personaggio. */
+.scheda .mezzo-note {
+  height: 160px;
+  line-height: 18px;
+  background: repeating-linear-gradient(to bottom, transparent 0 17px, var(--riga) 17px 18px);
+  background-attachment: local;
+}
+/* ------------------------------------------------------------------ roll template: card in chat */
+
+/* Le card in chat riprendono i riquadri del manuale: stessa struttura (testata colorata, corpo in una tinta
+   chiara dello stesso colore, etichette in grassetto), cambiano il colore e la testata.
+   - Di gioco (.sheet-gioco): prove, attacchi, danni, tiri salvezza, manifestazioni, TS contro morte. Testata
+     con l'angolo tagliato e la sbarretta dei blocchi delle creature. Celeste come i riquadri del capitolo 1
+     (Ruoli dei personaggi), viola per praxis e poteri (.sheet-psionica, colore di "Ritornare dalla morte").
+   - Di consultazione (.sheet-consulta): tratti, oggetti, carte di praxis, poteri e cyberware. Testata con le
+     barre oblique dei riquadri di regola. Grigia come "Esempio di gioco"; kaki per oggetti e cyberware
+     (.sheet-equipaggiamento: fascia delle tabelle e corpo dei riquadri del capitolo 3, Equipaggiamenti e
+     tecnologie); viola per praxis e poteri.
+   In chat la scheda non c'è (niente variabili di .scheda): i colori sono variabili della card. Roll20 applica
+   in chat solo le regole che iniziano con .sheet-rolltemplate-<nome>: qui si scrive il segnaposto «ogni», che
+   la build espande in ogni template (espandiRollTemplate in strumenti/build.mjs). */
+.sheet-rolltemplate-carta .sheet-tiro,
+.sheet-rolltemplate-danni .sheet-tiro,
+.sheet-rolltemplate-manifesta .sheet-tiro,
+.sheet-rolltemplate-morte .sheet-tiro,
+.sheet-rolltemplate-prova .sheet-tiro,
+.sheet-rolltemplate-riposo .sheet-tiro,
+.sheet-rolltemplate-salvezza .sheet-tiro,
+.sheet-rolltemplate-voce .sheet-tiro {
+  --fascia: #9ccae9;
+  --corpo: #d8edfb;
+  --accento: #3f7eb3;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 8px;
+  font-family: "Jost", sans-serif;
+  color: #1c1c1b;
+  background: var(--corpo);
+}
+.sheet-rolltemplate-carta .sheet-consulta,
+.sheet-rolltemplate-danni .sheet-consulta,
+.sheet-rolltemplate-manifesta .sheet-consulta,
+.sheet-rolltemplate-morte .sheet-consulta,
+.sheet-rolltemplate-prova .sheet-consulta,
+.sheet-rolltemplate-riposo .sheet-consulta,
+.sheet-rolltemplate-salvezza .sheet-consulta,
+.sheet-rolltemplate-voce .sheet-consulta {
+  --fascia: #b2b2b1;
+  --corpo: #e8e8e8;
+  --accento: #5d5d5c;
+}
+.sheet-rolltemplate-carta .sheet-equipaggiamento,
+.sheet-rolltemplate-danni .sheet-equipaggiamento,
+.sheet-rolltemplate-manifesta .sheet-equipaggiamento,
+.sheet-rolltemplate-morte .sheet-equipaggiamento,
+.sheet-rolltemplate-prova .sheet-equipaggiamento,
+.sheet-rolltemplate-riposo .sheet-equipaggiamento,
+.sheet-rolltemplate-salvezza .sheet-equipaggiamento,
+.sheet-rolltemplate-voce .sheet-equipaggiamento {
+  --fascia: #c8b5a2;
+  --corpo: #f5f0e1;
+  --accento: #7a6a58;
+}
+.sheet-rolltemplate-carta .sheet-psionica,
+.sheet-rolltemplate-danni .sheet-psionica,
+.sheet-rolltemplate-manifesta .sheet-psionica,
+.sheet-rolltemplate-morte .sheet-psionica,
+.sheet-rolltemplate-prova .sheet-psionica,
+.sheet-rolltemplate-riposo .sheet-psionica,
+.sheet-rolltemplate-salvezza .sheet-psionica,
+.sheet-rolltemplate-voce .sheet-psionica {
+  --fascia: #bcb4da;
+  --corpo: #e0dcee;
+  --accento: #6a5ca6;
+}
+
+/* Testata: titolo in maiuscolo sulla fascia. */
+.sheet-rolltemplate-carta .sheet-tiro-titolo,
+.sheet-rolltemplate-danni .sheet-tiro-titolo,
+.sheet-rolltemplate-manifesta .sheet-tiro-titolo,
+.sheet-rolltemplate-morte .sheet-tiro-titolo,
+.sheet-rolltemplate-prova .sheet-tiro-titolo,
+.sheet-rolltemplate-riposo .sheet-tiro-titolo,
+.sheet-rolltemplate-salvezza .sheet-tiro-titolo,
+.sheet-rolltemplate-voce .sheet-tiro-titolo {
+  position: relative;
+  padding: 6px 8px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--fascia);
+}
+/* Gioco: il bordo alto della testata scende in diagonale a destra, e nella tacca c'è la sbarretta. */
+.sheet-rolltemplate-carta .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-danni .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-manifesta .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-morte .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-prova .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-riposo .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-salvezza .sheet-gioco .sheet-tiro-titolo,
+.sheet-rolltemplate-voce .sheet-gioco .sheet-tiro-titolo {
+  padding-right: 74px;
+  clip-path: polygon(0 0, calc(100% - 72px) 0, calc(100% - 64px) 6px, 100% 6px, 100% 100%, 0 100%);
+}
+.sheet-rolltemplate-carta .sheet-gioco::before,
+.sheet-rolltemplate-danni .sheet-gioco::before,
+.sheet-rolltemplate-manifesta .sheet-gioco::before,
+.sheet-rolltemplate-morte .sheet-gioco::before,
+.sheet-rolltemplate-prova .sheet-gioco::before,
+.sheet-rolltemplate-riposo .sheet-gioco::before,
+.sheet-rolltemplate-salvezza .sheet-gioco::before,
+.sheet-rolltemplate-voce .sheet-gioco::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 1px;
+  right: 6px;
+  width: 50px;
+  height: 3px;
+  background: var(--fascia);
+}
+/* Consultazione: barre oblique più chiare in fondo alla testata. */
+.sheet-rolltemplate-carta .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-danni .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-manifesta .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-morte .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-prova .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-riposo .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-salvezza .sheet-consulta .sheet-tiro-titolo,
+.sheet-rolltemplate-voce .sheet-consulta .sheet-tiro-titolo {
+  padding-right: 56px;
+}
+.sheet-rolltemplate-carta .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-danni .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-manifesta .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-morte .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-prova .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-riposo .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-salvezza .sheet-consulta .sheet-tiro-titolo::after,
+.sheet-rolltemplate-voce .sheet-consulta .sheet-tiro-titolo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 8px;
+  bottom: 0;
+  width: 38px;
+  background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255, 255, 255, 0.5) 5px 9px);
+}
+
+/* Sottotitolo in corsivo, come la riga di classificazione delle creature; poi il personaggio, piccolo. Fonte e
+   dettaglio separati da un punto se ci sono entrambi. */
+.sheet-rolltemplate-carta .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-danni .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-manifesta .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-morte .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-prova .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-riposo .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-salvezza .sheet-tiro-sottotitolo,
+.sheet-rolltemplate-voce .sheet-tiro-sottotitolo {
+  padding: 5px 8px 0;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.3;
+}
+/* Riga "Etichetta valore" delle card di gioco (riposi: punti vitalità, punti psi, sfinimento, contatori). */
+.sheet-rolltemplate-carta .sheet-tiro-riga,
+.sheet-rolltemplate-danni .sheet-tiro-riga,
+.sheet-rolltemplate-manifesta .sheet-tiro-riga,
+.sheet-rolltemplate-morte .sheet-tiro-riga,
+.sheet-rolltemplate-prova .sheet-tiro-riga,
+.sheet-rolltemplate-riposo .sheet-tiro-riga,
+.sheet-rolltemplate-salvezza .sheet-tiro-riga,
+.sheet-rolltemplate-voce .sheet-tiro-riga {
+  padding: 3px 8px 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.sheet-rolltemplate-carta .sheet-tiro-etichetta,
+.sheet-rolltemplate-danni .sheet-tiro-etichetta,
+.sheet-rolltemplate-manifesta .sheet-tiro-etichetta,
+.sheet-rolltemplate-morte .sheet-tiro-etichetta,
+.sheet-rolltemplate-prova .sheet-tiro-etichetta,
+.sheet-rolltemplate-riposo .sheet-tiro-etichetta,
+.sheet-rolltemplate-salvezza .sheet-tiro-etichetta,
+.sheet-rolltemplate-voce .sheet-tiro-etichetta {
+  font-weight: 500;
+}
+.sheet-rolltemplate-carta .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-danni .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-manifesta .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-morte .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-prova .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-riposo .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-salvezza .sheet-tiro-etichetta::after,
+.sheet-rolltemplate-voce .sheet-tiro-etichetta::after {
+  content: ":";
+}
+.sheet-rolltemplate-carta .sheet-tiro-personaggio,
+.sheet-rolltemplate-danni .sheet-tiro-personaggio,
+.sheet-rolltemplate-manifesta .sheet-tiro-personaggio,
+.sheet-rolltemplate-morte .sheet-tiro-personaggio,
+.sheet-rolltemplate-prova .sheet-tiro-personaggio,
+.sheet-rolltemplate-riposo .sheet-tiro-personaggio,
+.sheet-rolltemplate-salvezza .sheet-tiro-personaggio,
+.sheet-rolltemplate-voce .sheet-tiro-personaggio {
+  padding: 1px 8px 0;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+}
+.sheet-rolltemplate-carta .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-danni .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-manifesta .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-morte .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-prova .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-riposo .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-salvezza .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before,
+.sheet-rolltemplate-voce .sheet-fonte:not(:empty) + .sheet-fonte-dettaglio:not(:empty)::before {
+  content: " ∙ ";
+}
+
+/* Risultato grande al centro; sotto, i dadi tirati e il bonus. */
+.sheet-rolltemplate-carta .sheet-tiro-risultato,
+.sheet-rolltemplate-danni .sheet-tiro-risultato,
+.sheet-rolltemplate-manifesta .sheet-tiro-risultato,
+.sheet-rolltemplate-morte .sheet-tiro-risultato,
+.sheet-rolltemplate-prova .sheet-tiro-risultato,
+.sheet-rolltemplate-riposo .sheet-tiro-risultato,
+.sheet-rolltemplate-salvezza .sheet-tiro-risultato,
+.sheet-rolltemplate-voce .sheet-tiro-risultato {
+  padding: 6px 0 0;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+}
+.sheet-rolltemplate-carta .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-risultato .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-risultato .inlinerollresult {
+  min-width: 0;
+  padding: 0;
+  font-weight: 500;
+  color: #1c1c1b;
+  background: none;
+  border: 0;
+}
+.sheet-rolltemplate-carta .sheet-tiro-dettaglio,
+.sheet-rolltemplate-danni .sheet-tiro-dettaglio,
+.sheet-rolltemplate-manifesta .sheet-tiro-dettaglio,
+.sheet-rolltemplate-morte .sheet-tiro-dettaglio,
+.sheet-rolltemplate-prova .sheet-tiro-dettaglio,
+.sheet-rolltemplate-riposo .sheet-tiro-dettaglio,
+.sheet-rolltemplate-salvezza .sheet-tiro-dettaglio,
+.sheet-rolltemplate-voce .sheet-tiro-dettaglio {
+  padding: 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: #444;
+}
+.sheet-rolltemplate-manifesta .sheet-tiro-effetto {
+  margin-top: 6px;
+}
+/* Dadi tirati: quelli usati in grassetto, lo scartato grigio e barrato; poi il bonus fra parentesi. */
+.sheet-rolltemplate-carta .sheet-dado,
+.sheet-rolltemplate-danni .sheet-dado,
+.sheet-rolltemplate-manifesta .sheet-dado,
+.sheet-rolltemplate-morte .sheet-dado,
+.sheet-rolltemplate-prova .sheet-dado,
+.sheet-rolltemplate-riposo .sheet-dado,
+.sheet-rolltemplate-salvezza .sheet-dado,
+.sheet-rolltemplate-voce .sheet-dado {
+  display: inline-block;
+  min-width: 1.4em;
+  font-size: 13px;
+  font-weight: 600;
+}
+.sheet-rolltemplate-carta .sheet-scartato,
+.sheet-rolltemplate-danni .sheet-scartato,
+.sheet-rolltemplate-manifesta .sheet-scartato,
+.sheet-rolltemplate-morte .sheet-scartato,
+.sheet-rolltemplate-prova .sheet-scartato,
+.sheet-rolltemplate-riposo .sheet-scartato,
+.sheet-rolltemplate-salvezza .sheet-scartato,
+.sheet-rolltemplate-voce .sheet-scartato {
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+}
+/* Un 1 rosso e un 12 verde, più marcati, anche scartati (restano barrati): si vede subito che è uscito qualcosa. */
+.sheet-rolltemplate-carta .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-danni .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-manifesta .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-morte .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-prova .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-riposo .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-salvezza .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-voce .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-carta .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-danni .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-manifesta .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-morte .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-prova .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-riposo .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-salvezza .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-voce .sheet-dado.sheet-dado-dodici {
+  font-weight: 800;
+}
+.sheet-rolltemplate-carta .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-danni .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-manifesta .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-morte .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-prova .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-riposo .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-salvezza .sheet-dado.sheet-dado-uno,
+.sheet-rolltemplate-voce .sheet-dado.sheet-dado-uno {
+  color: #c62828;
+}
+.sheet-rolltemplate-carta .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-danni .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-manifesta .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-morte .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-prova .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-riposo .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-salvezza .sheet-dado.sheet-dado-dodici,
+.sheet-rolltemplate-voce .sheet-dado.sheet-dado-dodici {
+  color: #2e7d32;
+}
+.sheet-rolltemplate-carta .sheet-tiro-bonus,
+.sheet-rolltemplate-danni .sheet-tiro-bonus,
+.sheet-rolltemplate-manifesta .sheet-tiro-bonus,
+.sheet-rolltemplate-morte .sheet-tiro-bonus,
+.sheet-rolltemplate-prova .sheet-tiro-bonus,
+.sheet-rolltemplate-riposo .sheet-tiro-bonus,
+.sheet-rolltemplate-salvezza .sheet-tiro-bonus,
+.sheet-rolltemplate-voce .sheet-tiro-bonus {
+  margin-left: 2px;
+}
+/* Perché il tiro ha vantaggio o svantaggio, con le voci fisse (passo P): "Svantaggio: Armatura improvvisata". */
+.sheet-rolltemplate-carta .sheet-tiro-motivo,
+.sheet-rolltemplate-danni .sheet-tiro-motivo,
+.sheet-rolltemplate-manifesta .sheet-tiro-motivo,
+.sheet-rolltemplate-morte .sheet-tiro-motivo,
+.sheet-rolltemplate-prova .sheet-tiro-motivo,
+.sheet-rolltemplate-riposo .sheet-tiro-motivo,
+.sheet-rolltemplate-salvezza .sheet-tiro-motivo,
+.sheet-rolltemplate-voce .sheet-tiro-motivo {
+  padding: 2px 8px 0;
+  font-size: 11px;
+  font-style: italic;
+  text-align: center;
+  color: #444;
+}
+/* Danni extra di un altro tipo (danni): una riga sotto i dadi, il totale in grassetto senza il riquadro del tiro. */
+.sheet-rolltemplate-carta .sheet-tiro-extra,
+.sheet-rolltemplate-danni .sheet-tiro-extra,
+.sheet-rolltemplate-manifesta .sheet-tiro-extra,
+.sheet-rolltemplate-morte .sheet-tiro-extra,
+.sheet-rolltemplate-prova .sheet-tiro-extra,
+.sheet-rolltemplate-riposo .sheet-tiro-extra,
+.sheet-rolltemplate-salvezza .sheet-tiro-extra,
+.sheet-rolltemplate-voce .sheet-tiro-extra {
+  padding: 2px 8px 0;
+  font-size: 13px;
+  text-align: center;
+}
+.sheet-rolltemplate-carta .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-extra .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-extra .inlinerollresult {
+  min-width: 0;
+  padding: 0;
+  font-weight: 600;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+.sheet-rolltemplate-carta .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-danni .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-manifesta .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-morte .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-prova .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-riposo .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-salvezza .sheet-tiro-extra-dadi,
+.sheet-rolltemplate-voce .sheet-tiro-extra-dadi {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Testo da leggere: descrizione e righe "Etichetta: valore" delle carte (vuote, spariscono). Niente white-space:
+   pre-line: Roll20 trasforma già ogni a capo in "<br>" e lascia anche l'a capo, che con pre-line conterebbe due volte. */
+.sheet-rolltemplate-carta .sheet-tiro-descrizione,
+.sheet-rolltemplate-danni .sheet-tiro-descrizione,
+.sheet-rolltemplate-manifesta .sheet-tiro-descrizione,
+.sheet-rolltemplate-morte .sheet-tiro-descrizione,
+.sheet-rolltemplate-prova .sheet-tiro-descrizione,
+.sheet-rolltemplate-riposo .sheet-tiro-descrizione,
+.sheet-rolltemplate-salvezza .sheet-tiro-descrizione,
+.sheet-rolltemplate-voce .sheet-tiro-descrizione {
+  padding: 6px 8px 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.sheet-rolltemplate-carta .sheet-carta-righe,
+.sheet-rolltemplate-danni .sheet-carta-righe,
+.sheet-rolltemplate-manifesta .sheet-carta-righe,
+.sheet-rolltemplate-morte .sheet-carta-righe,
+.sheet-rolltemplate-prova .sheet-carta-righe,
+.sheet-rolltemplate-riposo .sheet-carta-righe,
+.sheet-rolltemplate-salvezza .sheet-carta-righe,
+.sheet-rolltemplate-voce .sheet-carta-righe {
+  margin: 6px 8px 0;
+}
+.sheet-rolltemplate-carta .sheet-carta-riga,
+.sheet-rolltemplate-danni .sheet-carta-riga,
+.sheet-rolltemplate-manifesta .sheet-carta-riga,
+.sheet-rolltemplate-morte .sheet-carta-riga,
+.sheet-rolltemplate-prova .sheet-carta-riga,
+.sheet-rolltemplate-riposo .sheet-carta-riga,
+.sheet-rolltemplate-salvezza .sheet-carta-riga,
+.sheet-rolltemplate-voce .sheet-carta-riga {
+  display: flex;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.sheet-rolltemplate-carta .sheet-carta-etichetta,
+.sheet-rolltemplate-danni .sheet-carta-etichetta,
+.sheet-rolltemplate-manifesta .sheet-carta-etichetta,
+.sheet-rolltemplate-morte .sheet-carta-etichetta,
+.sheet-rolltemplate-prova .sheet-carta-etichetta,
+.sheet-rolltemplate-riposo .sheet-carta-etichetta,
+.sheet-rolltemplate-salvezza .sheet-carta-etichetta,
+.sheet-rolltemplate-voce .sheet-carta-etichetta {
+  order: -1;
+  font-weight: 600;
+}
+.sheet-rolltemplate-carta .sheet-carta-etichetta::after,
+.sheet-rolltemplate-danni .sheet-carta-etichetta::after,
+.sheet-rolltemplate-manifesta .sheet-carta-etichetta::after,
+.sheet-rolltemplate-morte .sheet-carta-etichetta::after,
+.sheet-rolltemplate-prova .sheet-carta-etichetta::after,
+.sheet-rolltemplate-riposo .sheet-carta-etichetta::after,
+.sheet-rolltemplate-salvezza .sheet-carta-etichetta::after,
+.sheet-rolltemplate-voce .sheet-carta-etichetta::after {
+  content: ":";
+}
+.sheet-rolltemplate-carta .sheet-carta-valore:empty,
+.sheet-rolltemplate-danni .sheet-carta-valore:empty,
+.sheet-rolltemplate-manifesta .sheet-carta-valore:empty,
+.sheet-rolltemplate-morte .sheet-carta-valore:empty,
+.sheet-rolltemplate-prova .sheet-carta-valore:empty,
+.sheet-rolltemplate-riposo .sheet-carta-valore:empty,
+.sheet-rolltemplate-salvezza .sheet-carta-valore:empty,
+.sheet-rolltemplate-voce .sheet-carta-valore:empty,
+.sheet-rolltemplate-carta .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-danni .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-manifesta .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-morte .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-prova .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-riposo .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-salvezza .sheet-carta-valore:empty + .sheet-carta-etichetta,
+.sheet-rolltemplate-voce .sheet-carta-valore:empty + .sheet-carta-etichetta {
+  display: none;
+}
+.sheet-rolltemplate-carta .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-danni .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-manifesta .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-morte .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-prova .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-riposo .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-salvezza .sheet-carta-costo .sheet-carta-valore::after,
+.sheet-rolltemplate-voce .sheet-carta-costo .sheet-carta-valore::after {
+  content: " psi";
+}
+.sheet-rolltemplate-carta .sheet-carta-incremento,
+.sheet-rolltemplate-danni .sheet-carta-incremento,
+.sheet-rolltemplate-manifesta .sheet-carta-incremento,
+.sheet-rolltemplate-morte .sheet-carta-incremento,
+.sheet-rolltemplate-prova .sheet-carta-incremento,
+.sheet-rolltemplate-riposo .sheet-carta-incremento,
+.sheet-rolltemplate-salvezza .sheet-carta-incremento,
+.sheet-rolltemplate-voce .sheet-carta-incremento {
+  margin: 7px 8px 0;
+  padding-top: 5px;
+  border-top: 1px solid var(--fascia);
+}
+
+/* Punti psi spesi e rimasti. */
+.sheet-rolltemplate-carta .sheet-tiro-psi,
+.sheet-rolltemplate-danni .sheet-tiro-psi,
+.sheet-rolltemplate-manifesta .sheet-tiro-psi,
+.sheet-rolltemplate-morte .sheet-tiro-psi,
+.sheet-rolltemplate-prova .sheet-tiro-psi,
+.sheet-rolltemplate-riposo .sheet-tiro-psi,
+.sheet-rolltemplate-salvezza .sheet-tiro-psi,
+.sheet-rolltemplate-voce .sheet-tiro-psi {
+  margin: 6px 8px 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* Risultati speciali ed esiti: righe con il bordo del colore d'accento. */
+.sheet-rolltemplate-carta .sheet-tiro-speciale,
+.sheet-rolltemplate-danni .sheet-tiro-speciale,
+.sheet-rolltemplate-manifesta .sheet-tiro-speciale,
+.sheet-rolltemplate-morte .sheet-tiro-speciale,
+.sheet-rolltemplate-prova .sheet-tiro-speciale,
+.sheet-rolltemplate-riposo .sheet-tiro-speciale,
+.sheet-rolltemplate-salvezza .sheet-tiro-speciale,
+.sheet-rolltemplate-voce .sheet-tiro-speciale {
+  margin: 7px 8px 0;
+  padding: 4px 7px;
+  font-size: 11px;
+  line-height: 1.3;
+  background: rgba(255, 255, 255, 0.55);
+  border-left: 3px solid var(--accento);
+}
+.sheet-rolltemplate-carta .sheet-tiro-prodezza,
+.sheet-rolltemplate-danni .sheet-tiro-prodezza,
+.sheet-rolltemplate-manifesta .sheet-tiro-prodezza,
+.sheet-rolltemplate-morte .sheet-tiro-prodezza,
+.sheet-rolltemplate-prova .sheet-tiro-prodezza,
+.sheet-rolltemplate-riposo .sheet-tiro-prodezza,
+.sheet-rolltemplate-salvezza .sheet-tiro-prodezza,
+.sheet-rolltemplate-voce .sheet-tiro-prodezza {
+  color: #fff;
+  background: var(--accento);
+}
+.sheet-rolltemplate-carta .sheet-tiro-imprevisto,
+.sheet-rolltemplate-danni .sheet-tiro-imprevisto,
+.sheet-rolltemplate-manifesta .sheet-tiro-imprevisto,
+.sheet-rolltemplate-morte .sheet-tiro-imprevisto,
+.sheet-rolltemplate-prova .sheet-tiro-imprevisto,
+.sheet-rolltemplate-riposo .sheet-tiro-imprevisto,
+.sheet-rolltemplate-salvezza .sheet-tiro-imprevisto,
+.sheet-rolltemplate-voce .sheet-tiro-imprevisto {
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0 8px, rgba(255, 255, 255, 0.3) 8px 16px);
+  border-left-color: #1c1c1b;
+}
+.sheet-rolltemplate-carta .sheet-tiro-edge,
+.sheet-rolltemplate-danni .sheet-tiro-edge,
+.sheet-rolltemplate-manifesta .sheet-tiro-edge,
+.sheet-rolltemplate-morte .sheet-tiro-edge,
+.sheet-rolltemplate-prova .sheet-tiro-edge,
+.sheet-rolltemplate-riposo .sheet-tiro-edge,
+.sheet-rolltemplate-salvezza .sheet-tiro-edge,
+.sheet-rolltemplate-voce .sheet-tiro-edge {
+  font-weight: 500;
+  border: 1.5px dashed var(--accento);
+  border-left-width: 3px;
+}
+
+/* Pulsante nel messaggio ([Tira i danni](~repeating_armi_ID_danni)): tira i danni della riga. */
+.sheet-rolltemplate-carta .sheet-tiro-azione,
+.sheet-rolltemplate-danni .sheet-tiro-azione,
+.sheet-rolltemplate-manifesta .sheet-tiro-azione,
+.sheet-rolltemplate-morte .sheet-tiro-azione,
+.sheet-rolltemplate-prova .sheet-tiro-azione,
+.sheet-rolltemplate-riposo .sheet-tiro-azione,
+.sheet-rolltemplate-salvezza .sheet-tiro-azione,
+.sheet-rolltemplate-voce .sheet-tiro-azione {
+  margin: 8px 8px 0;
+  text-align: center;
+}
+.sheet-rolltemplate-carta .sheet-tiro-azione a,
+.sheet-rolltemplate-danni .sheet-tiro-azione a,
+.sheet-rolltemplate-manifesta .sheet-tiro-azione a,
+.sheet-rolltemplate-morte .sheet-tiro-azione a,
+.sheet-rolltemplate-prova .sheet-tiro-azione a,
+.sheet-rolltemplate-riposo .sheet-tiro-azione a,
+.sheet-rolltemplate-salvezza .sheet-tiro-azione a,
+.sheet-rolltemplate-voce .sheet-tiro-azione a {
+  display: inline-block;
+  padding: 5px 14px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  background: #1c1c1b;
+  border: 0;
+  border-radius: 0;
+}
+.sheet-rolltemplate-carta .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-danni .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-manifesta .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-morte .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-prova .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-riposo .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-salvezza .sheet-tiro-azione a:hover,
+.sheet-rolltemplate-voce .sheet-tiro-azione a:hover {
+  background: var(--accento);
+}
+
+/* Valori calcolati dal worker (computed:: in finishRoll): Roll20 li mostra come risultati di un tiro
+   (span.inlinerollresult con riquadro colorato e il suggerimento "Rolling 0 = 0"). Qui sono solo numeri
+   (dadi tirati, psi rimasti, grado della prodezza, caselle del TS contro morte, PV dopo un riposo): stesso aspetto del testo
+   intorno e niente suggerimento. I psi spesi sono un tiro vero, ma restano in grassetto come i rimasti. */
+.sheet-rolltemplate-carta .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-dado .inlinerollresult,
+.sheet-rolltemplate-carta .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-carta .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-speciale .inlinerollresult,
+.sheet-rolltemplate-carta .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-conteggio .inlinerollresult,
+.sheet-rolltemplate-carta .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-riga .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-riga .inlinerollresult {
+  display: inline;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: inherit;
+  pointer-events: none;
+}
+.sheet-rolltemplate-carta .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-danni .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-manifesta .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-morte .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-prova .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-riposo .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-salvezza .sheet-tiro-psi .inlinerollresult,
+.sheet-rolltemplate-voce .sheet-tiro-psi .inlinerollresult {
+  font-weight: 600;
+}
