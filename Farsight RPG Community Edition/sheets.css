@@ -1,4 +1,4 @@
-/* Scheda di FARSIGHT per Roll20, versione 1.1.0 */
+/* Scheda di FARSIGHT per Roll20, versione 1.1.0+3.647a54a */
 /* Stile della scheda di FARSIGHT, ispirato alla scheda del personaggio ufficiale:
    pagina bianca, linee nere, pannelli con angoli smussati, esagoni, bande nei colori dei capitoli del manuale.
    Le forme sono fatte con clip-path sui pseudo-elementi: clip-path taglia anche i figli,
@@ -527,6 +527,66 @@
   text-align: left;
   border: 1px solid var(--inchiostro);
   border-bottom-width: 2px;
+}
+/* Specie, classe e background: un menu con l'id come valore (macro voce_manuale), così il nome si traduce anche in sola
+   lettura. A rotella chiusa lo stesso menu sembra testo e non si clicca; con «Altro…» al suo posto il nome scritto. */
+.campo-specie,
+.campo-classe {
+  position: relative;
+}
+.scheda .scelta-menu {
+  display: block;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  padding: 0 2px;
+  overflow: hidden;
+  font: 400 14px "Jost", sans-serif;
+  line-height: 17px;
+  color: var(--inchiostro);
+  text-overflow: ellipsis;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--inchiostro);
+  border-radius: 0;
+}
+.scheda .modifica-interruttore:not(:checked) ~ .scelta-menu,
+.scheda .modifica-interruttore:not(:checked) ~ * .scelta-menu,
+.scheda .scelta-menu.scelta-fissa {
+  pointer-events: none;
+}
+.scheda .modifica-interruttore:checked ~ .scelta-menu,
+.scheda .modifica-interruttore:checked ~ * .scelta-menu {
+  padding-right: 12px;
+  background: #fff;
+  background-image: linear-gradient(45deg, transparent 50%, var(--inchiostro) 50%), linear-gradient(135deg, var(--inchiostro) 50%, transparent 50%);
+  background-position: calc(100% - 6px) 8px, calc(100% - 2px) 8px;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  border-bottom-width: 2px;
+}
+.scheda .scelta-bandiera:not([value="altro"]) ~ .scelta-altra-valore,
+.scheda .scelta-bandiera:not([value="altro"]) ~ .scelta-altra,
+.scheda .modifica-interruttore:not(:checked) ~ .scelta-bandiera[value="altro"] ~ .scelta-menu,
+.scheda .modifica-interruttore:not(:checked) ~ * .scelta-bandiera[value="altro"] ~ .scelta-menu,
+.scheda .scelta-bandiera[value="altro"] ~ .scelta-menu.scelta-fissa {
+  display: none;
+}
+.scheda .intestazione-campi .campo .scelta-altra {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  z-index: 3;
+  width: 170px;
+  padding: 0 4px;
+  border: 1px solid var(--inchiostro);
+  border-bottom-width: 2px;
+}
+.scelta-riga {
+  flex: 1;
+  min-width: 0;
 }
 /* Rotella, pulsante "✓ Fatto" e sfondo della modifica (stili/modifica.css): sopra i campi, a destra. */
 .intestazione-campi {
@@ -1401,7 +1461,7 @@
 }
 /* Controlli delle sezioni ripetibili, creati da Roll20: .repcontrol (dopo le righe) con +Add e
    Modify/Done, e in modifica su ogni riga .repcontrol_del (cestino) e .repcontrol_move (maniglia).
-   I testi li scrive Roll20 in inglese: si nascondono (font-size: 0) e si riscrivono con ::before.
+   I testi sono quelli di Roll20 (+Add, Modify, Done): il CSS non si traduce, quindi non si riscrivono.
    Il .repcontrol segue il .repcontainer, quindi .editmode ~ .repcontrol riconosce la modalità modifica. */
 .scheda .repcontrol {
   display: flex;
@@ -1415,8 +1475,11 @@
   margin: 0;
   padding: 6px 16px 5px;
   font-family: "Jost", sans-serif;
-  font-size: 0;
+  font-size: 11px;
+  font-weight: 500;
   line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: #fff;
   background: var(--inchiostro);
   background-image: none;
@@ -1427,23 +1490,13 @@
   cursor: pointer;
   clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
 }
-.scheda .repcontrol .repcontrol_add::before,
-.scheda .repcontrol .repcontrol_edit::before {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.scheda .repcontrol .repcontrol_add::before { content: "+ Aggiungi"; }
-/* + Aggiungi nel colore pieno della pagina, Modifica nel chiaro; Fatto (lista in modifica) resta nero. */
+/* +Add nel colore pieno della pagina, Modify nel chiaro; Done (lista in modifica) resta nero. */
 .scheda .repcontrol .repcontrol_add {
   color: var(--inchiostro);
   background: var(--banda);
 }
-/* Roll20 mette Modify prima di +Add: Aggiungi va a sinistra, Modifica a destra. */
+/* Roll20 mette Modify prima di +Add: +Add va a sinistra, Modify a destra. */
 .scheda .repcontrol .repcontrol_add { order: -1; }
-.scheda .repcontrol .repcontrol_edit::before { content: "Modifica"; }
-.scheda .repcontainer.editmode ~ .repcontrol .repcontrol_edit::before { content: "Fatto"; }
 .scheda .repcontrol .repcontrol_edit {
   color: var(--inchiostro);
   background: var(--tinta);
@@ -1466,7 +1519,7 @@
 /* Trascinamento. Su Roll20 lo fa jQuery UI: la riga presa riceve .ui-sortable-helper e segue il cursore,
    al suo posto c'è un segnaposto vuoto .ui-sortable-placeholder che indica dove cadrà. La riga presa
    diventa una card; il segnaposto, che jQuery nasconde con visibility: hidden scritto sull'elemento,
-   si mostra (serve !important) come fascia tratteggiata "Rilascia qui". */
+   si mostra (serve !important) come fascia tratteggiata, senza scritta (il CSS non si traduce). */
 .scheda .repitem.ui-sortable-helper {
   background: #fff;
   outline: 1.5px solid var(--inchiostro);
@@ -1485,15 +1538,6 @@
   visibility: visible !important;
   background: repeating-linear-gradient(135deg, var(--banda) 0 10px, #f1f1f1 10px 20px);
   border: 1.5px dashed var(--inchiostro);
-}
-.scheda .repitem.ui-sortable-placeholder::before {
-  content: "Rilascia qui";
-  font-family: "Jost", sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #555;
 }
 /* Negli attacchi le righe sono una sotto l'altra, senza spazio (attacchi.css): anche il segnaposto. */
 .pannello-attacchi .repitem.ui-sortable-placeholder {
@@ -1537,8 +1581,8 @@
 .scheda .repcontainer.editmode .repitem .dettagli-interruttore,
 .scheda .repcontainer.editmode .repitem .info-icona,
 .scheda .repcontainer.editmode .repitem .info-interruttore,
-.scheda .repcontainer.editmode .repitem:hover .voce-chat[type="roll"],
-.scheda .repcontainer.editmode .repitem .voce-chat[type="roll"] {
+.scheda .repcontainer.editmode .repitem:hover .voce-chat[type="action"],
+.scheda .repcontainer.editmode .repitem .voce-chat[type="action"] {
   display: none;
 }
 /* Le righe di inventario e cyberware sono basse: cestino più piccolo, dentro la riga. */
@@ -1799,12 +1843,35 @@
   width: 34px;
   background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255, 255, 255, 0.5) 5px 9px);
 }
-.tratto-nome:empty::before {
-  content: "Senza nome";
+/* Senza nome: la fascia del nome vuota lascia il posto a quella con «Senza nome» (chat.card.default_unnamed). */
+.tratto-nome:empty,
+.tratto-nome:not(:empty) + .senza-nome {
+  display: none;
+}
+.tratto-nome.senza-nome {
   font-weight: 400;
   font-style: italic;
   text-transform: none;
   color: #555;
+}
+/* La fonte salvata è il testo italiano del menu: si mostra la voce tradotta che corrisponde al valore (fonti_tratti
+   di src/modello/elenchi.json), e il valore com'è solo se non è nell'elenco. */
+.tratto-fonte .fonte-voce,
+.fonte-bandiera[value="Specie"] ~ .fonte-scritta,
+.fonte-bandiera[value="Background"] ~ .fonte-scritta,
+.fonte-bandiera[value="Classe"] ~ .fonte-scritta,
+.fonte-bandiera[value="Talento"] ~ .fonte-scritta,
+.fonte-bandiera[value="Oggetto"] ~ .fonte-scritta,
+.fonte-bandiera[value="Altro"] ~ .fonte-scritta {
+  display: none;
+}
+.fonte-bandiera[value="Specie"] ~ .fonte-specie,
+.fonte-bandiera[value="Background"] ~ .fonte-background,
+.fonte-bandiera[value="Classe"] ~ .fonte-classe,
+.fonte-bandiera[value="Talento"] ~ .fonte-talento,
+.fonte-bandiera[value="Oggetto"] ~ .fonte-oggetto,
+.fonte-bandiera[value="Altro"] ~ .fonte-altro {
+  display: inline;
 }
 .tratto-fonte {
   display: block;
@@ -1814,7 +1881,7 @@
   line-height: 1.3;
   color: #444;
 }
-.tratto-fonte span[name="attr_fonte"]:not(:empty) + span:not(:empty)::before {
+.fonte-bandiera:not([value=""]) ~ .fonte-dettaglio:not(:empty)::before {
   content: " ∙ ";
 }
 .tratto-descrizione {
@@ -1844,11 +1911,10 @@
   display: none;
 }
 
-/* Fumetto: manda il tratto o l'oggetto in chat (roll template voce). Si vede passando il mouse sulla
-   riga, a sinistra della rotella. È un pulsante di tiro, e Roll20 dà ai pulsanti di tiro il d20 davanti
-   (".ui-dialog .charsheet button[type="roll"]::before", font dicefontd20, (0,3,2)) e margine, padding e testo
-   più grande ((0,3,1)): con [type="roll"] le regole della scheda pesano di più e li tolgono. */
-.scheda .repitem .voce-chat[type="roll"] {
+/* Fumetto: manda il tratto o l'oggetto in chat (act_chat, worker/tiri/fumetto.ts). Si vede passando il mouse sulla
+   riga, a sinistra della rotella. Roll20 dà ai pulsanti margine, padding e sfondo ((0,3,1)): con [type="action"] le
+   regole della scheda pesano di più e li tolgono. */
+.scheda .repitem .voce-chat[type="action"] {
   position: absolute;
   top: var(--icone-alto, 1px);
   right: 22px;
@@ -1865,10 +1931,7 @@
   box-shadow: none;
   cursor: pointer;
 }
-.scheda .repitem .voce-chat[type="roll"]::before {
-  content: none;
-}
-.scheda .repitem:hover .voce-chat[type="roll"] {
+.scheda .repitem:hover .voce-chat[type="action"] {
   display: block;
 }
 .voce-chat span {
@@ -2002,8 +2065,12 @@
   overflow-wrap: anywhere;
   background: var(--banda);
 }
-.contatore-nome:empty::before {
-  content: "Nuova risorsa";
+/* Nome vuoto: «Nuova risorsa» (resources.counter.new) al suo posto. */
+.contatore-nome:empty,
+.contatore-nome:not(:empty) + .contatore-nuova {
+  display: none;
+}
+.contatore-nuova {
   opacity: 0.55;
 }
 .contatore-dettaglio {
@@ -2013,10 +2080,27 @@
   text-transform: uppercase;
   color: #777;
 }
-.contatore-dettaglio span[name="attr_massimo"]:not(:empty)::before {
-  content: "su ";
+/* «su» (resources.counter.of_max) solo con il massimo; la ricarica salvata è il testo italiano del menu (vuoto = Mai):
+   si mostra la voce tradotta (ricariche_risorse di src/modello/elenchi.json), il valore com'è se non è nell'elenco. */
+.massimo-bandiera[value=""] ~ .massimo-su,
+.contatore-dettaglio .ricarica-voce,
+.ricarica-bandiera[value=""] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Mai"] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Ogni riposo"] ~ .ricarica-scritta,
+.ricarica-bandiera[value="Riposo completo"] ~ .ricarica-scritta {
+  display: none;
 }
-.contatore-dettaglio span[name="attr_massimo"]:not(:empty) + span:not(:empty)::before {
+.massimo-su::after {
+  content: " ";
+}
+.ricarica-bandiera[value=""] ~ .ricarica-mai,
+.ricarica-bandiera[value="Mai"] ~ .ricarica-mai,
+.ricarica-bandiera[value="Ogni riposo"] ~ .ricarica-ogni_riposo,
+.ricarica-bandiera[value="Riposo completo"] ~ .ricarica-riposo_completo {
+  display: inline;
+}
+.massimo-bandiera:not([value=""]) ~ .ricarica-voce::before,
+.massimo-bandiera:not([value=""]) ~ .ricarica-scritta:not(:empty)::before {
   content: " ∙ ";
 }
 /* Dettagli: nella colonna stretta del contatore le etichette vanno sopra i campi. */
@@ -2920,8 +3004,11 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.psi-nome span:empty::before {
-  content: "Senza nome";
+/* «Senza nome» (chat.card.default_unnamed) solo quando il nome è vuoto. */
+.psi-nome span:not(:empty) + .senza-nome {
+  display: none;
+}
+.psi-nome .senza-nome {
   font-weight: 400;
   font-style: italic;
   text-transform: none;
@@ -3013,6 +3100,25 @@
 .psi-info .valore .tiro-arma span:empty::before {
   content: "—";
   color: #aaa;
+}
+/* Categoria del cyberware e disciplina: il valore salvato è il testo italiano del menu, quindi in lettura c'è lo
+   stesso menu, non cliccabile e senza aspetto da menu, che mostra la voce nella lingua della scheda («—» se vuoto). */
+.scheda .psi-info .valore-menu {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
 }
 .psi-info .psi-descrizione {
   grid-column: 1 / -1;
@@ -4761,10 +4867,6 @@
   bottom: 0;
   width: 38px;
   background: repeating-linear-gradient(115deg, transparent 0 5px, rgba(255, 255, 255, 0.5) 5px 9px);
-}
-/* Tratto o oggetto senza nome. */
-.sheet-rolltemplate-voce .sheet-tiro-titolo:empty::before {
-  content: "Senza nome";
 }
 
 /* Sottotitolo in corsivo, come la riga di classificazione delle creature; poi il personaggio, piccolo. Fonte e
