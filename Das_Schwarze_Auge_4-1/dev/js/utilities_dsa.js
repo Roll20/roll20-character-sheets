@@ -175,10 +175,21 @@ function DSAsane (value, type) {
 		}
 	}
 
+	function limitedNumberValid(value, minimum, maximum) {
+		if (isNaN(value)
+		|| isNaN(parseFloat(value))
+		|| parseFloat(value) < minimum
+		|| parseFloat(value) > maximum) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	switch(type) {
 		case "int":
 			// General
-			// Must be number of parseInt()-able number
+			// Must be number or parseInt()-able number
 			// integer
 			if (!limitedIntValid(value, -Infinity, Infinity)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
@@ -187,9 +198,18 @@ function DSAsane (value, type) {
 			break;
 		case "non-negative int":
 			// General
-			// Must be number of parseInt()-able number
+			// Must be number or parseInt()-able number
 			// Non-negative integer
 			if (!limitedIntValid(value, 0, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-negative number":
+			// General
+			// Must be number or parseFloat()-able number
+			// Non-negative number
+			if (!limitedNumberValid(value, 0, Infinity)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				sane = false;
 			}
@@ -199,6 +219,15 @@ function DSAsane (value, type) {
 			// Must be number or parseInt()-able number
 			// Must be integer in range [0, 99]
 			if (!limitedIntValid(value, 0, 99)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-zero stat":
+			// GS, WS
+			// Must be number or parseInt()-able number
+			// Must be integer in range [1, 99]
+			if (!limitedIntValid(value, 1, 99)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				sane = false;
 			}

@@ -3,13 +3,16 @@ function initializeSheet(migrationChain) {
 	var caller = "initializeSheet";
 	debugLog(caller, "Initializing sheet ...");
 	var attrsToInit = [
+		// Game Info
+		"global_game_type",
+
 		// Stats and derived values
 		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
 		"LE", "legrundw", "LE_max",
 		"AU", "AU_max", "ausgrundw", "aus_max",
 		"erschoepfung_basis", "erschoepfung_max",
 		"ueberanstrengung_max",
-		"mrgrundw", "MR", "wundschwelle",
+		"mrgrundw", "MR", "WS_Basis", "WS_mod_general", "Wundschwelle",
 		"AE", "AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
 		"KE", "KE_max",
 		"ap_verfuegbar",
@@ -17,6 +20,51 @@ function initializeSheet(migrationChain) {
 		// Rolls
 		"cs_kampf_at", "cs_kampf_fk", "cs_kampf_pa", "cs_ritual", "cs_talent", "cs_zauber",
 		"cf_kampf_at", "cf_kampf_fk", "cf_kampf_pa", "cf_ritual", "cf_talent", "cf_zauber",
+
+		// Talents
+		/// Movement-related
+		"t_ko_athletik_gsbonus",
+		/// Lame-related
+		't_ko_akrobatik_mod_lame_setting',
+		't_ko_akrobatik_mod_lame',
+		't_ko_athletik_mod_lame_setting',
+		't_ko_athletik_mod_lame',
+		't_ko_fliegen_mod_lame_setting',
+		't_ko_fliegen_mod_lame',
+		't_ko_freiesfliegen_mod_lame_setting',
+		't_ko_freiesfliegen_mod_lame',
+		't_ko_gaukeleien_mod_lame_setting',
+		't_ko_gaukeleien_mod_lame',
+		't_ko_immanspiel_mod_lame_setting',
+		't_ko_immanspiel_mod_lame',
+		't_ko_klettern_mod_lame_setting',
+		't_ko_klettern_mod_lame',
+		't_ko_koerperbeherrschung_mod_lame_setting',
+		't_ko_koerperbeherrschung_mod_lame',
+		't_ko_reiten_mod_lame_setting',
+		't_ko_reiten_mod_lame',
+		't_ko_schleichen_mod_lame_setting',
+		't_ko_schleichen_mod_lame',
+		't_ko_schwimmen_mod_lame_setting',
+		't_ko_schwimmen_mod_lame',
+		't_ko_selbstbeherrschung_mod_lame_setting',
+		't_ko_selbstbeherrschung_mod_lame',
+		't_ko_sichverstecken_mod_lame_setting',
+		't_ko_sichverstecken_mod_lame',
+		't_ko_singen_mod_lame_setting',
+		't_ko_singen_mod_lame',
+		't_ko_sinnenschaerfe_mod_lame_setting',
+		't_ko_sinnenschaerfe_mod_lame',
+		't_ko_skifahren_mod_lame_setting',
+		't_ko_skifahren_mod_lame',
+		't_ko_stimmenimitieren_mod_lame_setting',
+		't_ko_stimmenimitieren_mod_lame',
+		't_ko_tanzen_mod_lame_setting',
+		't_ko_tanzen_mod_lame',
+		't_ko_taschendiebstahl_mod_lame_setting',
+		't_ko_taschendiebstahl_mod_lame',
+		't_ko_zechen_mod_lame_setting',
+		't_ko_zechen_mod_lame',
 
 		// Combat
 		/// Melee AT Values
@@ -26,6 +74,11 @@ function initializeSheet(migrationChain) {
 		/// Melee PA Values
 		"PA_Aktiv", "PA_Aktiv_TaW", "pabasis",
 		"PA_Anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+
+		/// Melee manoeuvres
+		"k_ausfall_mod_dialog_dwarven_stature",
+		"k_gegenhalten_mod_advantages_disadvantages",
+		"k_umreissen_mod_advantages_disadvantages",
 
 		/// Melee other
 		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",

@@ -448,9 +448,11 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 			var TaPstar = effTaW;
 
 			// Negativer TaW: |effTaW| zu Teilwürfen addieren
+			const TaPstarSuccessMin = 0;
 			if (criticality >= 2)
 			{
-				TaPstar = TaW;
+				TaPstar = Math.max(TaPstarSuccessMin, TaW);
+				console.log(func, `TaPstar: ${TaPstar}`);
 				result = 1;
 			} else {
 				if (effTaW < 0)
