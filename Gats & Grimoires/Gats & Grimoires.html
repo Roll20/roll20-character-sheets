@@ -1,7 +1,7 @@
 <div class="sheet-gg">
     <input type="hidden" name="attr_sheet_mode" class="sheet-mode-state" value="pc">
     <input type="hidden" name="attr_tab" class="sheet-tab-state" value="core">
-    <input type="hidden" name="attr_sheet_version" value="0.2.3">
+    <input type="hidden" name="attr_sheet_version" value="0.2.4">
     <input type="hidden" name="attr_worker_status" value="PREVIEW — WORKERS OFF">
     <input type="hidden" name="attr_physical_dc" value="10">
     <input type="hidden" name="attr_spell_dc" value="10">
@@ -396,7 +396,15 @@
                     <div class="sheet-dc-grid">
                         <div><span>Spell Attack</span><strong>Mind <span name="attr_mind">0</span></strong><small>plus spell bonuses</small></div>
                         <div><span>Spell DC</span><input class="sheet-autocalc-number sheet-dc-value" type="number" name="attr_spell_dc_magic_view" value="10+@{mind}" disabled="true" title="10 + Mind"><small>10 + Mind</small></div>
-                        <div><span>Mana</span><strong><span name="attr_mana">0</span> / <span name="attr_mana_max">0</span></strong><small>track spending manually</small></div>
+                        <div class="sheet-magic-mana-card">
+                            <span>Mana</span>
+                            <div class="sheet-magic-mana-pair">
+                                <input class="sheet-magic-mana-current" type="number" name="attr_mana" value="0" min="0" step="1" title="@{mana} — Current Mana (shared with Core)" aria-label="Current Mana">
+                                <b aria-hidden="true">/</b>
+                                <span class="sheet-magic-mana-max" name="attr_mana_max" title="Calculated maximum Mana">0</span>
+                            </div>
+                            <small>Current / Max</small>
+                        </div>
                     </div>
                 </div>
                 <div class="sheet-panel sheet-connected-box">
@@ -729,7 +737,7 @@
                 <input class="sheet-row-toggle" type="checkbox" name="attr_settings_expanded" value="1" title="Open or close sheet settings">
                 <div class="sheet-collapse-summary sheet-settings-summary">
                     <span class="sheet-collapse-title">Sheet Settings &amp; Diagnostics</span>
-                    <span class="sheet-collapse-meta">v0.2.3</span>
+                    <span class="sheet-collapse-meta">v0.2.4</span>
                 </div>
                 <div class="sheet-collapse-body sheet-settings-body">
                     <div class="sheet-settings-grid">
@@ -779,6 +787,10 @@
             <label>Speed<input type="number" name="attr_npc_speed" value="6"></label>
             <label><span>Mana</span><span class="sheet-paired-input"><input type="number" name="attr_npc_mana" value="0"><b>/</b><input type="number" name="attr_npc_mana_max" value="0"></span></label>
             <label>Other Pool<input type="text" name="attr_npc_pool" spellcheck="false" placeholder="Blood 6, Runes 4..."></label>
+            <div class="sheet-npc-initiative">
+                <button class="sheet-npc-initiative-button" type="roll" name="roll_npc_initiative" value="@{roll_whisper}&{template:ggsimple} {{name=@{npc_name}}} {{title=Initiative}} {{result=[[@{roll_mode}+@{npc_reflex}+?{Initiative Modifier|0}&{tracker}]]}} {{note=NPC Reflex-based initiative}}" title="Roll initiative using this NPC's Reflex; select its token to update the Turn Tracker.">ROLL INITIATIVE</button>
+                <span class="sheet-npc-initiative-note">Uses NPC Reflex. Select this NPC's token to update the Turn Tracker.</span>
+            </div>
         </div>
         <div class="sheet-panel">
             <div class="sheet-section-title">NPC Attacks</div>
@@ -1074,7 +1086,7 @@
 <script type="text/worker">
 'use strict';
 
-const GG_VERSION = '0.2.3';
+const GG_VERSION = '0.2.4';
 
 on('sheet:opened', function() {
     setAttrs({
