@@ -1,3 +1,20 @@
+# 2026-11-02
+
+- Spells:
+  - Fix for spell list ranks after level up.
+  - Fix for spell lists when ranks updates.
+  - Fix for spell lists on scr and stat changes.
+  - Fix spell mastery on updates.
+  - Add common buttons/refresh for all spells helpers.
+  - Implement the `refreshspells` and `refreshspellranks` buttons.
+  - In spell list info; show the scr_info and spellmastery_info
+  - Show general SCR bonus
+  - Tests for SCR/Spellmastery updates
+- Kill the reset workers function.
+- Reorg settings tab,
+- Refresh button for stats/realms.
+- Bonus Adder now understands PBonus and Rank bonuses.
+
 # 2026-10-28
 
 - Fix for levelup when it's not a specialised skill
