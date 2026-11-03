@@ -26,16 +26,33 @@ jobs:
       pull-requests: write
       statuses: write
     steps:
+      # The repository is gigabytes of sheets, so both checkouts fetch only the folders the check reads.
       - name: Check out master
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          sparse-checkout: .actions/sheet-checks
           persist-credentials: false
+      - name: List the changed sheet folders
+        id: folders
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+        run: |
+          folders=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST/files" --jq '.[].filename | select(contains("/")) | split("/")[0]' | sort -u)
+          delimiter="folders_$(openssl rand -hex 16)"
+          {
+            echo "list<<$delimiter"
+            echo "$folders"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
       - name: Check out the pull request's files to read
+        if: steps.folders.outputs.list != ''
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
           path: .pull-request
+          sparse-checkout: ${{ steps.folders.outputs.list }}
           persist-credentials: false
       - name: Run Checks
         uses: ./.actions/sheet-checks
