@@ -46,7 +46,7 @@ const combatTechniques = {
 	Default Values for Known Attributes
 
 Using safe get/setAttrs the default value 0 is assumed, if nothing is in this object.
-Currently, does not handle repeating sections.
+Currently, does not handle all repeating sections.
 */
 const defaultValues = {
 	// Uninitialized Attributes
@@ -54,6 +54,9 @@ const defaultValues = {
 	// Even if players diligently fill out the sheet, some buttons might not work due to missing attributes.
 	// Initializing these attributes to default values prevents this from happening.
 	// Some attributes might be created automatically, but have been included for the sake of completeness.
+
+	// Game Info
+	"global_game_type": "Legacy",
 
 	// Stats and derived values
 	"MU": 8,
@@ -65,6 +68,10 @@ const defaultValues = {
 	"KO": 8,
 	"KK": 8,
 	"GS": 8,
+	"GE_mod_advantages_disadvantages": 0,
+	"GS_mod_advantages_disadvantages": 0,
+	// 6, because only used/shown when "Dwarven Stature" is active and base GS for such characters is lowered by 2
+	"GS_march" : 6,
 
 	"LE": 12,
 	"legrundw": 12,
@@ -82,7 +89,10 @@ const defaultValues = {
 
 	"mrgrundw": 5,
 	"MR": 5,
-	"wundschwelle": 4,
+	"WS_Basis": 4,
+	"WS_mod_general": 0,
+	"WS_mod_advantages_disadvantages": 0,
+	"Wundschwelle": 4,
 
 	"AE": 12,
 	"AE_max": 12,
@@ -92,6 +102,12 @@ const defaultValues = {
 
 	"KE": 0,
 	"KE_max": 0,
+
+	"jump_long_runup_distance": 3.20,
+	"jump_long_stand_distance": 1.60,
+	"jump_high_runup_distance": 0.80,
+	"jump_high_stand_distance": 0.40,
+	"jump_mod_advantages_disadvantages": 0,
 
 	"ap_verfuegbar": 0,
 
@@ -109,6 +125,51 @@ const defaultValues = {
 	"cf_ritual": 20,
 	"cf_talent": 20,
 	"cf_zauber": 20,
+
+	// Talents
+	/// Movement-related
+	"t_ko_athletik_gsbonus": 1,
+	/// Lame-related
+	"t_ko_akrobatik_mod_lame_setting": "always",
+	"t_ko_akrobatik_mod_lame": "3",
+	"t_ko_athletik_mod_lame_setting": "always",
+	"t_ko_athletik_mod_lame": "3",
+	"t_ko_fliegen_mod_lame_setting": "never",
+	"t_ko_fliegen_mod_lame": "0",
+	"t_ko_freiesfliegen_mod_lame_setting": "never",
+	"t_ko_freiesfliegen_mod_lame": "0",
+	"t_ko_gaukeleien_mod_lame_setting": "ask",
+	"t_ko_gaukeleien_mod_lame": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+	"t_ko_immanspiel_mod_lame_setting": "always",
+	"t_ko_immanspiel_mod_lame": "3",
+	"t_ko_klettern_mod_lame_setting": "always",
+	"t_ko_klettern_mod_lame": "3",
+	"t_ko_koerperbeherrschung_mod_lame_setting": "ask",
+	"t_ko_koerperbeherrschung_mod_lame": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+	"t_ko_reiten_mod_lame_setting": "ask",
+	"t_ko_reiten_mod_lame": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+	"t_ko_schleichen_mod_lame_setting": "always",
+	"t_ko_schleichen_mod_lame": "3",
+	"t_ko_schwimmen_mod_lame_setting": "always",
+	"t_ko_schwimmen_mod_lame": "3",
+	"t_ko_selbstbeherrschung_mod_lame_setting": "never",
+	"t_ko_selbstbeherrschung_mod_lame": "0",
+	"t_ko_sichverstecken_mod_lame_setting": "ask",
+	"t_ko_sichverstecken_mod_lame": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+	"t_ko_singen_mod_lame_setting": "never",
+	"t_ko_singen_mod_lame": "0",
+	"t_ko_sinnenschaerfe_mod_lame_setting": "never",
+	"t_ko_sinnenschaerfe_mod_lame": "0",
+	"t_ko_skifahren_mod_lame_setting": "always",
+	"t_ko_skifahren_mod_lame": "3",
+	"t_ko_stimmenimitieren_mod_lame_setting": "never",
+	"t_ko_stimmenimitieren_mod_lame": "0",
+	"t_ko_tanzen_mod_lame_setting": "always",
+	"t_ko_tanzen_mod_lame": "3",
+	"t_ko_taschendiebstahl_mod_lame_setting": "ask",
+	"t_ko_taschendiebstahl_mod_lame": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+	"t_ko_zechen_mod_lame_setting": "never",
+	"t_ko_zechen_mod_lame": "0",
 
 	// Combat
 	/// Melee AT Values
@@ -161,6 +222,11 @@ const defaultValues = {
 	"PA_zweihand-hiebwaffen": 5,
 	"PA_zweihandschwerter": 5,
 
+	/// Melee manoeuvres
+	"k_ausfall_mod_dialog_dwarven_stature": "",
+	"k_gegenhalten_mod_advantages_disadvantages": 0,
+	"k_umreissen_mod_advantages_disadvantages": 0,
+
 	/// Melee other
 	"NKW_Aktiv1": 0,
 	"NKW_Aktiv2": 0,
@@ -175,6 +241,8 @@ const defaultValues = {
 	"TP_Bonus_Aktiv": 0,
 
 	"k_mod_left_hand": 9,
+	"k_ausweichen_mod_akrobatik": 0,
+	"k_ausweichen_mod_vorteile_nachteile": 0,
 
 	/// Ranged Combat
 	"FK_Aktiv": 5,
@@ -270,8 +338,10 @@ const defaultValues = {
 	"be_pa_mod": 0,
 	"be_at_mod_hint": 0,
 	"be_pa_mod_hint": 0,
+	"BE_GS_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
+	"BE_mod_advantages_disadvantages": 0,
 
 	"inibasis2": 6,
 	"inibasis": 6,
@@ -1371,6 +1441,44 @@ const talentsData = {
 	't_sc_vorimperialepiktogramme': {'internal': "schrift_vorimperialepiktogramme", 'ui': "Vor-Imperiale Piktogramme"},
 	't_sc_wasserschallzeichen': {'internal': "schrift_wasserschallzeichen", 'ui': "Wasserschallzeichen"}
 };
+const talentsDataOldToNew = {};
+for (let talent in talentsData)
+{
+	talentsDataOldToNew[talentsData[talent]["internal"]] = talent;
+}
+
+/*
+	Gifts Data
+
+Default data for known gifts.
+*/
+const giftsData = {
+	"empathie": { 'ui': "Empathie", 'stats': ['MU', 'IN', 'IN'] },
+	"gefahreninstinkt": { 'ui': "Gefahreninstinkt", 'stats': ['KL', 'IN', 'IN'] },
+	"geraeuschhexerei": { 'ui': "Geräuschhexerei", 'stats': ['IN', 'CH', 'KO'] },
+	"kraefteschub/talentschub": { 'ui': "Kräfteschub/Talentschub", 'stats': ['MU', 'IN', 'KO'] },
+	"magiegespuer": { 'ui': "Magiegespür", 'stats': ['MU', 'IN', 'IN'] },
+	"prophezeien": { 'ui': "Prophezeien", 'stats': ['IN', 'IN', 'CH'] },
+	"tierempathie": { 'ui': "Tierempathie", 'stats': ['MU', 'IN', 'CH'] },
+	"zwergennase": { 'ui': "Zwergennase", 'stats': ['IN', 'IN', 'FF'] },
+};
+
+/*
+	Metatalents Data
+
+Default data for known metatalents.
+*/
+const metatalentsData = {
+	"ansitzjagd": { 'ui': "Ansitzjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"hetzjagd": { 'ui': "Hetzjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"kraeutersuchen": { 'ui': "Kräutersuchen", 'stats': ['MU', 'IN', 'FF'] },
+	"nahrungsammeln": { 'ui': "Nahrungsammeln", 'stats': ['MU', 'IN', 'FF'] },
+	"pirschjagd": { 'ui': "Pirschjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"speerfischen": { 'ui': "Speerfischen", 'stats': ['MU', 'IN', 'GE'] },
+	"tierfallenstellen": { 'ui': "Tierfallenstellen", 'stats': ['KL', 'IN', 'FF'] },
+	"wachehalten": { 'ui': "Wachehalten", 'stats': ['MU', 'IN', 'KO'] },
+};
+
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
 	'z_accuratum': {'internal': "accuratum", 'ui': "Accuratum Zaubernadel", 'stats': ['KL', 'CH', 'FF']},
@@ -1912,7 +2020,7 @@ const meleeData = {
 			'sf_ausweichenI',
 			'sf_ausweichenII',
 			'sf_ausweicheniII',
-			'k_ausweichen_akrobatikbonus'
+			'k_ausweichen_mod_akrobatik'
 			]
 		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, ggf. INI-Verlust
 	},
@@ -1933,7 +2041,7 @@ const meleeData = {
 			'sf_ausweichenI',
 			'sf_ausweichenII',
 			'sf_ausweicheniII',
-			'k_ausweichen_akrobatikbonus'
+			'k_ausweichen_mod_akrobatik'
 			]
 		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, INI-Verlust
 	},

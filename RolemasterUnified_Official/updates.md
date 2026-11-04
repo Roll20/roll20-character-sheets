@@ -1,9 +1,115 @@
-# 2026-09-15
+# 2026-11-02
 
-Add {Acid|Mana|Void} {Ball|Bolt} to weapon attacks.
+- Spells:
+  - Fix for spell list ranks after level up.
+  - Fix for spell lists when ranks updates.
+  - Fix for spell lists on scr and stat changes.
+  - Fix spell mastery on updates.
+  - Add common buttons/refresh for all spells helpers.
+  - Implement the `refreshspells` and `refreshspellranks` buttons.
+  - In spell list info; show the scr_info and spellmastery_info
+  - Show general SCR bonus
+  - Tests for SCR/Spellmastery updates
+- Kill the reset workers function.
+- Reorg settings tab,
+- Refresh button for stats/realms.
+- Bonus Adder now understands PBonus and Rank bonuses.
+
+# 2026-10-28
+
+- Fix for levelup when it's not a specialised skill
+- Test-support `getAttrs`/`setAttrs` does not set nil fields.
+
+# 2026-10-27
+
+- Fix tracker to fetch characters again.
+- Remove rmuGetAttrs/rmuSetAttrs.
+- Fix the manual skillrefresh.
+- Fix for leveling up without any talents.
+- Remove a lot of debug messages.
+- BonusAdder is a bit more robust in the case of bad additions.
+
+# 2026-10-22a
+
+- Add `attr_fix` to work around an issue in Roll20 characters.
+
+# 2026-10-22
+
+- Add Arcane spell failure
+- Rearrange non-async code from rmuasync (moved to support)
+- Fix test dependencies to be more explicit
+- Spells:
+  - Fetch trickery & grace when casting spells
+  - Fix for total not being defined (again, rare error)
+  - Add a basic test for spell casting.
+  - More strictness in the spells page.
+- Fix attacks with strict
+
+# 2026-10-20
+
+- Add Arcane average option to the options in game
+- Stats
+  - Add a "Realm Stat" on the character sheet.  Like Will it's a phantom
+    stat, but having it clear is useful for Hybrids and Arcane users
+  - Kill the stat cache.  Now stuff pulls directly
+  - Stats automatically update from dependencies.
+  - Add a stat refresh button
+- Inventory Add Type (the toggle for the of item to add).  Fix handler so it toggles correctly.
+- Test Harness
+   - Handle multiple watchers on the same event.
+   - Trigger handlers when an attribute is changed.
+   - Handle triggering repeating section events.
+   - Handle repeating sections.
+   - Handle custom roll parsing.
+- Add standard suffixes for things like misc or bonus.  Avoid typos.
+- Skills update from dependencies.
+- Make PP Dev a special skill
+- Remove rmuSafe - seems like a failed idea.  Test better is the right solution.
+- Handle having pp multipliers with no PP
+- Handle invalid stats in skill updates
+- Grace & Trickery handled specifically for spell updates
+   - No longer rebuild everything for these.
+- Add new version of updateSkills & updateCategories
+   - Add test that every category updates.
+- RRs
+  - Can edit RRs miscbonus on sheet
+  - Show hybrid "realms" RRs
+  - RR & RR test now JS strict
+  - Updated dynamically
+  - Fix bug with hybrids
+  - Complete tests of nearly all realms
+  - Add refresh button
+- Fix Mental Focus and Endurance functions
+- Fix a couple of (rare?) bugs in async
+- Fix for rare bug in injuries (race condition)
+- Fix for rare bug in tracker (race condition)
+- Fix for rare bug in talents (race condition)
+- Show refresh counter for stats/skills
+- Removed used hack to get messages
+- Fix some race conditions in Edit.
+- Streamline version update process.
+- Fix build for RR changes.
+- Fix Training Packages needing a "Summoning" skill.
+- Levelup
+  - Fix a case were level could be shown as undefinied
+  - Remove pending on level/xp change.
+  - Use Roll20 dice roller to roll stat gains
+  - Report stat gains to chat (uses /whisper)
+  - Fix clear uses to not use a global.
+  - Show spent DP on the levelup summary page.
+  - Stat gains now counts organic + purchased stat gains.
+- Spell Mastery shown in info popup
+
+# 2026-09-29
+
+- Fix for options on the sheet
+
+
+# 2026-09-17
+
+- Add {Acid|Mana|Void} {Ball|Bolt} to weapon attacks.
     Probably not helpful unless you own Arcane
-Add bone & other as item materials
-
+- Add bone & other as item materials
 
 # 2026-08-??
 

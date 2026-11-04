@@ -240,4 +240,31 @@ on('clicked:patzer', async (info) => {
 		}
 	);
 });
+
+/*
+Detect game type
+
+This function uses a heuristic to determine whether the game is a legacy or a Jumpgate game.
+
+The downside of the approach used here is that legacy games will crash the function and stop all further execution of the action listener. Therefore, it must always come as one of the last functions to call.
+*/
+async function detectGameType()
+{
+	const caller = "detectGameType()";
+	const jumpgate = { "global_game_type": "Jumpgate" };
+	const gameTypeCheckRoll = "/s Erkennung des Spieltyps: Wenn dies zu einer Fehlermeldung führt (&bdquo;Unrecognized command: /s ...&ldquo;), handelt es sich um ein Legacy-Spiel und die Jumpgate-Features bleiben abgeschaltet. Nach einem Upgrade des Spiels kann über das Konfiguration-Tab im Abschnitt &bdquo;Spieltyp&ldquo; durch Drücken des Knopfes &bdquo;Spieltyp überprüfen&ldquo; eine manuelle Prüfung angestoßen werden, um so auch in den Genuss der neuen Features zu kommen.";
+
+	// Execute Roll
+	/// If this fails, execution will stop.
+	/// THIS IS IMPORTANT: THE NEXT LINE WILL FAIL ON LEGACY GAMES!
+	/// THIS BEHAVIOUR IS USED FOR THE GAME TYPE DETECTION!
+	/// Therefore: No if(), no switch(). Getting past that line is the equivalent to gameType === "Jumpgate" evaluating to true.
+	results = await startRoll(gameTypeCheckRoll);
+
+	// Process Roll
+	/// If we made it to here, the roll was successful. That means '/s' is supported and we are not running inside a legacy game.
+	finishRoll(results.rollId);
+
+	return jumpgate;
+}
 /* other end */
