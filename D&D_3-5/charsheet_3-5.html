@@ -14009,6 +14009,13 @@ const skillRankWarningValue = (ranksValue, classSkillValue, characterLevelValue)
 	return ranks > maximumRanks ? "1" : "0";
 };
 
+const skillRankHitDieFields = Array.from({length: 10}, (unused, index) => `hitdie${index + 1}`);
+const skillRankCharacterLevel = values => {
+	return values.autoCalcHP === "1"
+		? sumNumberedAttributes(values, "hitdie")
+		: values.hitdie;
+};
+
 const updateSkillRankWarnings = () => {
 	getSectionIDs("repeating_skills", skillRowIds => {
 		const repeatingSkillFields = skillRowIds.reduce((fields, rowId) => {
@@ -14016,13 +14023,14 @@ const updateSkillRankWarnings = () => {
 			return fields;
 		}, []);
 
-		getAttrs(["hitdie", ...trackedSkillFields, ...repeatingSkillFields], values => {
+		getAttrs(["autoCalcHP", "hitdie", ...skillRankHitDieFields, ...trackedSkillFields, ...repeatingSkillFields], values => {
 			const updates = {};
+			const characterLevel = skillRankCharacterLevel(values);
 			trackedSkills.forEach(skill => {
 				updates[`${skill}rankwarning`] = skillRankWarningValue(
 					values[`${skill}ranks`],
 					values[`${skill}classskill`],
-					values.hitdie
+					characterLevel
 				);
 			});
 
@@ -14030,7 +14038,7 @@ const updateSkillRankWarnings = () => {
 				updates[`repeating_skills_${rowId}_otherskillrankwarning`] = skillRankWarningValue(
 					values[`repeating_skills_${rowId}_otherskillranks`],
 					values[`repeating_skills_${rowId}_otherskillskill`],
-					values.hitdie
+					characterLevel
 				);
 			});
 
@@ -14039,7 +14047,8 @@ const updateSkillRankWarnings = () => {
 	});
 };
 
-on(`sheet:opened change:hitdie ${trackedSkillEvents} change:repeating_skills:otherskillranks change:repeating_skills:otherskillskill remove:repeating_skills`, updateSkillRankWarnings);
+const skillRankHitDieEvents = skillRankHitDieFields.map(field => `change:${field}`).join(" ");
+on(`sheet:opened change:autoCalcHP change:hitdie ${skillRankHitDieEvents} ${trackedSkillEvents} change:repeating_skills:otherskillranks change:repeating_skills:otherskillskill remove:repeating_skills`, updateSkillRankWarnings);
 
 on("change:npcautoCalcHP change:npclevel1 change:npclevel2 change:npclevel3 change:npclevel4 change:npclevel5 change:npclevel6 change:npclevel7 change:npclevel8 change:npclevel9 change:npclevel10", eventInfo => {
 	getAttrs(["npcautoCalcHP", "npclevel1", "npclevel2", "npclevel3", "npclevel4", "npclevel5", "npclevel6", "npclevel7", "npclevel8", "npclevel9", "npclevel10"], values => {
