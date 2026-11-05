@@ -1230,8 +1230,8 @@ traits.forEach((trait) => {
                     let tMod = parseInt(v[`${trait}mod`]) || 0;
                     let tDelta = parseInt(eventInfo.newValue) || 0;
                     let prevDelta = parseInt(eventInfo.previousValue) || 0;
-                    let tRankBase = v[`${trait}_base`];
-                    let tModBase = v[`${trait}mod_base`];
+                    let tRankBase = parseInt(v[`${trait}_base`]);
+                    let tModBase = parseInt(v[`${trait}mod_base`]) || 0;
                     const sAttRankBase = trait + "_base",
                         sAttRankModBase = trait + "mod_base",
                         sAttRank = trait,
@@ -1241,7 +1241,7 @@ traits.forEach((trait) => {
                     let counter = Math.abs(tDelta);
                     // log("Starting Values",`Rank/Base: ${tRank}/${tRankBase}, Mod/Base: ${tMod}/${tModBase}, Delta: ${tDelta}, Prev Delta: ${prevDelta}`,deltaColor);
                     //Check if previous Delta was 0, if so, will want to set base before changing anything
-                    if (prevDelta === 0 || tRankBase === "") {
+                    if (prevDelta === 0 || Number.isNaN(tRankBase)) {
                         //set the base values to the current values of the trait and mod
                         // log("Message","^^^ Setting the Bases ^^^",deltaColor);
                         sattrs[sAttRankBase] = tRank;
@@ -2723,7 +2723,7 @@ const determineWeaponOptions = function (
  * @param {object} argument.jsonObj - The PHEG compendium data that is being parsed.
  * @returns {void}
  */
-const applyGeneralEffects = function({targetObj,sectionName,jsonObj}){
+const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes = {}}){
   debug('Applying effects fields');
   const effectPrefix = PHEGSingular[sectionName];
   if (jsonObj[`${effectPrefix}effect`]) {
@@ -2734,16 +2734,19 @@ const applyGeneralEffects = function({targetObj,sectionName,jsonObj}){
         effectString.replace(
           /(.+?)\s*:\s*(.+)/,
           (match,field,value)=>{
-            if(targetObj.hasOwnProperty(field)){
-              let numValue = +value;
-              let numFieldValue = +targetObj[field];
-              if(!Number.isNaN(numValue) && !Number.isNaN(numFieldValue)){
-                targetObj[field] += numValue;
-              }else{
-                targetObj[field] += `& ${value}`;
-              }
+            const findKey = obj => Object.keys(obj).find(key => key.toLowerCase() === field.toLowerCase());
+            const targetField = findKey(targetObj) || field;
+            const currentValue = targetObj.hasOwnProperty(targetField) ?
+              targetObj[targetField] :
+              attributes[findKey(attributes)];
+            const numValue = +value;
+            const numCurrentValue = +(currentValue || 0);
+            if(!Number.isNaN(numValue) && !Number.isNaN(numCurrentValue)){
+              targetObj[targetField] = numCurrentValue + numValue;
+            }else if(/(reason|modtype)$/i.test(field) && currentValue){
+              targetObj[targetField] = `${currentValue}`.split(/\s*,\s*/).includes(value) ? `${currentValue}` : `${currentValue}, ${value}`;
             }else{
-              targetObj[field] = value;
+              targetObj[targetField] = value;
             }
           }
         )
@@ -2924,6 +2927,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes, prefix
       targetObj,
       sectionName:repSection,
       jsonObj,
+      attributes,
     });
   }
   if(fields.length) {
