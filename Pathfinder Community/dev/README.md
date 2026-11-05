@@ -78,6 +78,9 @@ More specific instructions; there is only a 'cmd' directory, not a bin directory
 - Run `npm run build` or `npm run dev` - Builds/Bundles the project's index.html and continues to watch for changes in the "./src" folder. Use Case: Development/Testing. Outputs a bundled index.html, copies ".src/pathfinder.css" and ".src/translation.json" to ".dist/" folder.
 - Run `npm run prod` - Turns **debug off** automatically. Builds/Bundles "pathfinder_community.html" and copies the pathfinder_community.css and translation.json and HTML files to the "/prod" folder. Use Case: Roll20 production. To push the production code to Roll20's repository, simply copy these files to the root of the project and make a pull request of any changes to Roll20's Origin/Main for approval.
 
+## Tests
+- Run `npm test` from the "./dev" folder (Node 18 or later, no extra install). It runs the files in "./test" with Node's built-in test runner. They load the built "../pathfinder_community.html", run its sheet workers in a small fake of Roll20's sheet sandbox and check their behavior. Set `SHEET_HTML=/path/to/pathfinder_community.html` to test another build, for example the one on master to compare.
+
 ## Viewing Edits on Roll20
 * Option 1: (preferred) Sync a Custom Sandbox game to your local files using Scott C's Chrome browser extension [Roll20 API and Sheet Autouploader](https://chromewebstore.google.com/detail/roll20-api-and-sheet-auto/hboggmcfmaakkifgifjbccnpfmnegick) Use the in-game Custom Sandbox Tool to browse to your local "./dist" folder. The extension can "should" detect any local changes and update the sheet in-game.
 * Option 2: Use the bundled index.html, pathfinder.css, and translation.json from the ./dist or ./prod folder accordingly. These files can be copied as raw text directly into a Custom game's, "Game Settings" editor (HTML|CSS|TRANSLATION|PREVIEW). Do not rely on the Custom settings Preview tab. Always view sheet changes "in-game" for accurate depiction.
