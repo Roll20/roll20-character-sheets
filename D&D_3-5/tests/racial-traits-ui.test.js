@@ -45,12 +45,17 @@ const chatButton = repeatingSection[1].match(/<button[^>]+class="racial-trait-ro
 assert.ok(chatButton, 'each racial trait title must be a chat roll button');
 assert.match(chatButton[0], /type="roll"/);
 assert.match(chatButton[0], /name="roll_racialtrait"/);
-assert.match(chatButton[0], /&{template:DnD35StdRoll}/);
-assert.match(chatButton[0], /{{abilityflag=true}}/);
+assert.match(chatButton[0], /&{template:DnD35RacialTrait}/);
+assert.match(chatButton[0], /{{character=@{character_name}}}/);
 assert.match(chatButton[0], /{{name=@{racialtrait_name}}}/);
-assert.match(chatButton[0], /{{subtags=@{racialtrait_summary}}}/);
-assert.match(chatButton[0], /{{traitdescription=@{racialtrait_description}}}/);
-assert.match(chatButton[0], /{{traitnotes=@{racialtrait_notes}}}/);
+assert.match(chatButton[0], /{{summary=@{racialtrait_summary}}}/);
+assert.match(chatButton[0], /{{description=@{racialtrait_description}}}/);
+assert.match(chatButton[0], /{{notes=@{racialtrait_notes}}}/);
+assert.doesNotMatch(
+    repeatingSection[1],
+    /<(?:table|thead|tbody|tfoot|tr|th|td)\b/i,
+    'the new structured editor must not introduce table-based layout'
+);
 assert.match(
     repeatingSection[1],
     /class="racial-trait-summary-display"[^>]+name="attr_racialtrait_summary"/,
@@ -62,20 +67,27 @@ assert.match(
     'the compact summary must wrap on its own line beneath the title'
 );
 
-assert.match(
-    sheet,
-    /{{#traitdescription}}<tr class="sheet-racial-trait-section">[\s\S]*?{{traitdescription}}[\s\S]*?{{\/traitdescription}}/,
-    'the D&D 3.5 standard roll template must render a full-width trait description'
+const chatTemplate = sheet.match(/<rolltemplate class="sheet-rolltemplate-DnD35RacialTrait">([\s\S]*?)<\/rolltemplate>/);
+assert.ok(chatTemplate, 'a dedicated D&D 3.5 racial trait roll template must exist');
+assert.match(chatTemplate[1], /{{#character}}[\s\S]*?{{character}}[\s\S]*?{{\/character}}/);
+assert.match(chatTemplate[1], /class="sheet-racial-trait-title">{{name}}/);
+assert.match(chatTemplate[1], /{{#summary}}[\s\S]*?{{summary}}[\s\S]*?{{\/summary}}/);
+assert.match(chatTemplate[1], /{{#description}}[\s\S]*?{{description}}[\s\S]*?{{\/description}}/);
+assert.match(chatTemplate[1], /{{#notes}}[\s\S]*?{{notes}}[\s\S]*?{{\/notes}}/);
+assert.doesNotMatch(
+    chatTemplate[1],
+    /<(?:table|thead|tbody|tfoot|tr|th|td)\b/i,
+    'the new racial trait roll template must not use table elements'
 );
 assert.match(
-    sheet,
-    /{{#traitnotes}}<tr class="sheet-racial-trait-section sheet-racial-trait-notes">[\s\S]*?{{traitnotes}}[\s\S]*?{{\/traitnotes}}/,
-    'the D&D 3.5 standard roll template must render a separate notes section'
+    styles,
+    /\.sheet-rolltemplate-DnD35RacialTrait\s+\.sheet-racial-trait-card\s*{/,
+    'the dedicated racial trait roll template must be styled'
 );
 assert.match(
-    sheet,
-    /{{#allprops\(\) notes traitdescription traitnotes /,
-    'trait-only template properties must not be repeated as generic key/value rows'
+    styles,
+    /\.sheet-rolltemplate-darkmode\.sheet-rolltemplate-DnD35RacialTrait\s+\.sheet-racial-trait-card\s*{/,
+    'the dedicated racial trait roll template must support dark mode'
 );
 
 assert.match(
