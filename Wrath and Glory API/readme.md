@@ -1,6 +1,6 @@
 # WH40k Wrath & Glory (Advanced API) Character Sheet
 
-This is a multi-purpose sheet for both characters (default view) and NPC's based on the quickstart rules (subject to change).  
+This is a multi-purpose sheet for both characters (default view) and NPC's for the Revised Edition rules.  
 
 This Wrath & Glory character sheet provides dice automation for inline dice rolls for any user and is integrated with the Wrath & Glory dice roller Mod Script (Roll20 Pro). 
 
@@ -28,13 +28,13 @@ All images are in the `images` folder and are released under CC0 1.0 Universal (
 - `info-unchecked-icon-16px.png` and `minus-checked-icon-16px.png`: checkbox icons created by Terry Duchastel and released under CC0 1.0.
 
 ### Planned Releases
-3.2 Maintenance - refactor code to align with Roll20 standards.
+3.2 Maintenance - continue aligning the code with Roll20 standards (compliance fixes and image hosting are done; removing tables and revising dice rolling are next).
 
 ### Current Release Changelog
 
 v3.1. Errata, Fixes, and Dying Enhancement
 
-The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the addition of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
 
 Updates:
 01. New: Added Dying checkbox to align with how Traumatic wounds work.  The Wrath dice for Traumatic Wounds only apply when a player is dying.
@@ -45,6 +45,15 @@ Updates:
 06. New: Errata changes for calculating wounds - I opted to leave in the recovery roll for shock to allow groups to have that option if so desired.
 
 ### Changelog
+
+** November 2026 - Layout and image cleanup (no change to sheet behavior or attribute names)**
+
+Updates:
+01. Cosmetic: Images are now hosted in the Roll20 repository (CC0) instead of Imgur.
+02. Cosmetic: Roll templates and sheet layout no longer use `<table>` elements or `display: table`; they use divs and CSS grid.
+03. Cosmetic: API roll labels no longer include the unused `++` markers.
+04. Fix: Stylelint warnings resolved in the CSS.
+05. Docs: API scripts wording changed to Mod Scripts.
 
 ** October 16th, 2026 - Roll20 repository compliance fixes (no change to sheet behavior or attribute names)**
 
@@ -57,7 +66,7 @@ Updates:
 
 ** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition** 
 
-The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the addition of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
 
 Updates:
 01. Cosmetic: Replaced all references to BP and Buildpoints with XP and Experience Points respectively.
