@@ -115,6 +115,9 @@ This is my fork of Suldae's initial sheet.
 * Added size difference Select to modify rolls
 * Added 2H mod when calculate Disarm bonus
 
+#### Bug Fix Update - Nov 2016
+* Broken background image fixed by Fire B. (13553003) and Vialmada (6040293)
+
 ### TODO
 
 * Compute Keen in conjunction with damage rolls
