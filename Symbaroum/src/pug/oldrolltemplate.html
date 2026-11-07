@@ -1,105 +1,175 @@
-<rolltemplate class="sheet-rolltemplate-abilitycheck">
-    <table>
-    	<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
-		{{#rollLess() selected 0}}
-        	<tr><td class="attribcat" colspan="2">{{character}} has failed to select an Attribute for this Ability</td></tr>
-        {{/rollLess() selected 0}}
-        {{#rollGreater() selected 0}}
-    		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
-    		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
-    		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
-    		{{#rollLess() roll attribute}}
-    			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-    		{{/rollLess() roll attribute}}
-    		{{#rollTotal() roll attribute}}
-    			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-    		{{/rollTotal() roll attribute}}
-    		{{#rollGreater() roll attribute}}
-    		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
-    		{{/rollGreater() roll attribute}}
-    	{{/rollGreater() selected 0}}
-    </table>
+<!-- Roll Templates -->
+<rolltemplate class="sheet-rolltemplate-initiative">
+    <div class="container">
+        <div><h1>Initiative *for* {{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		<div class="rowcolor"><span class="tcat">Rolled: </span>{{computed::roll1}}</div>
+    </div>
 </rolltemplate>
-<rolltemplate class="sheet-rolltemplate-powercheck">
-    <table>
-		<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
-		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
-		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
-		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
-		{{#rollLess() roll attribute}}
-			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-		{{/rollLess() roll attribute}}
-		{{#rollTotal() roll attribute}}
-			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-		{{/rollTotal() roll attribute}}		
-		{{#rollGreater() roll attribute}}
-		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
-		{{/rollGreater() roll attribute}}
-    </table>
+
+<rolltemplate class="sheet-rolltemplate-check">
+    <div class="container">
+
+		{{#name}}  <!--  Attributes -->
+			<div><h3 style="color: rgb(250,250,250);">{{name}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{title}}</h3></div>
+		{{/name}}
+
+		{{#attackTitle}}
+			<div><h3 style="color: rgb(250,250,250);">{{attackTitle}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{Weapon}} {{#rollTotal() vantage 1}}<span style="color: Green; padding: 0;" data-i18n-title="advantage-c"> + </span>{{/rollTotal() vantage 1}}</h3></div>
+		{{/attackTitle}}
+
+		{{#defenseTitle}}
+			<div><h3 style="color: rgb(250,250,250);">{{defenseTitle}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{Armor}} {{#rollTotal() vantage 1}}<span style="color: Red; padding: 0;" data-i18n-title="disadvantage-c"> - </span>{{/rollTotal() vantage 1}}</h3></div>
+		{{/defenseTitle}}
+
+		{{#commonTitle}} <!-- Common structure for Traits, Abilities, Boons, Burdens, Rituals, and Mystical Powers --> 
+			<div><h3 style="color: rgb(250,250,250);">{{commonTitle}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{commonElement}}</h3></div>
+		{{/commonTitle}}
+
+		{{#death}}  <!--  Death Check -->
+			<div><h3 style="color: rgb(250,250,250);">{{death}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{title}}</h3></div>
+		{{/death}}
+		
+		{{#passThrough}}  
+			<div><h3 style="color: rgb(250,250,250);">{{passThrough}}</h3></div>
+		{{/passThrough}}
+		
+		{{#chat}}  <!--  to Chat -->
+			<div><h3 style="color: rgb(250,250,250);">{{chat}}</h3></div>
+			<div><h3 style="color: rgb(204,180,117);">{{ChatName}}</h3></div>
+		{{/chat}}
+		
+		<hr style="width: 240px; height: 0px;  margin: 0px 14px 0px 14px; border: 1px solid DimGray;" >
+		
+		{{#name}}
+			<div class="rowcolor"><span class="tcat" data-i18n="roll-c">Roll </span>{{Roll}}</div>
+			{{#Target}}
+				<div class="rowcolor"><span class="tcat" data-i18n="target-c">Target </span>{{Target}}</div>
+				{{#rollBetween() Roll 0 Target }}
+					<div class="rowcolor"><span style="color: #22B14C;" data-i18n="success-c">Success</span></div>
+				{{/rollBetween() Roll 0 Target }}
+				{{#rollGreater() Roll Target}}
+					<div class="rowcolor"><span style="color: #BD001D;" data-i18n="failure-c">Failure</span></div>
+				{{/rollGreater() Roll Target}}
+			{{/Target}}
+		{{/name}}
+
+		{{#attackTitle}}
+			{{#Roll}}
+				<div class="rowcolor"><span class="tcat" data-i18n="roll-c">Roll </span>{{Roll}}</div>
+				{{#Target}}
+					<div class="rowcolor"><span class="tcat" data-i18n="target-c">Target </span>{{Target}}</div>
+					{{#rollBetween() Roll 0 Target }}
+						{{#rollTotal() Roll 1 }}
+							<div class="rowcolor"><span style="color: #22B14C;" data-i18n="perfectHit!-c">Perfect Hit!</span></div>
+							{{#Damage}}
+								<div class="rowcolor"><span class="tcat" data-i18n="damage-c">Damage </span>{{Damage}} {{#rollTotal() vantage 1}}<span data-i18n-title="advantage-c"> + {{damage-advantage}}</span>{{/rollTotal() vantage 1}}<span style="color: RoyalBlue" data-i18n-title="criticalDamage-c"> + &nbsp; {{damage-crit}} </span></div>
+							{{/Damage}}
+						{{/rollTotal() Roll 1 }}
+						{{#^rollTotal() Roll 1 }}
+							<div class="rowcolor"><span style="color: #22B14C;" data-i18n="success-c">Success</span></div>
+							{{#Damage}}
+								<div class="rowcolor"><span class="tcat" data-i18n="damage-c">Damage </span>{{Damage}} {{#rollTotal() vantage 1}}<span data-i18n-title="advantage-c"> + {{damage-advantage}}</span>{{/rollTotal() vantage 1}}</div>
+							{{/Damage}}
+						{{/^rollTotal() Roll 1 }}
+					{{/rollBetween() Roll 0 Target }}
+					{{#rollGreater() Roll Target}}
+						{{#rollTotal() Roll 20 }}
+							<div class="rowcolor"><span style="color: #BD001D;" data-i18n="fumbledAttack!-c">Fumbled Attack!</span></div>
+						{{/rollTotal() Roll 20 }}
+						{{#^rollTotal() Roll 20 }}
+							<div class="rowcolor"><span style="color: #BD001D;" data-i18n="failure-c">Failure</span></div>
+						{{/^rollTotal() Roll 20 }}
+
+					{{/rollGreater() Roll Target}}
+				{{/Target}}
+			{{/Roll}}
+		{{/attackTitle}}
+
+		{{#defenseTitle}}
+			{{#Roll}}
+				<div class="rowcolor"><span class="tcat" data-i18n="roll-c">Roll </span>{{Roll}}</div>
+				{{#Target}}
+					<div class="rowcolor"><span class="tcat" data-i18n="target-c">Target </span>{{Target}}</div>
+					{{#rollBetween() Roll 0 Target }}
+						{{#rollTotal() Roll 1 }}
+							<div class="rowcolor"><span style="color: #22B14C;" data-i18n="perfectDefense!-c">Perfect Defense!</span></div>
+						{{/rollTotal() Roll 1 }}
+						{{#^rollTotal() Roll 1 }}
+							<div class="rowcolor"><span style="color: #22B14C;" data-i18n="success-c">Success</span></div>
+						{{/^rollTotal() Roll 1 }}
+					{{/rollBetween() Roll 0 Target }}
+					{{#rollGreater() Roll Target}}
+						{{#rollTotal() Roll 20 }}
+							<div class="rowcolor"><span style="color: #BD001D;" data-i18n="fumbledDefense!-c">Fumbled Defense!</span></div>
+						{{#Damage}}
+								<div class="rowcolor"><span class="tcat" data-i18n="protect-c">Protect </span>{{Damage}} {{#rollTotal() vantage 1}}<span data-i18n-title="disadvantage-c"> - 2</span>{{/rollTotal() vantage 1}}<span style="color: Magenta" data-i18n-title="fumblePenalty-c"> > - </span>&nbsp; {{damage-crit}} </div>
+						{{/Damage}}
+						{{/rollTotal() Roll 20 }}
+						{{#^rollTotal() Roll 20 }}
+							<div class="rowcolor"><span style="color: #BD001D;" data-i18n="failure-c">Failure</span></div>
+							{{#Damage}}
+								<div class="rowcolor"><span class="tcat" data-i18n="protect-c">Protect </span>{{Damage}}{{#rollTotal() vantage 1}}<span data-i18n-title="disadvantage-c"> - 2</span>{{/rollTotal() vantage 1}}</div>
+							{{/Damage}} 
+						{{/^rollTotal() Roll 20 }}
+					{{/rollGreater() Roll Target}}
+				{{/Target}}
+			{{/Roll}}
+		{{/defenseTitle}}		
+
+		{{#commonTitle}} <!-- Common structure for Traits, Abilities, Boons?, Burdens?, Rituals, and Mystical Powers --> 
+			{{#rollLess() selected 0}}
+				<div class="rowcolor"><span style="color: #BD001D;">{{character}} has failed to select an Attribute for this roll</span></div>
+			{{/rollLess() selected 0}}
+			{{#rollGreater() selected 0}}
+				<div class="rowcolor"><span class="tcat" data-i18n="roll-c">Roll </span>{{Roll}}</div>
+				<div class="rowcolor"><span style="color: White; padding: 0; margin: 0px 10px 0px -34px;" data-i18n="attribute">Attribute</span>{{attribute}}</div>
+				{{#rollBetween() Roll 0 attribute }}
+					<div class="rowcolor"><span style="color: #22B14C;" data-i18n="success-c">Success</span></div>
+				{{/rollBetween() Roll 0 attribute }}
+				{{#rollGreater() Roll attribute}}
+					<div class="rowcolor"><span style="color: #BD001D;" data-i18n="failure-c">Failure</span></div>
+				{{/rollGreater() Roll attribute}}
+
+			{{/rollGreater() selected 0}}
+			{{#rollTotal() Level 1 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Novice</div> {{/rollTotal() Level 1 }}
+			{{#rollTotal() Level 2 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Adept</div> {{/rollTotal() Level 2 }}
+			{{#rollTotal() Level 3 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Master</div> {{/rollTotal() Level 3 }}
+			{{#Corruption}}
+				<div class="rowcolor"><span class="tcat" style="width: 90px; color: White; padding: 0; margin: 0px 0px 0px -50px;" data-i18n-title="temporary-corruption" data-i18n="corruption">Corruption </span>{{Corruption}}</div>
+			{{/Corruption}}
+			<div class="rowcolor" style="text-align: center" >{{Effect}}</div>
+		{{/commonTitle}}
+
+		{{#chat}} <!-- Common structure for Traits, Abilities, Boons?, Burdens?, Rituals, and Mystical Powers --> 
+			{{#rollTotal() Level 1 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Novice</div> {{/rollTotal() Level 1 }}
+			{{#rollTotal() Level 2 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Adept</div> {{/rollTotal() Level 2 }}
+			{{#rollTotal() Level 3 }} <div class="rowcolor"><span class="tcat" data-i18n="level:-c">Level: </span>Master</div> {{/rollTotal() Level 3 }}
+			<div class="rowcolor" style="text-align: center" >{{Effect}}</div>
+		{{/chat}}
+		
+ 		{{#death}}
+			<div class="rowcolor"><span class="tcat" data-i18n="roll-c">Roll </span>{{Roll}}</div>
+			{{#rollTotal() Roll 1 }}
+<!-- Remove [d4](~selected|d4) due to PUG compliance -->
+<!--				<div class="rowcolor"><span style="color: Green;" data-i18n="dc1-c">Wakes up with [d4](~selected|d4)</span>[d4](~selected|d4)<span style="color: Green;" data-i18n="dc1b-c"> Toughness recovered </span></div> -->
+				<div class="rowcolor"><span style="color: Green;" data-i18n="dc1-c">Wakes up with 1d4 Toughness recovered </span></div>
+			{{/rollTotal() Roll 1 }}
+			{{#rollBetween() Roll 2 10 }}
+				<div class="rowcolor"><span style="color: rgb(204,180,117);" data-i18n="dc2-10-c">Remains unconscious</span></div>
+			{{/rollBetween() Roll 2 10 }}
+			{{#rollBetween() Roll 11 19 }}
+				<div class="rowcolor"><span style="color: Red;" data-i18n="dc11-19-c">Is one step closer to death</span></div>
+			{{/rollBetween() Roll 11 19 }}
+			{{#rollTotal() Roll 20 }}
+				<div class="rowcolor"><span style="color: DarkRed;" data-i18n="dc20-c">Death</span></div>
+			{{/rollTotal() Roll 20 }}
+		{{/death}}
+	</div>
 </rolltemplate>
-<rolltemplate class="sheet-rolltemplate-attrib">
-    <table>
-		<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
-		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
-		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
-		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
-		{{#rollLess() roll attribute}}
-			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-		{{/rollLess() roll attribute}}
-		{{#rollTotal() roll attribute}}
-			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
-		{{/rollTotal() roll attribute}}		
-		{{#rollGreater() roll attribute}}
-		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
-		{{/rollGreater() roll attribute}}
-    </table>
-</rolltemplate>
-<rolltemplate class="sheet-rolltemplate-defense">
-    <table>
-        {{#rollLess() defense-type 0}}
-    		<tr><th class="defhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="negates-extra-damage">negates extra damage</span>{{#name}}&nbsp;<span data-i18n="using">using</span>&nbsp;{{name}}{{/name}}</th></tr>
-            <tr><td class="defcat"><span data-i18n="damage-negated">Damage negated</span>:</td><td class="defresult">{{damage-taken}}</td></tr>
-        {{/rollLess() defense-type 0}}
-        
-        {{#rollGreater() defense-type 0}}                
-			<tr><th class="defhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="defends">defends</span>{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
-			<tr><td class="defcat"><span data-i18n="attribute">Attribute</span>:</td><td class="defresult">{{attribute}}</td></tr>
-			<tr><td class="defcat"><span data-i18n="dice-roll">Roll</span>:</td><td class="defresult">{{defense-roll}}</td></tr>
-			{{#rollLess() defense-roll attribute1}} <!-- miss -->
-			    {{#^rollWasFumble() defense-roll}}<tr><th class="effex" colspan="2"><span class="defmiss"><span data-i18n="enemy-missed">Enemy missed</span>!</span></th></tr>{{/^rollWasFumble() defense-roll}}
-			    {{#rollWasFumble() defense-roll}} <tr><th class="effex" colspan="2" style="text-shadow:1px 1px 1px Black"><span class="defmiss"><span data-i18n="enemy-critically-missed">Enemy critically missed</span>!</span></th></tr>{{/rollWasFumble() defense-roll}}
-			{{/rollLess() defense-roll attribute1}}
-			
-			{{#rollGreater() defense-roll attribute}} <!-- hit -->
-				 {{#^rollWasCrit() defense-roll}}<tr><th colspan="2" style="border-bottom:0px;"><span class="defhit"><span data-i18n="enemy-hit">Enemy hit</span>!</span></th></tr>{{/^rollWasCrit() defense-roll}}
-				 {{#rollWasCrit() defense-roll}}<tr><th colspan="2" style="border-bottom:0px;"><span class="defhit"><span style="text-shadow:1px 1px 1px Black" data-i18n="enemy-critically-hit">Enemy critically hit</span>!</span></th></tr>{{/rollWasCrit() defense-roll}}
-                {{#rollGreater() damage-taken 0 }}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage-negated">Damage negated</span>:&nbsp;{{damage-taken}}</td></tr>{{/rollGreater() damage-taken 0 }}
-                {{#rollLess() damage-taken 1}}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage-negated">Damage negated</span>:&nbsp;0</td></tr>{{/rollLess() damage-taken 1}}
-			{{/rollGreater() defense-roll attribute}}
-        {{/rollGreater() defense-type 0}}
-    </table>
-</rolltemplate>
-<rolltemplate class="sheet-rolltemplate-attack">
-    <table>
-        {{#rollLess() attack-type 0}}
-        	<tr><th class="attkhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="does-extra-damage">does extra damage</span>&nbsp;{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
-			<tr style="background-color:#ffffff"><td class="attkcat"><span data-i18n="damage">Damage</span>:</td><td class="attkresult">{{damage}}</td></tr>		
-        {{/rollLess() attack-type 0}}
-        {{#rollGreater() attack-type 0}}
-            
-			<tr><th class="attkhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="attacks-chat">attacks</span>{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
-            <tr><td class="attkcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attkresult">{{attribute}}</td></tr>
-            <tr><td class="attkcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attkresult">{{attack}}</td></tr> 
-			{{#rollLess() attack attribute1}}
-				{{#^rollWasFumble() attack}}<tr><th class="effex" colspan="2"><span class="attkhit"><span data-i18n="attack-hit">Attack hit</span>!</span></th></tr>{{/^rollWasFumble() attack}}
-				{{#rollWasFumble() attack}} <tr><th class="effex" colspan="2" style="text-shadow:1px 1px 1px Black"><span class="attkhit"><span data-i18n="attack-critically-hit">Attack critically hit</span>!</span></th></tr>{{/rollWasFumble() attack}}
-				{{#rollGreater() damage 0}}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage">Damage</span>:&nbsp;{{damage}} {{#rollWasFumble() attack}}<span> + </span> {{damage-crit}} {{/rollWasFumble() attack}}</td></tr>{{/rollGreater() damage 0}}
-			{{/rollLess() attack attribute1}}
-			        
-			{{#rollGreater() attack attribute}}
-				{{#^rollWasCrit() attack}}<tr><th colspan="2"><span data-i18n="attack-missed">Attack missed</span>!</th></tr>{{/^rollWasCrit() attack}}
-				{{#rollWasCrit() attack}}<tr><th colspan="2" style="text-shadow:1px 1px 1px Black"><span data-i18n="attack-critically-missed">Attack critically missed</span>!</span></th></tr>{{/rollWasCrit() attack}}
-			{{/rollGreater() attack attribute}}  
-        {{/rollGreater() attack-type 0}} 
-    </table>
-</rolltemplate>
+
