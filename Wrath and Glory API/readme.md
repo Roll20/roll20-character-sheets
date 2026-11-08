@@ -22,10 +22,11 @@ Many thanks to the following individuals who reported defects and provided impro
 4. Thomas: whose help in identifying the underlying issue with a bug fix and willingness to test was a great aid!
 
 ### Image Credits
-All images are in the `images` folder and are released under CC0 1.0 Universal (Public Domain Dedication).
+All images are in the `images` folder. Except for `wrath-glory-background-tile.jpg` (see below), they are released under CC0 1.0 Universal (Public Domain Dedication).
 - `pergament-2-seamless-background.jpg`: "Pergament.2.jpg" from Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Pergament.2.jpg (CC0 1.0), edited to tile seamlessly.
 - `wrath-and-glory-banner-blue.png`: "Wrath & Glory" banner created by Terry Duchastel and released under CC0 1.0.
 - `info-unchecked-icon-16px.png` and `minus-checked-icon-16px.png`: checkbox icons created by Terry Duchastel and released under CC0 1.0.
+- `wrath-glory-background-tile.jpg`: stock photo licensed from Dreamstime under its Royalty-Free license (not CC0 and not free to reuse), https://www.dreamstime.com/stock-photo-stained-old-watercolor-paper-texture-scanned-high-resolution-image43191293, edited into a 1024x1024 tile for use as the sheet background.
 
 ### Planned Releases
 3.2 Maintenance - continue aligning the code with Roll20 standards (compliance fixes and image hosting are done; removing tables and revising dice rolling are next).
