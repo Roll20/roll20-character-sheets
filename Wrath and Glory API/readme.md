@@ -1,8 +1,8 @@
 # WH40k Wrath & Glory (Advanced API) Character Sheet
 
-This is a multi-purpose sheet for both characters (default view) and NPC's based on the quickstart rules (subject to change).  
+This is a multi-purpose sheet for both characters (default view) and NPC's for the Revised Edition rules.  
 
-This Wrath & Glory character sheet provides dice automation for inline dice rolls for any user and is integrated with the Wrath & Glory dice roller API for mentor level gamemasters. 
+This Wrath & Glory character sheet provides dice automation for inline dice rolls for any user and is integrated with the Wrath & Glory dice roller Mod Script (Roll20 Pro).
 
 Please note that the inline dice roll macros do not fully enable the type of dice rolls made in the Wrath & Glory system.  Users will need to hover over the inline roll results to count the number of successes (4 or 5 = 1 success; a 6 = an exalted icon that may be shifted to 2 successes); the inline rolls do not allow for counting if a 6 is = to 2 successes.  At this point it does not add modifiers to the rolls for inline dice.
 
@@ -12,29 +12,30 @@ If you have any questions, comments, or feedback (all welcome) please contact Ba
 Version 3.1 (August 30th, 2020) Revised Release (3.1) fixes.
 this release focused on incorporating max wounds changes from errata, a wiley defect (logical error) in dice rolls, and the addition of dying around trauma.
 
-### Thanks	
+### Thanks
 Many thanks to my players (Dave, Brian, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes - literally - in the middle of play).
 
-Many thanks to the following individuals who reported defects and provided improvements: 
+Many thanks to the following individuals who reported defects and provided improvements:
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
 2. Zoraste: update wounds to include wounds_max for token bar linking + notes field for Gear + minor spelling errors + request for private rolls + contributed code for automating trait calculations
 3. Fenrir: new layout was his work; full contributions in the API.
 4. Thomas: whose help in identifying the underlying issue with a bug fix and willingness to test was a great aid!
 
 ### Image Credits
-All images are in the `images` folder and are released under CC0 1.0 Universal (Public Domain Dedication).
+All images are in the `images` folder. Except for `wrath-glory-background-tile.jpg` (see below), they are released under CC0 1.0 Universal (Public Domain Dedication).
 - `pergament-2-seamless-background.jpg`: "Pergament.2.jpg" from Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Pergament.2.jpg (CC0 1.0), edited to tile seamlessly.
 - `wrath-and-glory-banner-blue.png`: "Wrath & Glory" banner created by Terry Duchastel and released under CC0 1.0.
 - `info-unchecked-icon-16px.png` and `minus-checked-icon-16px.png`: checkbox icons created by Terry Duchastel and released under CC0 1.0.
+- `wrath-glory-background-tile.jpg`: stock photo licensed from Dreamstime under its Royalty-Free license (not CC0 and not free to reuse), https://www.dreamstime.com/stock-photo-stained-old-watercolor-paper-texture-scanned-high-resolution-image43191293, edited into a 1024x1024 tile for use as the sheet background.
 
 ### Planned Releases
-3.2 Maintenance - refactor code to align with Roll20 standards.
+3.2 Maintenance - continue aligning the code with Roll20 standards (compliance fixes and image hosting are done; removing tables and revising dice rolling are next).
 
 ### Current Release Changelog
 
 v3.1. Errata, Fixes, and Dying Enhancement
 
-The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the addition of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
 
 Updates:
 01. New: Added Dying checkbox to align with how Traumatic wounds work.  The Wrath dice for Traumatic Wounds only apply when a player is dying.
@@ -46,18 +47,27 @@ Updates:
 
 ### Changelog
 
+** November 2026 - Layout and image cleanup (no change to sheet behavior or attribute names)**
+
+Updates:
+01. Cosmetic: Images are now hosted in the Roll20 repository (CC0) instead of Imgur.
+02. Cosmetic: Roll templates and sheet layout no longer use `<table>` elements or `display: table`; they use divs and CSS grid.
+03. Cosmetic: API roll labels no longer include the unused `++` markers.
+04. Fix: Stylelint warnings resolved in the CSS.
+05. Docs: API scripts wording changed to Mod Scripts.
+
 ** October 16th, 2026 - Roll20 repository compliance fixes (no change to sheet behavior or attribute names)**
 
 Updates:
 01. Fix: Added `spellcheck="false"` to text inputs and textareas.
 02. Cosmetic: Cleaned up the line breaks and Markdown formatting of the `instructions` text in `sheet.json` (wording unchanged).
 
-** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement** 
+** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement**
 
 
-** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition** 
+** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition**
 
-The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the addition of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
 
 Updates:
 01. Cosmetic: Replaced all references to BP and Buildpoints with XP and Experience Points respectively.
@@ -66,13 +76,13 @@ Updates:
 04. Cosmetic: References to Malignancy/ies changed to Mutation/s.
 05. Cosmetic: relabled Defining Trait to Background Type, removed Keyword from the list and renamed Custom to Other.
 06. Cosmetic: swapped Faction (previously Framework) with Species/Gender
-07.	Cosmetic: added text in skills flagging those with optional use requirements.
-08.	Cosmetic: added text to DMOD insturcting to add +1 for Brutal and Melta Short weapons.
+07.    Cosmetic: added text in skills flagging those with optional use requirements.
+08.    Cosmetic: added text to DMOD insturcting to add +1 for Brutal and Melta Short weapons.
 09. Cosmetic: Moved Memoriable Injuries to Combat tab.
 10. Cosmetic: Switched presentation of Current and Max for Shock and Wounds.
 11. Cosmetic: Removed Hvy and Lght wounds; no longer in use.
 12. Fix: Brutal Roll for non-api die roller on weapon damage.
-13.	Fix: Total Corruption Adjusted value.
+13.    Fix: Total Corruption Adjusted value.
 14. Update: Per revised rules, removed ranks 4 and 5 and updated rank label accordingly.
 15. Update: removed defiance rolls - no longer used.
 16. NEW: Added Faith to first tab.
@@ -82,7 +92,7 @@ Updates:
 20. NEW: Automated replacement of wrath dice with traumatic injuries for Attributes, Traits, Skills, Weapons, and Psychic Powers.  This does not include vehicle and voidship rules till those rules are released.
 21. NEW: On personal tab added fields for - Appearance, Age, Eyes, Hair, Height,Size, and Features.
 
-** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
+** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements**
 
 Updates:
 1. Cosmetic change: changed all dice to D6; teal buttons roll wrath, black/gold/red buttons have no wrath die.
@@ -100,14 +110,14 @@ Updates:
 13. New: Added Memorable Injuries as a repeating framework - can capture multiple memorable injuries - to Personal tab.
 14. New: Auto set rank title based on the selected rank; also automated to update existing character sheets.
 
-** June 30th, 2019: version 2.6 - Fixes** 
+** June 30th, 2019: version 2.6 - Fixes**
 
 Updates:
 1. Fixed NaN error when rolling psyker damage.
 2. Added Psychic Mastery as a hard skill on NPC's so Psychic power rolls are auto-calculated.
 3. Added to all tests a wrath outcome when using the API die roller so that a new ability in the API is included - it lists outcome of the die roll.
 
-** December 17th, 2018: version 2.5 - Fixes** 
+** December 17th, 2018: version 2.5 - Fixes**
 
 Updates:
 1. Fixed update to Conviction for older sheets.
@@ -116,14 +126,14 @@ Updates:
 4. Calculated Heavily wounded for Vehicle and Voidships.
 5. Autoupdate old versions of charactersheets for vehicle wounds, voidship wounds, calculating heavily wounded for vehicles, and heavily wounded for voidships.
 
-** November 4th, 2018: version 2.4 - API Message Layout Changes** 
+** November 4th, 2018: version 2.4 - API Message Layout Changes**
 
 Updates:
 1. API calls to the Wrath & Glory die roller will now use a different layout; the labels are inversed and a slight tweak made to font settings.
 2. API calls will now calculate damage.  The previous DR is replaced with a Damage label and it will show Total Damage and in Parenthesis DR & Successes.
 3. Fixed a labeling issue in the inline dice rolls.
 
-** October 28th, 2018: version 2.3 - Private Rolls & Background** 
+** October 28th, 2018: version 2.3 - Private Rolls & Background**
 
 Updates:
 1. Added the ability to whisper rolls to the GM.  A checkbox at the top of the page allows all rolls on the page to be sent only to the GM. [Thanks to Zoraste for the suggestion]
@@ -132,7 +142,7 @@ Updates:
 4. Made Malignancies a repeating section to capture each malignancy seperate of each other.
 5. Onload - first time loaders of this functionality will have their traits updated as previous formulas were changed.
 
-** October 14th, 2018: version 2.2 - Enhancements & Fixes** 
+** October 14th, 2018: version 2.2 - Enhancements & Fixes**
 
 Updates:
 1. Fixed minor types [Thanks to Zoraste for the catch]
@@ -152,7 +162,7 @@ Updates:
 15. If a psyker (added as a checkbox under keywords) and a weapon is a force weapon add 1/2 Base Willpower to DR.  If the character is not a psyker and the weapon is a force weapon -2 to DR. [Thanks to Morback for the suggestion]
 16. For PC & NPC sheets: Onload of a character sheet with current version, automatically update all weapon DR's, corruption levels, wound, shock, light wounded, heavy wounded.
 
-** September 23rd, 2018: version 2.1 - Fixes** 
+** September 23rd, 2018: version 2.1 - Fixes**
 
 Updates:
 1. Fixed all attack rolls using the API (character, NPC, Vehicle, Voidship); the feed to the API was not subtracting a die for Wrath from the pool being rolled.
@@ -160,7 +170,7 @@ Updates:
 3. Added Resist Corruption line under mental/social traits after the Corruption Rating
 4. Fixed Mission BP not being added to totals.
 
-** August 20th, 2018: version 2.0 - Base Rule Alignment Changes** 
+** August 20th, 2018: version 2.0 - Base Rule Alignment Changes**
 
 Updates:
 1. Changed XP labels to BP and tweaked layout on the progression tab; still same effect.
@@ -186,7 +196,7 @@ Note:  No existing attributes were changed or removed.  Existing functionality w
 Fixes:
     1. Toggling of Use Inline Dice vs API.  When checked and then unchecked, every time the sheet would be reopened it was defaulting to checked.  It should open to the value it closed on... checked or unchecked.
 
-** July 26th, 2018: version 1.0 submitted to Roll20** 
+** July 26th, 2018: version 1.0 submitted to Roll20**
 - resubmitted on August 6th due to roll20 packaging error.
 
 ### Known Issues
