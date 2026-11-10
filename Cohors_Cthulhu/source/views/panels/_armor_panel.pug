@@ -1,0 +1,144 @@
+//- views/panels/_armor_panel.pug
+//- Armor repeating section, with profiles from the game's armor table. Same
+//- approach as ccWeaponProfiles in _weapons_panel.pug.
+-
+  const ccArmorProfiles = {
+    'Chainmail / Lorica Hamata': {resistance: '2', qualities: 'Uncomfortable'},
+    'Leather Armor': {resistance: '1', qualities: ''},
+    'Lorica Segmentata': {resistance: '3', qualities: 'Uncomfortable'},
+    'Lorica Squamata': {resistance: '3', qualities: 'Heavy, Uncomfortable'},
+  };
+
+.cc-panel.cc-armor
+  .cc-banner Armor
+  .cc-rep-table.cc-rep-armor
+    .cc-rep-header
+      span.cc-npc-col
+      span Name
+      span Resistance
+      span Qualities
+    //- Recalculate total_armor when a row is deleted
+    //- (remove:repeating_armor); the resistance trigger only fires on edits.
+    +fieldset({name: 'armor', trigger: {affects: ['total_armor']}})
+      //- NPC Name: free text with a <datalist> (NPCs have natural hide,
+      //- chitin and the like), plus an apply button as for Weapons and
+      //- Talents. Player characters get a dropdown instead, which fires on
+      //- change and needs no apply button. Name is rendered twice on one
+      //- attribute; CSS shows one per Character Type, as for Weapons.
+      +action({
+        name: 'armor apply',
+        class: 'cc-armor-apply cc-npc-col',
+        trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+      })
+      +text({
+        name: 'name',
+        list: 'cc-armor-options',
+        trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+      }).cc-armor-name-text
+      //- Options are written out rather than looped (k-scaffold drops loop
+      //- content in +select), as for Weapons.
+      +select({
+        name: 'name',
+        trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+      }).cc-armor-name-select
+        +option({value: ''})
+          | Select Armor
+        +option({value: 'Chainmail / Lorica Hamata'})
+          | Chainmail / Lorica Hamata
+        +option({value: 'Leather Armor'})
+          | Leather Armor
+        +option({value: 'Lorica Segmentata'})
+          | Lorica Segmentata
+        +option({value: 'Lorica Squamata'})
+          | Lorica Squamata
+      +number({name: 'resistance', trigger: {affects: ['total_armor']}})
+      +text({name: 'qualities'})
+  datalist#cc-armor-options
+    option(value='Chainmail / Lorica Hamata')
+    option(value='Leather Armor')
+    option(value='Lorica Segmentata')
+    option(value='Lorica Squamata')
+
++scss.
+  .cc-character {
+    .cc-rep-armor {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.5fr 1fr 2.5fr;
+        align-items: center;
+      }
+
+      // Player characters: dropdown, no apply button.
+      .cc-npc-col,
+      .cc-armor-name-text {
+        display: none;
+      }
+
+      // Same icon button as .cc-talent-apply.
+      .cc-armor-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
++scss.
+  // NPC tiers keep the free-text Name and the apply button.
+  .cc-character {
+    #cc-character-type-trooper:checked,
+    #cc-character-type-toughened:checked,
+    #cc-character-type-nemesis:checked {
+      ~ .cc-armor .cc-rep-armor {
+        .cc-rep-header,
+        fieldset,
+        .repcontainer .repitem {
+          grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+        }
+
+        .cc-npc-col {
+          display: block;
+        }
+
+        .cc-armor-apply.cc-npc-col {
+          display: inline-block;
+        }
+
+        .cc-armor-name-text {
+          display: block;
+        }
+
+        .cc-armor-name-select {
+          display: none;
+        }
+      }
+    }
+  }
+
++module.
+  // Fills the row from a known armor, like ccApplyWeaponPreset. Setting
+  // resistance triggers its own total_armor update.
+  const ccArmorProfiles = !{JSON.stringify(ccArmorProfiles)};
+  const ccApplyArmorPreset = ({trigger, attributes}) => {
+    const profile = ccArmorProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyArmorPreset});
