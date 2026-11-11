@@ -2934,9 +2934,6 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <option value="8">Huge</option>
         <option value="9">Gigantic</option>
         <option value="10">Enormous</option>
-        <option value="11">Immense</option>
-        <option value="12">Behemoth</option>
-        <option value="13">Leviathan</option>
       </select>
       <span>Crit. Red.</span>
       <select style='width:100%' class='fancyselect' name='attr_target_crit'>
@@ -7753,9 +7750,6 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <option value="8">Huge</option>
         <option value="9">Gigantic</option>
         <option value="10">Enormous</option>
-        <option value="11">Immense</option>
-        <option value="12">Behemoth</option>
-        <option value="13">Leviathan</option>
       </select>
       <span>Crit. Red.</span>
       <select style='width:100%' class='fancyselect' name='attr_target_crit'>
@@ -11145,7 +11139,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 17da653f0b179748a39fd4bac3a57f5c9c82cdb0
+Revision 7c6dd4228b5617ae107dde97b72287a08ed81682
 
 
 <hr>
@@ -24492,7 +24486,7 @@ const fatigueResults = {
     msg: "It's time for a marathon. You take solace in your task and feel more energized " +
       "than ever to tackle what lies before you. Reduce any current fatigue penalty by 10, " +
       "and gain a +5 to whatever action you are about to perform.",
-    fatigue: 5
+    fatigue: 10
   }
 };
 
@@ -24594,7 +24588,7 @@ onCheck("change:hp", (_) => {
 	  update.hppenalty = -100;
 	}
 	update.hp_percent = hppercent;
-	setAttrs(update, { slient: true});
+	setAttrs(update, { silent: true});
     });
 });
 
@@ -24609,7 +24603,9 @@ onCheck("change:pp", (_) => {
 	update.pp_percent = 100;
       } else {
 	let ratio = +values.pp / +values.pp_max;
-	update.pp_percent = Math.min(Math.max(ratio || 1,0) * 100,100);
+	if (ratio > 1) ratio = 1;
+	if (ratio < 0) ratio = 0;
+	update.pp_percent = ratio * 100;
       }
       setAttrs(update, { silent: true });
     });
@@ -24667,7 +24663,7 @@ function doEnduranceRoll(type) {
 	      }
 	      if (type == 'mental') {
 		endroll += parseIntDefault(ev.mentalendurance, 0);
-		log += `) + ${ev.endurance}&nbsp;(Mental Endurance)`
+		log += `) + ${ev.mentalendurance}&nbsp;(Mental Endurance)`
 	      } else {
 		endroll += parseIntDefault(ev.endurance, 0);
 		log += `) + ${ev.endurance}&nbsp;(Endurance)`
@@ -24709,7 +24705,7 @@ function doEnduranceRoll(type) {
 	    let hasinjuryupdate = 0;
 	    let injury = 0;
 	    if (fr.hits) {
-	      updates.hp = parseInt(ev.hp) + fr.hits
+	      updates.hp = parseIntDefault(ev.hp, 0) + fr.hits
 	      let hppos = -fr.hits;
 	      needUpdate = true;
 	      hashitupdate = 1;
@@ -24783,7 +24779,7 @@ onCheck("clicked:statusrest", (_) => {
 	  if (minutes < 0) {
 	    minutes = 0;
 	  }
-	  result = "";
+	  let result = "";
 	  if (penalty < 0) {
 	    penalty += minutes;
 	    if (penalty > 0) {
@@ -24802,27 +24798,26 @@ onCheck("clicked:statusrest", (_) => {
 
 onCheck("clicked:statussleep", () => {
     'use strict';
-  getSectionIDs('repeating_specificinjury', (ids) => {
-      const toget = []
-      for (id of ids) {
-	toget.push('repeating_specificinjury_' + id + '_dailyrecovery');
-	toget.push('repeating_specificinjury_' + id + '_dailyrecovery');
-      }
-      getAttrs(toget, (data) => {
-	  const untreated = checkInjuryRecoveryRoll(data);
-	  if (untreated > 0) {
-	    let str = "You have an untreated injury, make a recovery roll before resting.";
-	    if (untreated > 1) {
-	      str = `You have ${untreated} untreated injuries, make recovery rolls before resting.`;
+    getSectionIDs('repeating_specificinjury', (ids) => {
+	const toget = []
+	for (let id of ids) {
+	  toget.push('repeating_specificinjury_' + id + '_dailyrecovery');
+	}
+	getAttrs(toget, (data) => {
+	    const untreated = checkInjuryRecoveryRoll(data);
+	    if (untreated > 0) {
+	      let str = "You have an untreated injury, make a recovery roll before resting.";
+	      if (untreated > 1) {
+		str = `You have ${untreated} untreated injuries, make recovery rolls before resting.`;
+	      }
+	      setAttrs({togglesleepinjuriesuntreatedshow: 'on', sleepinjuriesuntreatedmessage: str}); 
+	    } else {
+	      // Show the dialog to get the number of hours of rest.
+	      // Then we need to modify them to cap the recovery rate
+	      setAttrs({togglesleepshow: 'on'})
 	    }
-	    setAttrs({togglesleepinjuriesuntreatedshow: 'on', sleepinjuriesuntreatedmessage: str}); 
-	  } else {
-	    // Show the dialog to get the number of hours of rest.
-	    // Then we need to modify them to cap the recovery rate
-	    setAttrs({togglesleepshow: 'on'})
-	  }
-      });
-  });
+	});
+    });
 });
 
 // Use the same button for both
@@ -24853,7 +24848,7 @@ onCheck("clicked:statussleepsave", () => {
       "statussleepjournalnote",
       "option_usefx", "activetokenid",
       "injurypenalty"];
-    for (id of ids) {
+    for (let id of ids) {
       toget.push('repeating_specificinjury_' + id + '_dailyrecovery');
       toget.push('repeating_specificinjury_' + id + '_summary');
     }
@@ -24862,10 +24857,11 @@ onCheck("clicked:statussleepsave", () => {
 	let hporig = hp;
 	let hp_max = parseIntDefault(data.hp_max, 100);
 	let hours = parseIntDefault(data.statussleephours, 0);
+	let hours2 = Math.floor(hours / 2)
 
 	// Hits: Every 2 hours is 10%
 	let hpph = Math.max(1, Math.floor(hp_max / 10))
-	hp = Math.min(hp_max, hp + hpph * hours);
+	hp = Math.min(hp_max, hp + hpph * hours2);
 
 	if (hp > hporig) {
 	  logs.push(`HP now ${hp} (Recovered ${hp - hporig})`);
@@ -24873,7 +24869,6 @@ onCheck("clicked:statussleepsave", () => {
 	}
 
 	// PP: as per power level.  Every _2_ hours you get the increment.
-	let hours2 = Math.floor(hours / 2);
 	let pp = parseIntDefault(data.pp, 0);
 	let pporig = pp;
 	let pp_max = parseIntDefault(data.pp_max, 0);
@@ -24998,14 +24993,14 @@ function refreshInjuryPenalty() {
     'use strict';
   getSectionIDs('repeating_specificinjury', (ids) => {
     const toget = []
-    for (id of ids) {
+    for (let id of ids) {
       toget.push('repeating_specificinjury_' + id + '_dailyrecovery');
       toget.push('repeating_specificinjury_' + id + '_penalty');
     }
     let total = 0;
     getAttrs(toget, (data) => {
       // For each ID: See if we have daily recovery, else use the penalty
-      for (id of ids) {
+      for (let id of ids) {
 	const recovery = data['repeating_specificinjury_' + id + '_dailyrecovery'];
 	if (recovery) {
 	  const items = recovery.split(",");
@@ -25080,7 +25075,7 @@ function doRollInitiativeNoTracker(donefn) {
 function updatetokenmarkers() {
     'use strict';
   console.log("updatetokenmarkers start");
-  getAttrs(['option_usetokenmarkers', 'sheetselect', 'character_name',
+  getAttrs(['option_usetokenmarkers', 'sheetselect', 'sheettype', 'character_name',
     // Stuns & staggered
     'statusstagger', 'statusstun75', 'statusstun50', 'statusstun25',
     'bleedlist', 'grapplestatus'], (info) => {
@@ -25098,7 +25093,7 @@ function updatetokenmarkers() {
       let statusstun75 = parseIntDefault(info.statusstun75, 0);
       let statusstun50 = parseIntDefault(info.statusstun50, 0);
       let statusstun25 = parseIntDefault(info.statusstun25, 0);
-      let grapplestatus = parseIntDefault(info.statusstun25, 0);
+      let grapplestatus = parseIntDefault(info.grapplestatus, 0);
 
       let tokens = []
 
@@ -25127,12 +25122,18 @@ function updatetokenmarkers() {
 	tokens.push("!purple");
       }
 
+      if (grapplestatus > 0) {
+	tokens.push("orange");
+      } else {
+	tokens.push("!orange");
+      }
+
       let tstr = tokens.join('|')
 
       // Join token string.  with --set st
       let message = `!token-mod --ids @{${info.character_name}|character_id} --set statusmarkers|${tstr}`
       console.log(message)
-      startRoll(message, (t) => finishRoll(t.rollId, t));
+      startRoll(message, (t) => finishRoll(t.rollId, {}));
   });
 }
     

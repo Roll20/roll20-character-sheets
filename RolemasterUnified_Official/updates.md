@@ -1,3 +1,18 @@
+# 2026-11-10
+
+- Fix for Endurance bonus on success
+- Fix for a number of calls using bad variables including healing/resting
+- Fix for PP ranges clamping range
+- Fix for logging endurance and mental endurance
+- Fix for status uninitialized variables
+- Remove duplicated fetch request
+- Healing is too fast, healing 10% per hour, instead of 10% per 2 hours
+- Fix missing `sheettype` in token markers fetch
+- Fix for `grapplestatus` using the wrong field (`statusstun25`), and triggering state
+- Add a new onCheckAuto to reduce duplicate code and properties.
+- Tests for above.
+- Save events in the test support so you can change events in tests.
+
 # 2026-11-02
 
 - Spells:
