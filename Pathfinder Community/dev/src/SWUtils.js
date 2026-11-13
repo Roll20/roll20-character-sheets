@@ -784,6 +784,17 @@ export function getRowId  (sourceAttribute) {
 	}
 	return "";
 }
+/** True only when a "create attack" checkbox was really turned on (unchecked to checked).
+ * When a character's sheet starts up in a browser, Roll20 can fire change events for values
+ * that did not change. The create-attack handlers must not treat those as a click, or every
+ * such event creates another copy of the linked attack.
+ * @param {object} eventInfo from the change event
+ * @returns {boolean}
+ */
+export function isCheckboxTurnedOn (eventInfo) {
+	if (!eventInfo) { return false; }
+	return String(eventInfo.newValue) === '1' && String(eventInfo.previousValue) !== '1';
+}
 /** Returns attribute name not including repeating_section_id_****
  * if there is no id (if called in context of event on a row) then returns string after repeating_section_
  * @param {string} source from eventInfo.sourceAttribute should be repeating_section_id_attributename
