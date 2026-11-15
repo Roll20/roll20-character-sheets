@@ -62,11 +62,15 @@ function migrateTo20190427 (migrationChain) {
 				"---": "nothing",
 				"Ansitzjagd": "ansitzjagd",
 				"Hetzjagd": "hetzjagd",
+				"Kräuter suchen": "kraeutersuchen",
 				"Kräutersuchen": "kraeutersuchen",
+				"Nahrung sammeln": "nahrungsammeln",
 				"Nahrungsammeln": "nahrungsammeln",
 				"Pirschjagd": "pirschjagd",
 				"Speerfischen": "speerfischen",
+				"Tierfallen stellen": "tierfallenstellen",
 				"Tierfallenstellen": "tierfallenstellen",
+				"Wache Halten": "wachehalten",
 				"Wachehalten": "wachehalten",
 			};
 			const gaben = {
@@ -92,7 +96,7 @@ function migrateTo20190427 (migrationChain) {
 				"wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ],
 			};
 
-			const attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
+			const attrsToGet = statAttrs;
 			// GIFTS MIGRATION
 			if(gabenIDs.length === 0)
 			{
