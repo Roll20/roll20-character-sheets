@@ -181,6 +181,7 @@ export function migrateRepeatingDamage(ids, callback) {
     }
   });
 }
+
 /** sets old dropdown  max dex and acp values to new ones for Magik's updates.
  * because old values were so different, new values are set to either "none" or "armor and load"
  */
@@ -194,6 +195,7 @@ export function migrateMaxDexAndACP() {
     }
   });
 }
+
 /** updates repeating_spells ranges from text to dropdown and custom text field, and range number
  * @param {function} callback call after finishing */
 export function migrateSpellRanges(callback) {
@@ -271,6 +273,7 @@ export function migrateSpellRanges(callback) {
     });
   });
 }
+
 /* fixes rolltemplate image urls in dropdown to update urls from solid bkg to transparent. (from old to new val) */
 export function migrateRollTemplateImages() {
   getAttrs(
@@ -350,33 +353,34 @@ export function migrateRollTemplateImages() {
  *@param {int} macroVal the value the macro currently evaluates to.
  *@param {string} miscMacroText text of 2nd macro to add to macroText if there is one
  *@param {int} miscVal the value we are adding to macroText , it is value of miscMacroText if there is a macro
- *@returns {string} the resulting new macro text
+ *@returns {{macroText: string, macroVal: number}} the resulting new macro text and evaluated value
  */
 export function addNumberToMacro(macroText, macroVal, miscMacroText, miscVal) {
   //TAS.debug("at addNumberToMacro:" );
-  macroText = macroText || '';
-  miscMacroText = miscMacroText || '';
-  if (macroText || macroVal) {
-    macroVal += miscVal;
-    if (miscMacroText) {
-      macroText += ' ' + miscMacroText;
-    } else if (miscVal) {
-      if (miscVal > 0) {
-        macroText += ' + ';
-      } else {
-        macroText += ' - ';
-      }
-      macroText += String(Math.abs(miscVal));
+  let macroTextCurrent = (macroText || '').trim();
+  const miscMacroTextCurrent = (miscMacroText || '').trim();
+  let macroValCurrent = Number(macroVal) || 0;
+  const miscValNum = Number(miscVal) || 0;
+
+  if (macroTextCurrent || macroValCurrent) {
+    macroValCurrent += miscValNum;
+    if (miscMacroTextCurrent) {
+      const hasOperator = /^[+-]/.test(miscMacroTextCurrent);
+      macroTextCurrent += hasOperator ? ` ${miscMacroTextCurrent}` : ` + ${miscMacroTextCurrent}`;
+    } else if (miscValNum) {
+      const sign = miscValNum > 0 ? '+' : '-';
+      macroTextCurrent = macroTextCurrent ? `${macroTextCurrent} ${sign} ${Math.abs(miscValNum)}` : String(miscValNum);
     }
-  } else if (miscVal) {
-    macroText = String(miscVal);
-    macroVal = miscVal;
+  } else if (miscMacroTextCurrent || miscValNum) {
+    macroTextCurrent = miscMacroTextCurrent || String(miscValNum);
+    macroValCurrent = miscValNum;
   } else {
-    macroText = '';
-    macroVal = 0;
+    macroTextCurrent = '';
+    macroValCurrent = 0;
   }
-  return {macroText: macroText, macroVal: macroVal};
+  return {macroText: macroTextCurrent, macroVal: macroValCurrent};
 }
+
 /** adds the value to the end of the macro string. either "macro + miscVal" or "macro - miscVal"
  * saves new macro to the sheet
  *@param {function} callback call when done
@@ -434,6 +438,7 @@ export function migrateMoveIntIntoMacro(callback, migrateFlag, macroAttr, modAtt
     }
   });
 }
+
 /**migrateHPMisc copies HP-misc into HP-formula-macro-text and HP-formula-mod
  * This modifies the same fields aas migrateNPC so make sure to call them in sequence not at the same time!
  *@param {function} callback when done.
@@ -442,6 +447,7 @@ export function migrateHPMisc(callback) {
   //TAS.debug("at migrateHPMisc");
   migrateMoveIntIntoMacro(callback, 'migrated_hp_misc', 'HP-formula-macro-text', 'HP-formula-mod', '', 'HP-misc');
 }
+
 /**migrateHPMisc copies Max-Skill-Ranks-Misc2 into Max-Skill-Ranks-Misc
  *@param {function} callback when done.
  */
@@ -449,6 +455,7 @@ export function migrateMaxSkills(callback) {
   //TAS.debug("at migrateMaxSkills");
   migrateMoveIntIntoMacro(callback, 'migrated_maxskill_misc', 'Max-Skill-Ranks-Misc', 'Max-Skill-Ranks-mod', '', 'Max-Skill-Ranks-Misc2');
 }
+
 /** updates NPC from pre v 1.00 to version 1.00
  * @param {function} callback call when done
  * @param {number} oldversion the sheet attribute PFVersion.
@@ -759,6 +766,7 @@ export function migrateRepeatingItemAttributes(callback) {
     });
   });
 }
+
 export function migrateAbilityListFlags(callback) {
   var done = _.once(function () {
       //TAS.debug("leaving migrateAbilityListFlags");
@@ -811,6 +819,7 @@ export function migrateAbilityListFlags(callback) {
     }
   });
 }
+
 export function migrateSpellPointFlag(callback, oldversion) {
   var done = _.once(function () {
     if (typeof callback === 'function') {
@@ -930,40 +939,41 @@ export function migrateConfigFlags(callback, oldversion) {
 
 export function getAllMigrateFlags(v) {
   //TAS.debug("at PFMigrate.getAllMigrateFlags");
-  v = v || {};
-  v['classSkillsMigrated'] = 1;
-  v['spellranges_migrated'] = 1;
-  v['migrated_damage-multiplier'] = 1;
-  v['migrated_experience'] = 1;
-  v['migrated_spellflag'] = 1;
-  v['migrated_npc'] = 1;
-  v['migrated_worn_equipment'] = 1;
-  v['migrated_repeating_item_attributes'] = 1;
-  //v['migrated_skill_macrosv1']=1;
-  //v['migrated_attack_macrosv1']=1;
-  //v['migrated_spells_macrosv1']=1;
-  //v['migrated_feature_macrosv109']=1;
-  //v['migrated_ability_macrosv112']=1;
-  //v['migrated_item_macrosv1']=1;
-  v['migrated_hp_misc'] = 1;
-  v['migrated_maxskill_misc'] = 1;
-  v['migrated_featurelists_defaults'] = 1;
-  v['migrated_attacklist_defaults111'] = 1;
-  v['migrated_itemlist_defaults'] = 1;
-  v['migrated_abilityflags109'] = 1;
-  v['migrated_whispers'] = 1;
-  v['migrated_linked_attacks'] = 1;
-  v['migrated_buffs_rangeddmg_ability'] = 1;
-  v['migrated_itemlist_newfields'] = 1;
-  v['migrate_fatigued_conditions'] = 1;
-  v['migrated_attack_bab_dropdowns'] = 1;
-  v['migrated_skill_dropdowns5'] = 1;
+  const values = v || {};
+  values['classSkillsMigrated'] = 1;
+  values['spellranges_migrated'] = 1;
+  values['migrated_damage-multiplier'] = 1;
+  values['migrated_experience'] = 1;
+  values['migrated_spellflag'] = 1;
+  values['migrated_npc'] = 1;
+  values['migrated_worn_equipment'] = 1;
+  values['migrated_repeating_item_attributes'] = 1;
+  //values['migrated_skill_macrosv1']=1;
+  //values['migrated_attack_macrosv1']=1;
+  //values['migrated_spells_macrosv1']=1;
+  //values['migrated_feature_macrosv109']=1;
+  //values['migrated_ability_macrosv112']=1;
+  //values['migrated_item_macrosv1']=1;
+  values['migrated_hp_misc'] = 1;
+  values['migrated_maxskill_misc'] = 1;
+  values['migrated_featurelists_defaults'] = 1;
+  values['migrated_attacklist_defaults111'] = 1;
+  values['migrated_itemlist_defaults'] = 1;
+  values['migrated_abilityflags109'] = 1;
+  values['migrated_whispers'] = 1;
+  values['migrated_linked_attacks'] = 1;
+  values['migrated_buffs_rangeddmg_ability'] = 1;
+  values['migrated_itemlist_newfields'] = 1;
+  values['migrate_fatigued_conditions'] = 1;
+  values['migrated_attack_bab_dropdowns'] = 1;
+  values['migrated_skill_dropdowns5'] = 1;
   //force these to migrate, for some reason sheets using old values even for new Sheets!
-  //v['migrated_ability_dropdowns4']=1;
-  //v['migrated_take10_dropdown']=1;
-  //v['migrated_skill_speedup3']=1;
-  return v;
+  //values['migrated_ability_dropdowns4']=1;
+  //values['migrated_take10_dropdown']=1;
+  //values['migrated_skill_speedup3']=1;
+  return values;
 }
+
 export function setAllMigrateFlags(callback) {
   var done = _.once(function () {
     //TAS.debug("leaving PFMigrate setAllMigrateFlags");
