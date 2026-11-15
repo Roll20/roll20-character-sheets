@@ -345,6 +345,7 @@ export function migrateRollTemplateImages() {
     },
   );
 }
+
 /**addNumberToMacro adds the value to the end of the macro string.
  * so the evaluated value of the returned string equals macroVal + miscVal
  * either "macroText + miscVal" or "macroText - miscVal"
