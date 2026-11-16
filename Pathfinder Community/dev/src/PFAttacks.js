@@ -138,10 +138,11 @@ function setAdvancedMacroCheckbox() {
         hasAnyMacros = _.reduce(
           v,
           function (tot, value, fieldname) {
+            let total = tot;
             if (fieldname !== 'adv_macro_show' && !(value === '' || value === '0' || value === undefined || value === null)) {
-              tot += 1;
+              total += 1;
             }
-            return tot;
+            return total;
           },
           0,
         );
@@ -669,7 +670,11 @@ export function updateAssociatedAttacksFromParents(callback) {
   });
   getSectionIDs('repeating_weapon', function (ids) {
     var doneOne,
-      attrs = [];
+      attrs = [],
+      lowerIDs = [],
+      lowerSpellIDs = [],
+      lowerItemIDs = [],
+      lowerAbilityIDs = [];
     if (_.size(ids) === 0) {
       done();
       return;
@@ -683,29 +688,29 @@ export function updateAssociatedAttacksFromParents(callback) {
     });
     attrs = _.flatten(attrs);
     getAttrs(attrs, function (v) {
-      ids = _.map(ids, function (id) {
+      lowerIDs = _.map(ids, function (id) {
         return id.toLowerCase();
       });
       getSectionIDs('repeating_spells', function (spellIDs) {
-        spellIDs = _.map(spellIDs, function (id) {
+        lowerSpellIDs = _.map(spellIDs, function (id) {
           return id.toLowerCase();
         });
         getSectionIDs('repeating_item', function (itemIDs) {
-          itemIDs = _.map(itemIDs, function (id) {
+          lowerItemIDs = _.map(itemIDs, function (id) {
             return id.toLowerCase();
           });
           getSectionIDs('repeating_ability', function (abilityIDs) {
             var setter = {};
-            abilityIDs = _.map(abilityIDs, function (id) {
+            lowerAbilityIDs = _.map(abilityIDs, function (id) {
               return id.toLowerCase();
             });
-            TAS.debug('################', 'Checking linked attacks. attack links, spellids, itemids, abilityids', v, spellIDs, itemIDs, abilityIDs);
-            _.each(ids, function (id) {
+            TAS.debug('################', 'Checking linked attacks. attack links, spellids, itemids, abilityids', v, lowerSpellIDs, lowerItemIDs, lowerAbilityIDs);
+            _.each(lowerIDs, function (id) {
               if (v['repeating_weapon_' + id + '_source-item']) {
                 TAS.debug('checking ' + id + ' for item:' + v['repeating_weapon_' + id + '_source-item']);
                 if (v['repeating_weapon_' + id + '_source-item'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-item'] + ' in item list');
-                  if (_.size(itemIDs > 0) && _.contains(itemIDs, v['repeating_weapon_' + id + '_source-item'])) {
+                  if (_.size(lowerItemIDs > 0) && _.contains(lowerItemIDs, v['repeating_weapon_' + id + '_source-item'])) {
                     PFInventory.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-item'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' item link is not found:' + v['repeating_weapon_' + id + '_source-item']);
@@ -716,7 +721,7 @@ export function updateAssociatedAttacksFromParents(callback) {
                 TAS.debug('checking ' + id + ' for spell:' + v['repeating_weapon_' + id + '_source-spell']);
                 if (v['repeating_weapon_' + id + '_source-spell'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-spell'] + ' in spell list');
-                  if (_.size(spellIDs > 0) && _.contains(spellIDs, v['repeating_weapon_' + id + '_source-spell'])) {
+                  if (_.size(lowerSpellIDs > 0) && _.contains(lowerSpellIDs, v['repeating_weapon_' + id + '_source-spell'])) {
                     PFSpells.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-spell'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' spell link is not found:' + v['repeating_weapon_' + id + '_source-spell']);
@@ -727,7 +732,7 @@ export function updateAssociatedAttacksFromParents(callback) {
                 TAS.debug('checking ' + id + ' for ability:' + v['repeating_weapon_' + id + '_source-ability']);
                 if (v['repeating_weapon_' + id + '_source-ability'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-ability'] + ' in ability list');
-                  if (_.size(abilityIDs > 0) && _.contains(abilityIDs, v['repeating_weapon_' + id + '_source-ability'])) {
+                  if (_.size(lowerAbilityIDs > 0) && _.contains(lowerAbilityIDs, v['repeating_weapon_' + id + '_source-ability'])) {
                     PFAbility.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-ability'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' ability link is not found:' + v['repeating_weapon_' + id + '_source-ability']);
@@ -896,12 +901,13 @@ function getRecalculatedAttack(id, v, setter) {
  * @param {*} setter
  */
 function syncDefaultDamageDice(id, v, setter, useSizeMod, prefix) {
+  let repPrefix = '';
   if (!prefix) {
-    prefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
+    repPrefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
   }
-  if (!useSizeMod || !parseInt(v[prefix + 'size_affects'], 10)) {
-    setter[prefix + 'default_damage-dice-num'] = v[prefix + 'damage-dice-num'] || 0;
-    setter[prefix + 'default_damage-die'] = v[prefix + 'damage-die'] || 0;
+  if (!useSizeMod || !parseInt(v[repPrefix + 'size_affects'], 10)) {
+    setter[repPrefix + 'default_damage-dice-num'] = v[repPrefix + 'damage-dice-num'] || 0;
+    setter[repPrefix + 'default_damage-die'] = v[repPrefix + 'damage-die'] || 0;
   }
   return setter;
 }
@@ -966,27 +972,28 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
     defSize = 0,
     sizeDiff = 0,
     newDice = {};
+  let repPrefix = '';
   try {
     if (!prefix) {
-      prefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
+      repPrefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
     }
-    //TAS.debug("#########","PFAttacks.adjustDamageDice for "+prefix,v);
-    currNotDefault = parseInt(v[prefix + 'not_default_size'], 10) || 0;
-    if (parseInt(v[prefix + 'size_affects'], 10)) {
-      currDice = parseInt(v[prefix + 'damage-dice-num'], 10) || 0;
-      currDie = parseInt(v[prefix + 'damage-die'], 10) || 0;
+    //TAS.debug("#########","PFAttacks.adjustDamageDice for "+repPrefix,v);
+    currNotDefault = parseInt(v[repPrefix + 'not_default_size'], 10) || 0;
+    if (parseInt(v[repPrefix + 'size_affects'], 10)) {
+      currDice = parseInt(v[repPrefix + 'damage-dice-num'], 10) || 0;
+      currDie = parseInt(v[repPrefix + 'damage-die'], 10) || 0;
       //TAS.debug("PFAttacks.adjustDamageDice curr size:"+ currCharSize+" and current dmg: "+currDice+"d"+currDie);
       if (!(currDice === 0 || currDie === 0)) {
         defSize = parseInt(v['default_char_size'], 10);
-        defWeaponSize = parseInt(v[prefix + 'default_size'], 10);
-        defDice = parseInt(v[prefix + 'default_damage-dice-num'], 10) || 0;
-        defDie = parseInt(v[prefix + 'default_damage-die'], 10) || 0;
+        defWeaponSize = parseInt(v[repPrefix + 'default_size'], 10);
+        defDice = parseInt(v[repPrefix + 'default_damage-dice-num'], 10) || 0;
+        defDie = parseInt(v[repPrefix + 'default_damage-die'], 10) || 0;
         //TAS.debug("PFAttacks.adjustDamageDice default is:"+defDice+"d"+defDie+", for size:"+defWeaponSize+", "+"def char size:"+defSize+", and curr char size:"+ currCharSize);
 
         //check for errors
         if (isNaN(defWeaponSize)) {
           defWeaponSize = defSize;
-          setter[prefix + 'default_size'] = defWeaponSize;
+          setter[repPrefix + 'default_size'] = defWeaponSize;
         }
         if (isNaN(defSize)) {
           defSize = currCharSize;
@@ -994,20 +1001,20 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
         if (defDice === 0 || defDie === 0) {
           defDice = currDice;
           defDie = currDie;
-          setter[prefix + 'default_damage-dice-num'] = defDice;
-          setter[prefix + 'default_damage-die'] = defDie;
+          setter[repPrefix + 'default_damage-dice-num'] = defDice;
+          setter[repPrefix + 'default_damage-die'] = defDie;
         }
         //check for change
         if (currCharSize !== defSize) {
           if (!currNotDefault) {
-            setter[prefix + 'not_default_size'] = 1;
+            setter[repPrefix + 'not_default_size'] = 1;
           }
           sizeDiff = PFSize.getSizeLevelChange(currCharSize, defSize);
           //TAS.debug("PFAttacks update dice, char size change is "+sizeDiff);
         }
         if (defWeaponSize !== defSize) {
           if (!currNotDefault) {
-            setter[prefix + 'not_default_size'] = 1;
+            setter[repPrefix + 'not_default_size'] = 1;
           }
           weaponSizeDiff = PFSize.getSizeLevelChange(defWeaponSize, defSize);
           //TAS.debug("PFAttacks update dice, weapon size change is "+weaponSizeDiff);
@@ -1018,29 +1025,29 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
           newDice = PFSize.updateDamageDice(sizeDiff, defSize, defDice, defDie);
           TAS.debug('###########', 'PFAttacks.adjustDamageDice NEW DAMAGE is:' + newDice.dice + 'd' + newDice.die + ', for sizeDiff:' + sizeDiff);
           if (currDice !== newDice.dice || currDie !== newDice.die) {
-            setter[prefix + 'damage-dice-num'] = newDice.dice;
-            setter[prefix + 'damage-die'] = newDice.die;
+            setter[repPrefix + 'damage-dice-num'] = newDice.dice;
+            setter[repPrefix + 'damage-die'] = newDice.die;
           }
         } else {
           if (currNotDefault) {
-            setter[prefix + 'not_default_size'] = 0;
+            setter[repPrefix + 'not_default_size'] = 0;
           }
           if (currDice !== defDice || currDie !== defDie) {
-            setter[prefix + 'damage-dice-num'] = defDice;
-            setter[prefix + 'damage-die'] = defDie;
+            setter[repPrefix + 'damage-dice-num'] = defDice;
+            setter[repPrefix + 'damage-die'] = defDie;
           }
         }
       } else {
         //size affects was 1, but no damage dice
-        setter[prefix + 'size_affects'] = 0;
+        setter[repPrefix + 'size_affects'] = 0;
       }
     } else {
       //TAS.debug("PFAttacks.adjustDamageDice: size_affects is blank so reset regular to default")
       if (!(currDice === 0 || currDie === 0)) {
-        setter[prefix + 'damage-dice-num'] = v[prefix + 'default_damage-dice-num'];
-        setter[prefix + 'damage-die'] = v[prefix + 'default_damage-die'];
+        setter[repPrefix + 'damage-dice-num'] = v[repPrefix + 'default_damage-dice-num'];
+        setter[repPrefix + 'damage-die'] = v[repPrefix + 'default_damage-die'];
         if (currNotDefault) {
-          setter[prefix + 'not_default_size'] = 0;
+          setter[repPrefix + 'not_default_size'] = 0;
         }
       }
     }
@@ -1160,14 +1167,17 @@ export function setDualWieldVals(params, setter, id, updMode) {
     prefix = '',
     tempStr = '',
     tempStr2 = '';
+  let rowID = '';
   const output = setter || {};
   try {
     TAS.debug('PFAttacks.setDualWieldVals', params);
     if (!id) {
-      id = generateRowID();
-      //TAS.debug("the new id is "+id);
+      rowID = generateRowID();
+      //TAS.debug("the new id is "+rowID);
+    } else {
+      rowID = id;
     }
-    prefix = 'repeating_weapon_' + id + '_';
+    prefix = 'repeating_weapon_' + rowID + '_';
     //TAS.debug("prefix is "+prefix);
     if (updMode) {
       currMacro = params['macro-text'];

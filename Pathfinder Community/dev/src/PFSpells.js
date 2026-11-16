@@ -750,6 +750,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
 
 export function updateAssociatedAttack(id, callback, silently, eventInfo) {
   let done = _.once(function () {
+      //TAS.debug("leaving PFSpells.updateAssociatedAttack");
       if (typeof callback === 'function') {
         callback();
       }
@@ -758,9 +759,31 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
     item_entry = '',
     attrib = '',
     attributes = [];
-  try {
-    itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
-    item_entry = 'repeating_spells_' + SWUtils.getRepeatingIDStr(itemId);
+  itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
+  item_entry = 'repeating_spells_' + SWUtils.getRepeatingIDStr(itemId);
+  attrib = eventInfo ? SWUtils.getAttributeName(eventInfo.sourceAttribute) : '';
+  attributes = [];
+  //TAS.debug("at PFSpells updateAssociatedAttack: for row" + id   );
+  if (attrib) {
+    attributes = [item_entry + attrib];
+    if (/range/i.test(attrib)) {
+      attributes = [item_entry + 'range_pick', item_entry + 'range', item_entry + 'range_numeric'];
+    } else {
+      attributes = [
+        item_entry + 'range_pick',
+        item_entry + 'range',
+        item_entry + 'range_numeric',
+        item_entry + 'damage-macro-text',
+        item_entry + 'damage-type',
+        item_entry + 'sr',
+        item_entry + 'savedc',
+        item_entry + 'save',
+        item_entry + 'spell-attack-type',
+        item_entry + 'name',
+        item_entry + 'toggle_attack_entry',
+      ];
+    }
+  } else {
     attributes = [
       item_entry + 'range_pick',
       item_entry + 'range',
@@ -770,26 +793,12 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
       item_entry + 'sr',
       item_entry + 'savedc',
       item_entry + 'save',
-      item_entry + 'spell-attack-type',
+      item_entry + 'abil-attack-type',
       item_entry + 'name',
       item_entry + 'toggle_attack_entry',
     ];
-    /*
-        attrib = (eventInfo ? SWUtils.getAttributeName(eventInfo.sourceAttribute) : "");
-        if (attrib){
-            attributes = [item_entry+attrib];
-            if ((/range/i).test(attrib)){
-                attributes =[item_entry+'range_pick',item_entry+'range',item_entry+'range_numeric'];
-            }
-        } else {
-            attributes = ["range_pick", "range", "range_numeric", "damage-macro-text", "damage-type", "sr", "savedc", "save", "spell-attack-type", "name"];
-        }
-        */
-  } catch (erro) {
-    TAS.error('PFSpells.updateAssociatedAttack erro', erro, id, eventInfo);
-    done();
-    return;
   }
+
   getAttrs(attributes, function (spellVal) {
     getSectionIDs('repeating_weapon', function (idarray) {
       // get the repeating set
@@ -811,16 +820,16 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
             let prefix = 'repeating_weapon_' + currentID + '_';
             if (v[prefix + 'source-spell'] === itemId) {
               idlist.push(currentID);
-              setter = setAttackEntryVals(item_entry, prefix, spellVal, setter, true);
+              setter = setAttackEntryVals(item_entry, prefix, spellVal, setter);
             }
           });
-          if (silently) {
-            params = PFConst.silentParams;
-          }
         } catch (err) {
           TAS.error('PFSpells.updateAssociatedAttack', err);
         } finally {
           if (_.size(setter) > 0) {
+            if (silently) {
+              params = PFConst.silentParams;
+            }
             SWUtils.setWrapper(setter, params, function () {
               PFAttackOptions.resetSomeOptions(idlist);
             });
@@ -2252,28 +2261,15 @@ function registerEventHandlers() {
   on(
     tempstr,
     TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
-      let attr;
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
-      attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
       if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
-        updateAssociatedAttack(null, null, null, eventInfo);
-      }
-    }),
-  );
-  on(
-    tempstr,
-    TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
-      let attr;
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
-      attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
-      if (eventInfo.sourceType === 'sheetworker' || eventInfo.sourceType === 'api') {
         updateAssociatedAttack(null, null, null, eventInfo);
       }
     }),
   );
   // sync repeating_spells with settings>attacks>link spells
   on('change:include_link_spells', function (eventInfo) {
-    TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
+    TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
     if (eventInfo.sourceType === 'sheetworker' || eventInfo.sourceType === 'player') {
       updateIncludeLink();
     }
