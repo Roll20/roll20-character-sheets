@@ -739,7 +739,8 @@ function updateEquipmentLocation(id, callback, silently, eventInfo, targetLocati
     }),
     /* unsetOtherItems makes sure any other row than id is not in location */
     idStr = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) || '' : ''),
-    sourceAttr = SWUtils.getAttributeName(eventInfo.sourceAttribute),
+    // sourceAttr = SWUtils.getAttributeName(eventInfo.sourceAttribute),
+    sourceAttr = eventInfo ? SWUtils.getAttributeName(eventInfo.sourceAttribute) : '',
     item_entry = 'repeating_item_' + idStr + '_',
     locationField = item_entry + 'location',
     locationTabField = item_entry + 'loctype-tab',
