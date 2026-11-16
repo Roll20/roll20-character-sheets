@@ -2046,7 +2046,7 @@ export function setCasterTypeSpells(eventInfo) {
           thisCastingType = spellClass2;
         }
         thisCastingType === 1 ? (thisCastingType = 0) : (thisCastingType = 1);
-        // TAS.debug(`~~~ Casting Type Set for: ${id} ~~~`);
+        TAS.debug(`Casting Type Set for: ${id}`);
         output[`repeating_spells_${id}_toggle_casting_type`] = thisCastingType;
       });
       setAttrs(output, {
@@ -2074,7 +2074,7 @@ function setCasterTypeRow(eventInfo) {
       thisCastingType = spellClass2;
     }
     thisCastingType === 1 ? (thisCastingType = 0) : (thisCastingType = 1);
-    // TAS.debug(`~~~ Casting Type Set for: ${id} ~~~`);
+    TAS.debug(`Casting Type Set for: ${id}`);
     output[`repeating_spells_${id}_toggle_casting_type`] = thisCastingType;
     setAttrs(output, {
       silent: true,

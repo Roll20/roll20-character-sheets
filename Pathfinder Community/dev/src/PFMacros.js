@@ -99,7 +99,7 @@ export function checkAbilityType2Row (eventInfo) {
         const ruleCategory = values['repeating_ability_rule_category'];
         const featOrTraitCheck = /feats/g.test(ruleCategory) || /traits/g.test(ruleCategory) ? 1 : 0;
         let macroTextReplaced = '';
-            TAS.debug(`~~~ id:${rowid} featOrTraitCheck:${featOrTraitCheck} ability_type2:${abilityType2} ~~~`);
+            TAS.debug(`id:${rowid} featOrTraitCheck:${featOrTraitCheck} ability_type2:${abilityType2}`);
         if (featOrTraitCheck === 0) {
           if (/{{subtitle=.*{@{rule_category}} - @{ability_type2}}}/g.test(macroText)) {
             macroTextReplaced = macroText.replace(
@@ -141,7 +141,7 @@ export function checkAbilityType2 () {
                 const ruleCategory = values['repeating_ability_' + rowid + '_rule_category'];
                 const featOrTraitCheck = ((/feats/g.test(ruleCategory)) || (/traits/g.test(ruleCategory))) ? 1 : 0;
                 let macroTextReplaced = "";
-                    TAS.debug(`~~~ id:${rowid} featOrTraitCheck:${featOrTraitCheck} ability_type2:${abilityType2} ~~~`);
+                    TAS.debug(`~~~ id:${rowid} featOrTraitCheck:${featOrTraitCheck} ability_type2:${abilityType2}`);
                 if (featOrTraitCheck === 0) {
                     if (/{{subtitle=.*{@{rule_category}} - @{ability_type2}}}/g.test(macroText)) {
                         macroTextReplaced = macroText.replace(

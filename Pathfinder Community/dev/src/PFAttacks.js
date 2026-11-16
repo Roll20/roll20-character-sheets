@@ -376,7 +376,7 @@ function updateRepeatingWeaponDamage(id, eventInfo) {
       //Multiplier only applies to an Ability bonus.
       if (ability <= 0) {
         abilityMult = 1;
-        TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + ability);
+        TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + ability);
       }
       abilityTot = Math.floor(Math.min(abilityMult * (ability + damagePowerAttack), maxA));
       totalDamage = abilityTot + damageBuffs + miscDmg + enhance;
@@ -603,7 +603,7 @@ function getRecalculatedDamageOnly(id, v) {
       //Multiplier only applies to an Ability bonus.
       if (abilitydmg <= 0) {
         abilityMult = 1;
-        TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
+        TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
       }
       abilityTotDmg = Math.floor(Math.min(abilityMult * (abilitydmg + damagePowerAttack), maxAbility));
       newTotalDamage = abilityTotDmg + damageBuffs + dmgMacroMod + enhance;
@@ -820,7 +820,7 @@ function getRecalculatedAttack(id, v, setter) {
     //Multiplier only applies to an Ability bonus.
     if (abilitydmg <= 0) {
       abilityMult = 1;
-      TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
+      TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
     }
     abilityTotDmg = Math.min(Math.floor(abilityMult * (abilitydmg + damagePowerAttack)), maxAbility);
     newTotalDamage = abilityTotDmg + damageBuffs + dmgMacroMod + enhance;
