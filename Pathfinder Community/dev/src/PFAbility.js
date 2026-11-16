@@ -56,7 +56,7 @@ function setClassName(id, callback, eventInfo) {
     idStr = SWUtils.getRepeatingIDStr(id),
     prefix = 'repeating_ability_' + idStr,
     clbasisField = prefix + 'CL-basis';
-  if (eventInfo.sourceAttribute === 'ability_cl-basis') {
+  if (eventInfo && eventInfo.sourceAttribute === 'ability_CL-basis') {
     // use global attrs
     prefix = 'ability_';
     clbasisField = 'ability_CL-basis';
@@ -76,7 +76,7 @@ function setClassName(id, callback, eventInfo) {
             // added "Other" value="(0*(@{level}))" on Cl-Basis selector since "N/A" option uses value="0"
           } else if (v[clbasisField] === '(0*(@{level}))') {
             // if Class-name has been set by the user, prevent it from being overwritten when recalculating
-            if (v[prefix + 'class-name'] != 'undefined') {
+            if (v[prefix + 'class-name']) {
               clBase = v[prefix + 'class-name'];
               setter[prefix + 'CL-basis-mod'] = 0;
             } else {
@@ -1016,11 +1016,17 @@ function recalcAbilities(callback, silently, eventInfo, levelOnly) {
         'CL-basis',
         'CL-basis-mod',
         function () {
+          // updateCharLevel(id, function () {
+          //   setClassName(id);
+          //   updateAbilityRange(id, function () {
+          //     doneOne();
+          //   });
+          // });
+          // wait to complete until after name and range
           updateCharLevel(id, function () {
-            setClassName(id);
-            updateAbilityRange(id, function () {
-              doneOne();
-            });
+            let doneRow = _.after(2, doneOne);
+            setClassName(id, doneRow);
+            updateAbilityRange(id, doneRow);
           });
         },
         true,
