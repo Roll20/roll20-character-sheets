@@ -503,6 +503,20 @@ export var recalculate = TAS.callback(function PFCustomRecalculate(callback, sil
   }, oldversion);
 });
 
+// apply CSS class directly to .pf-wrapper
+export const updateReadonlyMode = () => {
+  getAttrs(['readonly_show'], (values) => {
+    const isReadonly = values.readonly_show !== '1';
+    if (isReadonly) {
+      $20('.pf-wrapper').removeClass('is-editmode');
+      $20('.pf-wrapper').addClass('is-readonly');
+    } else {
+      $20('.pf-wrapper').removeClass('is-readonly');
+      $20('.pf-wrapper').addClass('is-editmode');
+    }
+  });
+};
+
 function registerEventHandlers() {
   //custom page
   on(
@@ -574,6 +588,9 @@ function registerEventHandlers() {
       }
     }),
   );
+
+  // set readonly/mode
+  on('sheet:opened change:readonly_show', updateReadonlyMode);
 }
 
 registerEventHandlers();
