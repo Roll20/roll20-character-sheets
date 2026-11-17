@@ -56,6 +56,11 @@ function setClassName(id, callback, eventInfo) {
     idStr = SWUtils.getRepeatingIDStr(id),
     prefix = 'repeating_ability_' + idStr,
     clbasisField = prefix + 'CL-basis';
+  if (eventInfo && eventInfo.sourceAttribute === 'ability_CL-basis') {
+    // use global attrs
+    prefix = 'ability_';
+    clbasisField = 'ability_CL-basis';
+  }
   getAttrs(
     [prefix + 'CL-basis', prefix + 'class-name', 'character_name', 'race', 'class-0-name', 'class-1-name', 'class-2-name', 'class-3-name', 'class-4-name', 'class-5-name'],
     function (v) {
@@ -71,7 +76,7 @@ function setClassName(id, callback, eventInfo) {
             // added "Other" value="(0*(@{level}))" on Cl-Basis selector since "N/A" option uses value="0"
           } else if (v[clbasisField] === '(0*(@{level}))') {
             // if Class-name has been set by the user, prevent it from being overwritten when recalculating
-            if (v[prefix + 'class-name'] != 'undefined') {
+            if (v[prefix + 'class-name']) {
               clBase = v[prefix + 'class-name'];
               setter[prefix + 'CL-basis-mod'] = 0;
             } else {
@@ -116,6 +121,7 @@ function setTypeTab(callback, silently, id, eventInfo) {
     },
   );
 }
+
 function setRuleTab(callback, silently, id, eventInfo) {
   let prefix = 'repeating_ability_' + SWUtils.getRepeatingIDStr(id);
   getAttrs(
@@ -178,6 +184,7 @@ function setRuleTab(callback, silently, id, eventInfo) {
     },
   );
 }
+
 export function setRuleTabs() {
   getSectionIDs('repeating_ability', function (ids) {
     _.each(ids, function (id) {
@@ -243,6 +250,7 @@ function getAbilityTypes(callback) {
     });
   });
 }
+
 function getNewAbilityAttrs(ability) {
   let setter = {},
     id = '',
@@ -260,7 +268,7 @@ function getNewAbilityAttrs(ability) {
     setter[prefix + 'short-description'] = ability['short-description'] || '';
     setter[prefix + 'description'] = ability['description'] || '';
     setter[prefix + 'rule_category'] = ability['rule_category'] || '';
-    setter[prefix + 'CL-basis'] = ability['CL-basis'] || '0';
+    setter[prefix + 'CL-basis'] = ability['CL-basis'] || '(0*(@{level}))';
     setter[prefix + 'class-name'] = ability['class-name'] || '';
     if (ability.rule_category === 'spell-like-abilities') {
       setter[prefix + 'ability_type'] = 'Sp';
@@ -295,6 +303,7 @@ function getNewAbilityAttrs(ability) {
     return setter;
   }
 }
+
 export function copyToAbilities(callback, abilities) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.copyToAbilities");
@@ -362,6 +371,7 @@ function getTopOfMenu(callback, isNPC) {
     done(newMacro);
   }
 }
+
 export function resetCommandMacro(callback) {
   let done = _.once(function () {
       if (typeof callback === 'function') {
@@ -383,6 +393,7 @@ export function resetCommandMacro(callback) {
   PFMenus.resetOneCommandMacro('sp', false, doneOne);
   PFMenus.resetOneCommandMacro('su', false, doneOne);
 }
+
 export function importFromCompendium(callback, eventInfo) {
   let done = _.once(function () {
       resetCommandMacro();
@@ -436,7 +447,7 @@ export function importFromCompendium(callback, eventInfo) {
             newcat = 'feats';
           } else if (compcat === 'monster rule') {
             newcat = 'monster-rule';
-          } else if (compcat === 'spell') {
+          } else if (compcat === 'spells') {
             newcat = 'spell-like-abilities';
           }
           if (newcat === 'monster-rule') {
@@ -504,7 +515,7 @@ export function importFromCompendium(callback, eventInfo) {
             if (ability_basis === 'CON' && parseInt(v.is_undead, 10)) {
               ability_basis = 'CHA';
             }
-            ability_basis = '@{' + ability_basis + '}';
+            ability_basis = '@{' + ability_basis + '-mod}';
             setter[prefix + 'ability-basis'] = ability_basis;
           }
         }
@@ -528,42 +539,42 @@ export function importFromCompendium(callback, eventInfo) {
 export function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName) {
   let notes = '',
     attackType = '';
-  setter = setter || {};
+  const output = setter || {};
   try {
     attackType = PFUtils.findAbilityInString(v[spellPrefix + 'abil-attack-type']);
     if (v[spellPrefix + 'name']) {
       if (!noName) {
-        setter[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
+        output[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
       }
-      setter[weaponPrefix + 'source-ability-name'] = v[spellPrefix + 'name'];
+      output[weaponPrefix + 'source-ability-name'] = v[spellPrefix + 'name'];
     }
     if (attackType) {
-      setter[weaponPrefix + 'attack-type'] = v[spellPrefix + 'abil-attack-type'];
+      output[weaponPrefix + 'attack-type'] = v[spellPrefix + 'abil-attack-type'];
       if (/CMB/i.test(attackType)) {
-        setter[weaponPrefix + 'vs'] = 'cmd';
+        output[weaponPrefix + 'vs'] = 'cmd';
       } else if (/ranged/i.test(attackType)) {
-        setter[weaponPrefix + 'vs'] = 'touch';
-        setter[weaponPrefix + 'isranged'] = 1;
-        setter[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'] || 0;
+        output[weaponPrefix + 'vs'] = 'touch';
+        output[weaponPrefix + 'isranged'] = 1;
+        output[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'] || 0;
       } else {
-        setter[weaponPrefix + 'vs'] = 'touch';
-        setter[weaponPrefix + 'range'] = 0;
+        output[weaponPrefix + 'vs'] = 'touch';
+        output[weaponPrefix + 'range'] = 0;
       }
     }
     if (v[spellPrefix + 'damage-macro-text']) {
-      setter[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+      output[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+        output[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       } else {
-        setter[weaponPrefix + 'critical_dmg_macro'] = '';
+        output[weaponPrefix + 'critical_dmg_macro'] = '';
       }
     }
     if (v[spellPrefix + 'damage-type']) {
-      setter[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
+      output[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
+        output[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
       } else {
-        setter[weaponPrefix + 'critical_dmg_type'] = '';
+        output[weaponPrefix + 'critical_dmg_type'] = '';
       }
     }
     if (v[spellPrefix + 'save']) {
@@ -597,14 +608,15 @@ export function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName)
       }
     }
     if (notes) {
-      setter[weaponPrefix + 'notes'] = notes;
+      output[weaponPrefix + 'notes'] = notes;
     }
   } catch (err) {
     TAS.error('PFAbility.setAttackEntryVals', err);
   } finally {
-    return setter;
+    return output;
   }
 }
+
 /**Triggered from a button in repeating spells
  *@param {string} id the row id or null
  *@param {string} weaponId if updating existing row
@@ -625,7 +637,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
     done();
     return;
   }
-  itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
+  itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.triggerName) : '');
   item_entry = 'repeating_ability_' + SWUtils.getRepeatingIDStr(itemId);
   slaPrefix = item_entry;
   if (!itemId) {
@@ -696,6 +708,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
     }
   });
 }
+
 export function updateAssociatedAttack(id, callback, silently, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.updateAssociatedAttack");
@@ -788,6 +801,7 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
     });
   });
 }
+
 function updateCharLevel(id, callback, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving updateCharLevel");
@@ -827,6 +841,7 @@ function updateCharLevel(id, callback, eventInfo) {
     }
   });
 }
+
 function updateAbilityRange(id, callback, silently, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving updateAbilityRange");
@@ -844,14 +859,16 @@ function updateAbilityRange(id, callback, silently, eventInfo) {
       isSP = 0,
       currPosRange = 0;
     try {
-      isSP = v[prefix + 'ability_type'] === 'Sp' ? 1 : 0;
+      // isSP = v[prefix + 'ability_type'] === 'Sp' ? 1 : 0;
       currRange = parseInt(v[prefix + 'range_numeric'], 10) || 0;
-      if (isSP) {
-        cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
-        newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
-      } else {
-        newRange = parseInt(SWUtils.trimBoth(v[prefix + 'range']), 10) || 0;
-      }
+      // if (isSP) {
+      //   cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
+      //   newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
+      // } else {
+      //   newRange = parseInt(SWUtils.trimBoth(v[prefix + 'range']), 10) || 0;
+      // }
+      cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
+      newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
       if (newRange !== currRange) {
         //TAS.debug("updating range");
         setter[prefix + 'range_numeric'] = newRange;
@@ -873,6 +890,7 @@ function updateAbilityRange(id, callback, silently, eventInfo) {
     }
   });
 }
+
 /** to use in calls to _.invoke or otherwise, sets switch variables to setter for given row
  * @param {jsobj} setter to pass in first var of SWUtils.setWrapper
  * @param {string} id the id of this row, or null if we are within the row context already
@@ -888,19 +906,19 @@ function resetOption(setter, id, v, eventInfo) {
     hasAttack = '',
     atkstr = '',
     attackStrForDisplay = '';
-  setter = setter || {};
+  const output = setter || {};
   try {
     if (!v) {
-      return setter;
+      return output;
     }
     isSP = v[prefix + 'ability_type'] === 'Sp' ? '1' : '';
 
     if (isSP !== v[prefix + 'is_sp']) {
-      setter[prefix + 'is_sp'] = isSP;
+      output[prefix + 'is_sp'] = isSP;
     }
     posRange = (parseInt(v[prefix + 'range_numeric'], 10) || 0) > 0 ? '1' : '';
     if (posRange !== v[prefix + 'hasposrange']) {
-      setter[prefix + 'hasposrange'] = posRange;
+      output[prefix + 'hasposrange'] = posRange;
     }
     if (v[prefix + 'frequency'] && v[prefix + 'frequency'] !== 'not-applicable') {
       hasFrequency = '1';
@@ -914,16 +932,16 @@ function resetOption(setter, id, v, eventInfo) {
       }
     }
     if (hasFrequency !== v[prefix + 'hasfrequency']) {
-      setter[prefix + 'hasfrequency'] = hasFrequency;
+      output[prefix + 'hasfrequency'] = hasFrequency;
     }
     if (hasUses !== v[prefix + 'hasuses']) {
-      setter[prefix + 'hasuses'] = hasUses;
+      output[prefix + 'hasuses'] = hasUses;
     }
     if (PFUtils.findAbilityInString(v[prefix + 'abil-attack-type'])) {
       hasAttack = '1';
     }
     if (hasAttack !== v[prefix + 'hasattack']) {
-      setter[prefix + 'hasattack'] = hasAttack;
+      output[prefix + 'hasattack'] = hasAttack;
     }
     if (hasAttack) {
       atkstr = v[prefix + 'abil-attack-type'].toLowerCase();
@@ -936,14 +954,15 @@ function resetOption(setter, id, v, eventInfo) {
       }
     }
     if (attackStrForDisplay !== v[prefix + 'abil-attacktypestr']) {
-      setter[prefix + 'abil-attacktypestr'] = attackStrForDisplay;
+      output[prefix + 'abil-attacktypestr'] = attackStrForDisplay;
     }
   } catch (err) {
     TAS.error('PFAbility.recalcAbilities', err);
   } finally {
-    return setter;
+    return output;
   }
 }
+
 function resetOptionAsync(id, callback, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.resetOption");
@@ -997,11 +1016,17 @@ function recalcAbilities(callback, silently, eventInfo, levelOnly) {
         'CL-basis',
         'CL-basis-mod',
         function () {
+          // updateCharLevel(id, function () {
+          //   setClassName(id);
+          //   updateAbilityRange(id, function () {
+          //     doneOne();
+          //   });
+          // });
+          // wait to complete until after name and range
           updateCharLevel(id, function () {
-            setClassName(id);
-            updateAbilityRange(id, function () {
-              doneOne();
-            });
+            let doneRow = _.after(2, doneOne);
+            setClassName(id, doneRow);
+            updateAbilityRange(id, doneRow);
           });
         },
         true,
@@ -1016,11 +1041,13 @@ function recalcAbilities(callback, silently, eventInfo, levelOnly) {
     });
   });
 }
+
 export function migrate(callback) {
   if (typeof callback === 'function') {
     callback();
   }
 }
+
 export let recalculate = TAS.callback(function callPFAbilityRecalculate(callback, silently, oldversion) {
   let done = _.once(function () {
       TAS.info('leaving PFAbility.recalculate');
@@ -1045,6 +1072,7 @@ export let recalculate = TAS.callback(function callPFAbilityRecalculate(callback
     done();
   }
 });
+
 //sync repeating_ability with settings>attacks>link spells
 function updateIncludeLink() {
   getSectionIDs('repeating_ability', function (ids) {
@@ -1058,11 +1086,55 @@ function updateIncludeLink() {
     });
   });
 }
+
 //trigger updateIncludeLink when updating the sheet version
 export function updateIncludeLinkVersionCheck() {
   setAttrs({
     include_link_abilities: 1,
     include_link_spells: 1,
+  });
+}
+
+function setSLAsGlobally(eventInfo) {
+  getSectionIDs('repeating_ability', (idArray) => {
+    getAttrs(
+      [
+        'ability_CL-basis',
+        'ability_spell_level-basis',
+        'ability_class-name',
+        'ability_CL-basis-mod',
+        'confirm_ability_CL-basis',
+        'confirm_ability_spell_level-basis',
+        'ability_spell_level-misc',
+      ],
+      (v) => {
+        const output = {};
+        const button = eventInfo.triggerName.split(':').pop();
+        const confirmCL = +v['confirm_ability_CL-basis'] || 0;
+        const confirmSL = +v['confirm_ability_spell_level-basis'] || 0;
+        const clBasis = v['ability_CL-basis'] || '@{level}';
+        const clBasisName = v['ability_class-name'] || '';
+        const clBasisMod = v['ability_CL-basis-mod'] || 0;
+        const slBasis = v['ability_spell_level-basis'] || 'floor(@{casterlevel}/2)';
+        const slBasisCustom = v['ability_spell_level-misc'] || 0;
+        idArray.forEach((id) => {
+          if (button === 'set-sla-cl' && confirmCL) {
+            output[`repeating_ability_${id}_CL-basis`] = clBasis;
+            output[`repeating_ability_${id}_class-name`] = clBasisName;
+            output[`repeating_ability_${id}_CL-basis-mod`] = clBasisMod;
+            output['confirm_ability_CL-basis'] = 0;
+          } else if (button === 'set-sla-dc' && confirmSL) {
+            slBasis === '0' ? (output[`repeating_ability_${id}_spell_level-misc`] = slBasisCustom) : (output[`repeating_ability_${id}_spell_level-misc`] = 0);
+            output[`repeating_ability_${id}_spell_level-basis`] = slBasis;
+            output[`repeating_ability_${id}_ability-basis`] = '@{CHA-mod}';
+            output['confirm_ability_spell_level-basis'] = 0;
+          } else {
+            TAS.error('no match ' + button);
+          }
+        });
+        setAttrs(output);
+      },
+    );
   });
 }
 
@@ -1078,14 +1150,15 @@ function registerEventHandlers() {
       PFAttacks.removeLinkedAttack(null, PFAttacks.linkedAttackType.ability, SWUtils.getRowId(eventInfo.sourceAttribute));
     }),
   );
+
   macroEvent = _.reduce(
     events.commandMacroFields,
     function (m, a) {
-      m += singleEvent + a + ' ';
-      return m;
+      return m + singleEvent + a + ' ';
     },
     macroEvent,
   );
+
   on(
     macroEvent,
     TAS.callback(function eventRepeatingAbilityCommandMacroUpdate(eventInfo) {
@@ -1096,6 +1169,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-basis',
     TAS.callback(function eventAbilityClassDropdown(eventInfo) {
@@ -1106,14 +1180,26 @@ function registerEventHandlers() {
       }
     }),
   );
+
+  on(
+    'change:ability_CL-basis',
+    TAS.callback(function eventAbilityClassDropdown(eventInfo) {
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
+      SWUtils.evaluateAndSetNumber('ability_CL-basis', 'ability_CL-basis-mod');
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+        setClassName(null, null, eventInfo);
+      }
+    }),
+  );
+
   eventToWatch = _.reduce(
     optionRepeatingHelperFields,
     function (m, a) {
-      m += 'change:repeating_ability:' + a + ' ';
-      return m;
+      return m + 'change:repeating_ability:' + a + ' ';
     },
     '',
   );
+
   on(
     eventToWatch,
     TAS.callback(function eventChangeAbilityTypeFrequencyOrRange(eventInfo) {
@@ -1123,13 +1209,15 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
-    'change:repeating_ability:CL-misc change:repeating_ability:spell_level-misc',
+    'change:repeating_ability:CL-misc change:repeating_ability:spell_level-misc change:ability_spell_level-misc',
     TAS.callback(function eventSLAEquationMacro(eventInfo) {
       TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
       SWUtils.evaluateAndSetNumber(eventInfo.sourceAttribute, eventInfo.sourceAttribute + '-mod');
     }),
   );
+
   on(
     'change:buff_CasterLevel-total change:CasterLevel-Penalty',
     TAS.callback(function eventAbilityLevelChange(eventInfo) {
@@ -1139,6 +1227,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-basis-mod change:repeating_ability:CL-misc-mod',
     TAS.callback(function eventAbilityLevelChange(eventInfo) {
@@ -1148,6 +1237,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:compendium_category',
     TAS.callback(function eventAbilityCompendium(eventInfo) {
@@ -1157,15 +1247,17 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
-    'change:repeating_ability:create-attack-entry',
-    TAS.callback(function eventcreateAttackEntryFromSLA(eventInfo) {
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
-      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+    'clicked:repeating_ability:create-attack-entry',
+    TAS.callback(function eventcreateAttackEntryFromRow(eventInfo) {
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType + ' trigger: ' + eventInfo.triggerName.split('_').pop());
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api' || eventInfo.triggerName.split('_').pop() === 'create-attack-entry') {
         createAttackEntryFromRow(null, null, false, eventInfo);
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-misc-mod change:repeating_ability:CL-basis-mod change:repeating_ability:range_pick change:repeating_ability:range',
     TAS.callback(function eventClassRangeMod(eventInfo) {
@@ -1180,14 +1272,15 @@ function registerEventHandlers() {
       }
     }),
   );
+
   eventToWatch = _.reduce(
     events.attackEventsSLA,
     function (memo, attr) {
-      memo += 'change:repeating_ability:' + attr + ' ';
-      return memo;
+      return memo + 'change:repeating_ability:' + attr + ' ';
     },
     '',
   );
+
   on(
     eventToWatch,
     TAS.callback(function eventupdateAssociatedSLAttackAttack(eventInfo) {
@@ -1197,6 +1290,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:toggle_attack_entry',
     TAS.callback(function eventupdateAssociatedSLAttackAttack(eventInfo) {
@@ -1206,6 +1300,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:rule_category',
     TAS.callback(function eventUpdateAbilityRule(eventInfo) {
@@ -1213,6 +1308,7 @@ function registerEventHandlers() {
       setRuleTab(null, null, null, eventInfo);
     }),
   );
+
   on(
     'change:repeating_ability:ability_type',
     TAS.callback(function eventUpdateAbilityType(eventInfo) {
@@ -1220,6 +1316,7 @@ function registerEventHandlers() {
       setTypeTab(null, null, null, eventInfo);
     }),
   );
+
   // toggles the chat menu Show option for all repeating abilities
   on('change:showinmenu_all_abilities', function () {
     getSectionIDs('repeating_ability', function (idArrayAbility) {
@@ -1249,6 +1346,7 @@ function registerEventHandlers() {
       });
     });
   });
+
   //sync repeating_abilities with settings>attacks>link abilities
   on('change:include_link_abilities', function (eventInfo) {
     TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
@@ -1256,6 +1354,7 @@ function registerEventHandlers() {
       updateIncludeLink();
     }
   });
+
   // dynamic translation of datalist for ability_type2
   on('change:repeating_ability:ability_type2', (eventInfo) => {
     TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
@@ -1280,5 +1379,12 @@ function registerEventHandlers() {
     TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
     PFMacros.checkAbilityType2Row(eventInfo);
   });
+
+  // set all SLA's using global attrs
+  on('clicked:set-sla-cl clicked:set-sla-dc', (eventInfo) => {
+    TAS.debug('caught ' + eventInfo.triggerName.split(':').pop());
+    setSLAsGlobally(eventInfo);
+  });
 }
+
 registerEventHandlers();

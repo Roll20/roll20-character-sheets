@@ -513,6 +513,7 @@ function migrate(oldversion, callback, errorCallback) {
     done();
   }
 }
+
 function recalculateParallelModules(callback, silently, oldversion) {
   var done = _.once(function () {
       TAS.info('leaving PFSheet.recalculateParallelModules');
@@ -559,6 +560,7 @@ function recalculateParallelModules(callback, silently, oldversion) {
     done();
   }
 }
+
 function recalculateDefenseAndEncumbrance(callback, silently, oldversion) {
   var done = _.once(function () {
       //TAS.debug("leaving PFSheet.recalculateDefenseAndEncumbrance");
@@ -578,6 +580,7 @@ function recalculateDefenseAndEncumbrance(callback, silently, oldversion) {
     callEncumbrance();
   }
 }
+
 function recalculateCore(callback, silently, oldversion) {
   var done = _.once(function () {
       //TAS.debug("leaving PFSheet.recalculateCore");
@@ -624,27 +627,28 @@ function recalculateCore(callback, silently, oldversion) {
 /** recalculate - all pages in sheet!
  *@param {number} oldversion the current version attribute
  *@param {function} callback when done if no errors
- *@param {function} errorCallback  call this if we get an error
+ *@param {boolean} [silently=true] whether to suppress UI updates/logs
  */
-export function recalculate(oldversion, callback, silently) {
-  var done = function () {
-      TAS.info('leaving PFSheet.recalculate');
-      if (typeof callback === 'function') {
-        callback();
-      }
-    },
-    callParallel = TAS.callback(function callRecalculateParallelModules() {
-      recalculateParallelModules(done, silently, oldversion);
-    }),
-    callEncumbrance = TAS.callback(function callRecalculateDefenseAndEncumbrance() {
-      recalculateDefenseAndEncumbrance(callParallel, silently, oldversion);
-    }),
-    callRecalcCore = TAS.callback(function callRecalculateCore() {
-      recalculateCore(callEncumbrance, silently, oldversion);
-    });
-  silently = true;
+export function recalculate(oldversion, callback, silently = true) {
+  const done = function () {
+    TAS.info('leaving PFSheet.recalculate');
+    if (typeof callback === 'function') {
+      callback();
+    }
+  };
+  const callParallel = TAS.callback(function callRecalculateParallelModules() {
+    recalculateParallelModules(done, silently, oldversion);
+  });
+  const callEncumbrance = TAS.callback(function callRecalculateDefenseAndEncumbrance() {
+    recalculateDefenseAndEncumbrance(callParallel, silently, oldversion);
+  });
+  const callRecalcCore = TAS.callback(function callRecalculateCore() {
+    recalculateCore(callEncumbrance, silently, oldversion);
+  });
+
   callRecalcCore();
 }
+
 /* checkForUpdate looks at current version of page in PFSheet_Version and compares to code PFConst.version
  *  calls recalculateSheet if versions don't match or if recalculate button was pressed.
  * */
@@ -853,4 +857,5 @@ function registerEventHandlers() {
     setAttrs(setter, PFConst.silentParams);
   });
 }
+
 registerEventHandlers();
