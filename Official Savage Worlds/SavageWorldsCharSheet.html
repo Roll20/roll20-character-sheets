@@ -2205,7 +2205,9 @@ const PHEGSingular = {
     'shields':'shield',
     'armors':'armor',
     'vehicle':'vehicle',
-    'specialabilities':'specialability'
+    'specialabilities':'specialability',
+    'race':'character',
+    'iconic_framework':'character'
 };
 //Lookup proxy handlers. These functions are used int he proxies to return an appropriate value from the lookup objects above, even when a given key does not exist in those objects.
 const genericLookupHandler = {
@@ -2267,17 +2269,17 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
-        lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
+    lookupBurndown(queue, productArray, searchArray, callback, origBlock,IDPathways);
 };
 
 //Actually queries the compendium to get details on the items in each category using the searchArray assembled in compendiumLookup
 //ARGUMENTS
-//statblock (object): the original object dropped from the compendium
+//statblocks (array): the objects whose attachments are looked up, starting with the object dropped from the compendium
 //productArray (array): The array of expansion IDs that this product may rely on
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
-const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock,IDPathways) {
+const lookupBurndown = function(statblocks, productArray, searchArray, callback, origBlock,IDPathways) {
     getCompendiumQuery(searchArray, (dataArr) => {
         debug({dataArr});
         if(!Array.isArray(dataArr)){
@@ -2295,7 +2297,7 @@ const lookupBurndown = function(statblock, productArray, searchArray, callback, 
                 });
             }
         });
-        let queue = additionalLookups(statblock,origBlock);
+        let queue = statblocks.flatMap((statblock) => additionalLookups(statblock,origBlock));
         if(queue.length){
             compendiumDataLookup({queue,callback,origBlock,IDPathways});
         }else{
@@ -2324,7 +2326,7 @@ const additionalLookups = function(statblock,origBlock){
                                 origBlock[nProp] = origBlock[nProp] ? 
                                     [...origBlock[nProp],...jArr] : 
                                     [...jArr];
-                                m.data[nProp] = jArr;
+                                m.data[nProp] = [...(m.data[nProp] || []), ...jArr];
                                 m.nested = true;
                             }
                         }catch(err){
@@ -2726,6 +2728,7 @@ const determineWeaponOptions = function (
 const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes = {}}){
   debug('Applying effects fields');
   const effectPrefix = PHEGSingular[sectionName];
+  const traitDice = [...attributeNames, ...static.map(attr => attr.replace(/^static/, '').toLowerCase())];
   if (jsonObj[`${effectPrefix}effect`]) {
     //get all the different pieces
     jsonObj[`${effectPrefix}effect`]
@@ -2734,7 +2737,7 @@ const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes =
         effectString.replace(
           /(.+?)\s*:\s*(.+)/,
           (match,field,value)=>{
-            const findKey = obj => Object.keys(obj).find(key => key.toLowerCase() === field.toLowerCase());
+            const findKey = (obj, name = field) => Object.keys(obj).find(key => key.toLowerCase() === name.toLowerCase());
             const targetField = findKey(targetObj) || field;
             const currentValue = targetObj.hasOwnProperty(targetField) ?
               targetObj[targetField] :
@@ -2742,7 +2745,29 @@ const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes =
             const numValue = +value;
             const numCurrentValue = +(currentValue || 0);
             if(!Number.isNaN(numValue) && !Number.isNaN(numCurrentValue)){
-              targetObj[targetField] = numCurrentValue + numValue;
+              if(traitDice.includes(field.toLowerCase())){
+                const modField = findKey(targetObj, `${field}mod`) || `${field}mod`;
+                const currentMod = +((targetObj.hasOwnProperty(modField) ?
+                  targetObj[modField] :
+                  attributes[findKey(attributes, modField)]) || 0);
+                let die = numCurrentValue;
+                let mod = currentMod;
+                for (let steps = Math.round(numValue / 2); steps > 0; steps--) {
+                  die === 12 ? mod++ : die += 2;
+                }
+                for (let steps = Math.round(numValue / 2); steps < 0 && die > 4; steps++) {
+                  die === 12 && mod > 0 ? mod-- : die -= 2;
+                }
+                targetObj[targetField] = die;
+                if (mod !== currentMod) {
+                  targetObj[modField] = mod;
+                }
+              }else{
+                targetObj[targetField] = numCurrentValue + numValue;
+              }
+            }else if(/^runningdie$/i.test(field) && !Number.isNaN(numValue)){
+              const sides = parseInt(`${currentValue || '1d6'}`.replace(/^1d/, '')) + numValue;
+              targetObj[targetField] = `1d${Math.min(12, Math.max(4, sides))}`;
             }else if(/(reason|modtype)$/i.test(field) && currentValue){
               targetObj[targetField] = `${currentValue}`.split(/\s*,\s*/).includes(value) ? `${currentValue}` : `${currentValue}, ${value}`;
             }else{
@@ -2889,6 +2914,7 @@ const dropArmorweapons = function({repSectionID,repSection,targetObj,jsonObj,att
 const dropCharacterType = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
   //Character types are not directly stored in repeating sections
   debug('dropping character type');
+  applyGeneralEffects({targetObj,sectionName:repSection,jsonObj,attributes});
   const retValue = [false,sheetAttributes];
   return retValue;
 };
@@ -3412,7 +3438,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         let dropType = getDropInfoCommand(type, source);
         let prefix = '';
         if(phegObj.data.subcategory){
-          prefix = /armor/i.test(phegObj.data.subcategory) ?
+          prefix = /^(power|robot) armor$/i.test(phegObj.data.subcategory) ?
             `${phegObj.data.subcategory[0].toLowerCase()}a_` :
             '';
         }
