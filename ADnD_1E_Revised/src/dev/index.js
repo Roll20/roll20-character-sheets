@@ -227,7 +227,7 @@ on(
 );
 
 const attackMacroDefault =
-  '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}';
+  '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{bestAChit=[[0]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammoTracking=[[0]]}} {{ammo=[[0]]}} {{ammoMax=[[0]]}} {{ammoRaw=@{weapon_ammo}/@{weapon_ammo|max}}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}';
 
 const armorRowIDs = [
   'unarmored_row_id',
@@ -871,7 +871,7 @@ const migrateAC = async (current_version, final_version) => {
 const weaponMacroUpdate = async (current_version, final_version) => {
   const idArray = await getSectionIDsAsync('repeating_weapon');
   const fields = idArray.map((id) => `repeating_weapon_${id}_weapon_macro_text`);
-  const v = await getAttrsAsync(fields);
+  const v = await getAttrsAsync(['default_attack_macro', ...fields]);
   const output = {};
   const replacements = {
     weapon_old:
@@ -886,8 +886,11 @@ const weaponMacroUpdate = async (current_version, final_version) => {
       '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + @{weapon_backstab_bonus}[BACKSTAB] + @{weapon_tohitbonus}[HIT_BON] + @{weapon_prof_pen}[PROF_PEN] + @{weapon_dual_pen}[DUAL_PEN]+ @{weapon_magicbonus}[MAG_BON] + ?{To Hit Modifier?|0}[MISC_MOD] ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=@{toggle_critdamage}}} @{weapon_tohitacadj}',
     weapon_old_v6:
       '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + @{weapon_backstab_bonus}[BACKSTAB] + @{weapon_tohitbonus}[HIT_BON] + @{weapon_prof_pen}[PROF_PEN] + @{weapon_dual_pen}[DUAL_PEN]+ @{weapon_magicbonus}[MAG_BON] + ?{To Hit Modifier?|0}[MISC_MOD] ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}',
-    weapon_current:
+    // pre-CRP
+    weapon_old_v7:
       '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}',
+    // newest/latest version of the attack macro
+    weapon_current: attackMacroDefault,
   };
   const oldVersions = [
     replacements.weapon_old,
@@ -896,13 +899,19 @@ const weaponMacroUpdate = async (current_version, final_version) => {
     replacements.weapon_old_v4,
     replacements.weapon_old_v5,
     replacements.weapon_old_v6,
+    replacements.weapon_old_v7,
   ];
+  // check and update all existing attacks
   _.each(idArray, (id) => {
     const attrName = `repeating_weapon_${id}_weapon_macro_text`;
     if (oldVersions.includes(v[attrName])) {
       output[attrName] = replacements.weapon_current;
     }
   });
+  // ensures that the on-sheet default also gets updated
+  if (oldVersions.includes(v.default_attack_macro)) {
+    output.default_attack_macro = replacements.weapon_current;
+  }
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: weaponMacroUpdate completed`);
   await setAttrsAsync(output, {silent: true});
@@ -926,11 +935,20 @@ const abilityMacroUpdate = async (current_version, final_version) => {
       '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[ @{ability_current|max} ]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
     ability_old_v5:
       '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
-    ability_current:
+    ability_old_v6:
       '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ 0 + @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[ 0 + @{ability_current|max} ]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
+    ability_current:
+      '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll=[[ 0 + @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}}{{usesTracking=[[0]]}} {{uses=[[0]]}} {{usesMax=[[0]]}} {{usesRaw=@{ability_current}/@{ability_current|max}}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
   };
   // Create a list of all old versions for easier checking
-  const oldVersions = [replacements.ability_old, replacements.ability_old_v2, replacements.ability_old_v3, replacements.ability_old_v4, replacements.ability_old_v5];
+  const oldVersions = [
+    replacements.ability_old,
+    replacements.ability_old_v2,
+    replacements.ability_old_v3,
+    replacements.ability_old_v4,
+    replacements.ability_old_v5,
+    replacements.ability_old_v6,
+  ];
   _.each(idArray, (id) => {
     const attrName = `repeating_ability_${id}_ability_macro_text`;
     const currentText = v[attrName];
@@ -1017,13 +1035,16 @@ const equipmentMacroUpdate = async (current_version, final_version) => {
   const replacements = {
     equipment_old:
       '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
-    equipment_current:
+    equipment_old_v2:
       '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{quantity=@{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
+    equipment_current:
+      '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{usesTracking=[[0]]}} {{uses=[[0]]}} {{usesMax=[[0]]}} {{usesRaw=@{equipment_current}/@{equipment_current|max}}} {{quantityTracking=[[0]]}} {{quantity=[[0]]}} {{quantityMax=[[0]]}} {{quantityRaw=@{equipment_quantity}/@{equipment_quantity|max}}}',
   };
+  const oldVersions = [replacements.equipment_old, replacements.equipment_old_v2];
+  // check and update all existing equipment
   _.each(idArray, (id) => {
     const attrName = `repeating_equipment_${id}_equipment_macro_text`;
-    // Only update if the current text matches the old default exactly
-    if (v[attrName] === replacements.equipment_old) {
+    if (oldVersions.includes(v[attrName])) {
       output[attrName] = replacements.equipment_current;
     }
   });
@@ -1323,10 +1344,10 @@ const setEquipmentUpdate = async (current_version, final_version) => {
     // Setting carried_select to carried value to preserve existing state
     output[`${prefix}equipment_carried_select`] = int(v[`${prefix}equipment_carried`]);
     output[`${prefix}equipment_carried`] = int(v[`${prefix}equipment_carried`]);
-    output[`${prefix}equipment_quantity`] = int(v[`${prefix}equipment_quantity`]);
-    output[`${prefix}equipment_quantity_max`] = int(v[`${prefix}equipment_quantity_max`]);
-    output[`${prefix}equipment_weight`] = int(v[`${prefix}equipment_weight`]);
-    output[`${prefix}equipment_cost`] = int(v[`${prefix}equipment_cost`]);
+    output[`${prefix}equipment_quantity`] = float(v[`${prefix}equipment_quantity`]);
+    output[`${prefix}equipment_quantity_max`] = float(v[`${prefix}equipment_quantity_max`]);
+    output[`${prefix}equipment_weight`] = float(v[`${prefix}equipment_weight`]);
+    output[`${prefix}equipment_cost`] = float(v[`${prefix}equipment_cost`]);
     output[`${prefix}equipment_armor_type`] = int(v[`${prefix}equipment_armor_type`]);
     output[`${prefix}equipment_armor_worn`] = int(v[`${prefix}equipment_armor_worn`]);
     output[`${prefix}equipment_armor_ac`] = int(v[`${prefix}equipment_armor_ac`]);
@@ -1430,6 +1451,8 @@ const setWeaponsUpdate = async (current_version, final_version) => {
     // Strings/Misc
     output[`${prefix}weapon_dual`] = v[`${prefix}weapon_dual`];
     output[`${prefix}weapon_whisper_to_hit`] = v[`${prefix}weapon_whisper_to_hit`];
+    // copy outside repeating_weapon for future access
+    output.weapon_whisper_to_hit = v[`${prefix}weapon_whisper_to_hit`];
     output[`${prefix}weapon_length`] = v[`${prefix}weapon_length`];
     output[`${prefix}weapon_space`] = v[`${prefix}weapon_space`];
     output[`${prefix}weapon_speed`] = v[`${prefix}weapon_speed`];
@@ -1698,13 +1721,14 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   versionator(current_version, final_version);
 };
 
-// One-time update: trigger recalc for '/w gm to-Hit' default values
+// One-time update: trigger recalc for '/ss to-Hit' default values
 const recalcToHitWhisper = async (current_version, final_version) => {
   const idArray = await getSectionIDsAsync('repeating_weapon');
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_whisper_to_hit`, `repeating_weapon_${id}_weapon_whisper_to_hit_select`]);
   const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
   const updates = await Promise.all(idArray.map((id) => getToHitRowUpdate(v, id)));
   const output = Object.assign({}, ...updates);
+  output.weapon_whisper_to_hit = v.weapon_whisper_to_hit;
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: recalcToHitWhisper completed`);
   await setAttrsAsync(output, {silent: true});
@@ -1891,6 +1915,15 @@ versionator = async (current_version, final_version) => {
   if (current_version < 1.7) {
     return await recalcToHitWhisper(1.7, final_version);
   }
+  if (current_version < 1.71) {
+    return await weaponMacroUpdate(1.71, final_version);
+  }
+  if (current_version < 1.72) {
+    return await equipmentMacroUpdate(1.72, final_version);
+  }
+  if (current_version < 1.73) {
+    return await abilityMacroUpdate(1.73, final_version);
+  }
   // All updates completed
   const finalCheck = await getAttrsAsync(['sheet_version', 'old_character']);
   const actualAttrVersion = parseFloat(finalCheck.sheet_version) || 0;
@@ -1908,7 +1941,7 @@ versionator = async (current_version, final_version) => {
 };
 
 on('sheet:opened', async () => {
-  const final_version = 1.7; // must be >= last update versionator()
+  const final_version = 1.73; // must be >= last update versionator()
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
   let current_version = float(v.sheet_version);
   // New Sheet?
@@ -1946,10 +1979,10 @@ on(
   },
 );
 
-on('change:abilities_info_show change:toggle_exceptional change:strength', (eventInfo) => {
+on('change:abilities_info_show change:toggle_exceptional change:strength', async (eventInfo) => {
   const output = {};
   output.exceptional_strength_flag = 1;
-  setAttrs(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 });
 
 // PC or NPC sheet role
@@ -2866,20 +2899,20 @@ on('remove:repeating_equipment', async (eventInfo) => {
   if (isMatch) await syncArmorToEquipment(id, null, row_removed);
 });
 
-on('clicked:addturnundead', (eventInfo) => {
+on('clicked:addturnundead', async (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
   output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by Type';
   output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by Type](~selected|turn_undead_roll)';
-  setAttrs(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 });
 
-on('clicked:addturnundead2', (eventInfo) => {
+on('clicked:addturnundead2', async (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
   output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by HD';
   output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by HD](~selected|turn_undead2_roll)';
-  setAttrs(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Spell Tabs and Memorized toggle
@@ -3116,11 +3149,8 @@ const getToHitRowUpdate = async (v, id, isLocal) => {
   let thishitTableSelect = int(v[attrSelect]);
   let thishitTableMacro = '';
   const noMacro = '&nbsp;';
-  // IMPORTANT these strings MUST include a hard return to force a new line
-  const matrixMacro = `
-/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac-10} ]]}} {{ToHitAC-9=[[ @{thac-9} ]]}} {{ToHitAC-8=[[ @{thac-8} ]]}} {{ToHitAC-7=[[ @{thac-7} ]]}} {{ToHitAC-6=[[ @{thac-6} ]]}} {{ToHitAC-5=[[ @{thac-5} ]]}} {{ToHitAC-4=[[ @{thac-4} ]]}} {{ToHitAC-3=[[ @{thac-3} ]]}} {{ToHitAC-2=[[ @{thac-2} ]]}} {{ToHitAC-1=[[ @{thac-1} ]]}} {{ToHitAC0=[[ @{thac0} ]]}} {{ToHitAC1=[[ @{thac1} ]]}} {{ToHitAC2=[[ @{thac2} ]]}} {{ToHitAC3=[[ @{thac3} ]]}} {{ToHitAC4=[[ @{thac4} ]]}} {{ToHitAC5=[[ @{thac5} ]]}} {{ToHitAC6=[[ @{thac6} ]]}} {{ToHitAC7=[[ @{thac7} ]]}} {{ToHitAC8=[[ @{thac8} ]]}} {{ToHitAC9=[[ @{thac9} ]]}} {{ToHitAC10=[[ @{thac10} ]] }}`;
-  const thac0Macro = `
-/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac0-10} ]]}} {{ToHitAC-9=[[ @{thac0-9} ]]}} {{ToHitAC-8=[[ @{thac0-8} ]]}} {{ToHitAC-7=[[ @{thac0-7} ]]}} {{ToHitAC-6=[[ @{thac0-6} ]]}} {{ToHitAC-5=[[ @{thac0-5} ]]}} {{ToHitAC-4=[[ @{thac0-4} ]]}} {{ToHitAC-3=[[ @{thac0-3} ]]}} {{ToHitAC-2=[[ @{thac0-2} ]]}} {{ToHitAC-1=[[ @{thac0-1} ]]}} {{ToHitAC0=[[ @{thac00} ]]}} {{ToHitAC1=[[ @{thac01} ]]}} {{ToHitAC2=[[ @{thac02} ]]}} {{ToHitAC3=[[ @{thac03} ]]}} {{ToHitAC4=[[ @{thac04} ]]}} {{ToHitAC5=[[ @{thac05} ]]}} {{ToHitAC6=[[ @{thac06} ]]}} {{ToHitAC7=[[ @{thac07} ]]}} {{ToHitAC8=[[ @{thac08} ]]}} {{ToHitAC9=[[ @{thac09} ]]}} {{ToHitAC10=[[ @{thac010} ]] }}`;
+  const matrixMacro = `/ss &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac-10} ]]}} {{ToHitAC-9=[[ @{thac-9} ]]}} {{ToHitAC-8=[[ @{thac-8} ]]}} {{ToHitAC-7=[[ @{thac-7} ]]}} {{ToHitAC-6=[[ @{thac-6} ]]}} {{ToHitAC-5=[[ @{thac-5} ]]}} {{ToHitAC-4=[[ @{thac-4} ]]}} {{ToHitAC-3=[[ @{thac-3} ]]}} {{ToHitAC-2=[[ @{thac-2} ]]}} {{ToHitAC-1=[[ @{thac-1} ]]}} {{ToHitAC0=[[ @{thac0} ]]}} {{ToHitAC1=[[ @{thac1} ]]}} {{ToHitAC2=[[ @{thac2} ]]}} {{ToHitAC3=[[ @{thac3} ]]}} {{ToHitAC4=[[ @{thac4} ]]}} {{ToHitAC5=[[ @{thac5} ]]}} {{ToHitAC6=[[ @{thac6} ]]}} {{ToHitAC7=[[ @{thac7} ]]}} {{ToHitAC8=[[ @{thac8} ]]}} {{ToHitAC9=[[ @{thac9} ]]}} {{ToHitAC10=[[ @{thac10} ]] }}`;
+  const thac0Macro = `/ss &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac0-10} ]]}} {{ToHitAC-9=[[ @{thac0-9} ]]}} {{ToHitAC-8=[[ @{thac0-8} ]]}} {{ToHitAC-7=[[ @{thac0-7} ]]}} {{ToHitAC-6=[[ @{thac0-6} ]]}} {{ToHitAC-5=[[ @{thac0-5} ]]}} {{ToHitAC-4=[[ @{thac0-4} ]]}} {{ToHitAC-3=[[ @{thac0-3} ]]}} {{ToHitAC-2=[[ @{thac0-2} ]]}} {{ToHitAC-1=[[ @{thac0-1} ]]}} {{ToHitAC0=[[ @{thac00} ]]}} {{ToHitAC1=[[ @{thac01} ]]}} {{ToHitAC2=[[ @{thac02} ]]}} {{ToHitAC3=[[ @{thac03} ]]}} {{ToHitAC4=[[ @{thac04} ]]}} {{ToHitAC5=[[ @{thac05} ]]}} {{ToHitAC6=[[ @{thac06} ]]}} {{ToHitAC7=[[ @{thac07} ]]}} {{ToHitAC8=[[ @{thac08} ]]}} {{ToHitAC9=[[ @{thac09} ]]}} {{ToHitAC10=[[ @{thac010} ]] }}`;
   if (isLocal) {
     // clog(`getToHitRowUpdate: USE LOCAL CHANGE`);
     if (thishitTableSelect === 2) {
@@ -3673,7 +3703,7 @@ on(
     // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
     const triggerEvent = eventInfo.triggerName;
     const recalc = triggerEvent === 'clicked:calcac' ? 1 : 0;
-    clog(`triggerEvent: ${triggerEvent} recalc:${recalc}`);
+    // clog(`triggerEvent: ${triggerEvent} recalc:${recalc}`);
     await calcAC(recalc);
   },
 );
@@ -3775,6 +3805,7 @@ const repeatingWeaponNumber = [
   'weapon_quantity',
   'weapon_ammo',
   'weapon_ammo_max',
+  'weapon_tracking',
   'weapon_weight',
   'weapon_cost',
   'weapon_range_short',
@@ -3825,6 +3856,7 @@ const repeatingEquipmentNumber = [
   'equipment_carried',
   'equipment_quantity',
   'equipment_quantity_max',
+  'equipment_tracking',
   'equipment_weight',
   'equipment_cost',
   'equipment_armor_type',
@@ -6956,7 +6988,7 @@ const classView = async () => {
   if (/thief|assassin|rogue|thief-acrobat|acrobat/gi.test(classes)) {
     output.toggle_thief_skills = 0;
   }
-  await setAttrs(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 };
 
 // Globals for Ability Calcs
@@ -7114,7 +7146,7 @@ const charismaCalcs = async () => {
   output.loyaltybonus = (AT_CHA.getEntry(stat_cha).getLoyaltyBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getLoyaltyBonus();
   output.reactionbonus = (AT_CHA.getEntry(stat_cha).getReactionBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getReactionBonus();
   output.comeliness_cha_adj = (AT_CHA.getEntry(stat_cha).getComeliness() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getComeliness();
-  await setAttrs(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 };
 
 const thiefSkillsDexCalcs = async (autofill_thief_dex) => {
@@ -7592,3 +7624,278 @@ on('clicked:equipment-sort-undo', async (eventInfo) => {
     // clog(`Undo process finished. Sheet unlocked.`);
   }
 });
+
+// CRP
+// non-repeating buttons
+const buttonSet = [];
+
+// enables drag/drop of action buttons by syncing with a normal button
+on('sheet:opened change:character_name', async (eventInfo) => {
+  // console.log(`Syncing Action buttons for macrobar.`);
+  const idArrayWeapons = await getSectionIDsAsync('repeating_weapon');
+  const idArrayEquipment = await getSectionIDsAsync('repeating_equipment');
+  const idArrayAbility = await getSectionIDsAsync('repeating_ability');
+  let output = {};
+  const v = await getAttrsAsync(['character_name']);
+  // process non-repeating buttons
+  output = buttonSet.reduce((all, one) => {
+    return {...all, [one]: `%{${v.character_name}|${one}-button}`};
+  }, {});
+  // process each repeating sections buttons
+  idArrayWeapons.forEach((id) => {
+    // repeating buttons
+    const repeatingButtonSet = ['weapon_attack_roll', 'weapon_attack_npc_roll'];
+    const attribute_values = repeatingButtonSet.reduce((all, one) => {
+      // added .replaceAll step for action buttons
+      return {...all, [`repeating_weapon_${id}_${one}`]: `%{${v.character_name}|repeating_weapon_${id}_${one.replaceAll('_', '-')}-button}`};
+    }, {});
+    output = {...output, ...attribute_values};
+  });
+  idArrayEquipment.forEach((id) => {
+    // repeating buttons
+    const repeatingButtonSet = ['equipment_roll'];
+    const attribute_values = repeatingButtonSet.reduce((all, one) => {
+      // added .replaceAll step for action buttons
+      return {...all, [`repeating_equipment_${id}_${one}`]: `%{${v.character_name}|repeating_equipment_${id}_${one.replaceAll('_', '-')}-button}`};
+    }, {});
+    output = {...output, ...attribute_values};
+  });
+  idArrayAbility.forEach((id) => {
+    // repeating buttons
+    const repeatingButtonSet = ['ability_roll', 'ability_npc_roll'];
+    const attribute_values = repeatingButtonSet.reduce((all, one) => {
+      // added .replaceAll step for action buttons
+      return {...all, [`repeating_ability_${id}_${one}`]: `%{${v.character_name}|repeating_ability_${id}_${one.replaceAll('_', '-')}-button}`};
+    }, {});
+    output = {...output, ...attribute_values};
+  });
+  await setAttrsAsync(output, {silent: true});
+});
+
+on(
+  'clicked:repeating_weapon:weapon-attack-roll-button clicked:repeating_weapon:weapon-attack-npc-roll-button clicked:repeating_equipment:equipment-roll-button clicked:repeating_ability:ability-roll-button clicked:repeating_ability:ability-npc-roll-button',
+  async (eventInfo) => {
+    const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
+    console.log(`${eventInfo.triggerName} id:${id}`);
+    const fields = [
+      'toggle_to_hit_table',
+      'best_ac_hit_method',
+      'hide_best_ac_hit',
+      'thac0',
+      'thac00',
+      `repeating_weapon_${id}_weapon_whisper_to_hit`,
+      `repeating_weapon_${id}_weapon_tracking`,
+      `repeating_weapon_${id}_weapon_attack_type`, // 1 || 3 is ranged
+      `repeating_weapon_${id}_weapon_ammo`,
+      `repeating_weapon_${id}_weapon_ammo_max`,
+      `repeating_equipment_${id}_equipment_tracking`,
+      `repeating_equipment_${id}_equipment_current`,
+      `repeating_equipment_${id}_equipment_current_max`,
+      `repeating_equipment_${id}_equipment_quantity`,
+      `repeating_equipment_${id}_equipment_quantity_max`,
+      `repeating_ability_${id}_ability_tracking`,
+      `repeating_ability_${id}_ability_current`,
+      `repeating_ability_${id}_ability_current_max`,
+    ];
+    const v = await getAttrsAsync(fields);
+    const output = {};
+    // repeating CRP rolls
+    const repeatingRolls = {
+      [`repeating_weapon_${id}_weapon-attack-roll-button`]: `@{whisper_pc} @{repeating_weapon_${id}_weapon_macro_text}`,
+      [`repeating_weapon_${id}_weapon-attack-npc-roll-button`]: `@{whisper_npc} @{repeating_weapon_${id}_weapon_macro_text} @{repeating_weapon_${id}_weapon_damage_chat_menu_npc}`,
+      [`repeating_equipment_${id}_equipment-roll-button`]: `@{repeating_equipment_${id}_equipment_macro_text}`,
+      [`repeating_ability_${id}_ability-roll-button`]: `@{whisper_pc} @{repeating_ability_${id}_ability_macro_text}`,
+      [`repeating_ability_${id}_ability-npc-roll-button`]: `@{whisper_npc} @{repeating_ability_${id}_ability_macro_text}`,
+    };
+    const toHitTableDefault =
+      '/ss gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac-10} ]]}} {{ToHitAC-9=[[ @{thac-9} ]]}} {{ToHitAC-8=[[ @{thac-8} ]]}} {{ToHitAC-7=[[ @{thac-7} ]]}} {{ToHitAC-6=[[ @{thac-6} ]]}} {{ToHitAC-5=[[ @{thac-5} ]]}} {{ToHitAC-4=[[ @{thac-4} ]]}} {{ToHitAC-3=[[ @{thac-3} ]]}} {{ToHitAC-2=[[ @{thac-2} ]]}} {{ToHitAC-1=[[ @{thac-1} ]]}} {{ToHitAC0=[[ @{thac0} ]]}} {{ToHitAC1=[[ @{thac1} ]]}} {{ToHitAC2=[[ @{thac2} ]]}} {{ToHitAC3=[[ @{thac3} ]]}} {{ToHitAC4=[[ @{thac4} ]]}} {{ToHitAC5=[[ @{thac5} ]]}} {{ToHitAC6=[[ @{thac6} ]]}} {{ToHitAC7=[[ @{thac7} ]]}} {{ToHitAC8=[[ @{thac8} ]]}} {{ToHitAC9=[[ @{thac9} ]]}} {{ToHitAC10=[[ @{thac10} ]] }}';
+    // Which button was pressed?
+    const trigger = eventInfo.triggerName.replace('clicked:', '');
+    const roll_string = repeatingRolls[trigger];
+    if (!roll_string) {
+      console.error(`Roll string undefined for trigger: ${trigger}`);
+      return;
+    }
+
+    if (trigger.includes('weapon-attack-roll-button') || trigger.includes('weapon-attack-npc-roll-button')) {
+      const useTHAC0 = int(v.toggle_to_hit_table);
+      const THAC0 = useTHAC0 ? int(v.thac00) : int(v.thac0);
+      const toHitTable = v[`repeating_weapon_${id}_weapon_whisper_to_hit`] || toHitTableDefault;
+      const hideBestAC = int(v.hide_best_ac_hit);
+      const weaponTracking = int(v[`repeating_weapon_${id}_weapon_tracking`]);
+      const attackType = int(v[`repeating_weapon_${id}_weapon_attack_type`]);
+      const isRanged = attackType === 1 || attackType === 3;
+      const ammoValid = await numbersOnly(v[`repeating_weapon_${id}_weapon_ammo`]);
+      const ammoMaxValid = await numbersOnly(v[`repeating_weapon_${id}_weapon_ammo_max`]);
+      const ammo = ammoValid ? int(v[`repeating_weapon_${id}_weapon_ammo`]) : v[`repeating_weapon_${id}_weapon_ammo`];
+      const ammoMax = ammoMaxValid ? int(v[`repeating_weapon_${id}_weapon_ammo_max`]) : v[`repeating_weapon_${id}_weapon_ammo_max`];
+      const currentAmmo = isRanged && weaponTracking === 1 && ammoValid && ammo >= 0 ? ammo - 1 : ammo; // allow negative for roll template
+      console.log(`ammoValid:${ammoValid} ammoMaxValid:${ammoMaxValid} weaponTracking:${weaponTracking} isRanged:${isRanged} currentAmmo:${currentAmmo}`);
+      // Native async startRoll
+      const roll = await startRoll(roll_string);
+      // console.log(roll);
+      const d20 = int(roll.results.attack1.dice[0]);
+      const totalRoll = int(roll.results.attack1.result);
+      const bestAcHitMethod = int(v.best_ac_hit_method) || 0;
+      let bestAC = 0;
+
+      // Option 0: RAW (total adjusted roll)
+      if (bestAcHitMethod === 0) {
+        if (totalRoll < 20) {
+          bestAC = THAC0 - totalRoll;
+        } else if (totalRoll <= 25) {
+          bestAC = THAC0 - 25;
+        } else {
+          bestAC = THAC0 - totalRoll - 5;
+        }
+      }
+      // Option 1: Nat20 Always Hits (Any AC)
+      else if (bestAcHitMethod === 1) {
+        if (d20 === 20) {
+          bestAC = -99; // Auto-hit bypass
+        } else if (totalRoll < 20) {
+          bestAC = THAC0 - totalRoll;
+        } else if (totalRoll <= 25) {
+          bestAC = THAC0 - 25;
+        } else {
+          bestAC = THAC0 - totalRoll - 5;
+        }
+      }
+      // Option 2: DMG p82 Official Clarification
+      else if (bestAcHitMethod === 2) {
+        if (d20 === 20) {
+          if (totalRoll < 20) {
+            bestAC = THAC0 - 25; // Penalties frozen on plateau
+          } else {
+            bestAC = THAC0 - totalRoll - 5; // unfreezes bonuses for target numbers 21+
+          }
+        } else {
+          if (totalRoll < 20) {
+            bestAC = THAC0 - totalRoll;
+          } else {
+            bestAC = THAC0 - 25; // totalRoll >= 20 reaches but cannot extend past plateau without a Nat 20
+          }
+        }
+      } else {
+        // bestAcHitMethod value not recognized use RAW
+        if (totalRoll < 20) {
+          bestAC = THAC0 - totalRoll;
+        } else if (totalRoll <= 25) {
+          bestAC = THAC0 - 25;
+        } else {
+          bestAC = THAC0 - totalRoll - 5;
+        }
+      }
+      finishRoll(roll.rollId, {
+        //'name of key': 'computed value'
+        // hides "hits AC" in roll based on sheet settings
+        bestAChit: hideBestAC ? 99 : bestAC,
+        ammoTracking: isRanged ? weaponTracking : 99,
+        ammo: currentAmmo,
+        ammoMax: ammoMax,
+      });
+      // hidden attr for macros and/or API access
+      output.best_ac_hit = bestAC;
+      // Ammo tracking
+      output[`repeating_weapon_${id}_weapon_ammo`] = ammoValid ? Math.max(0, currentAmmo) : currentAmmo; // prevents setting a negative value
+      output[`repeating_weapon_${id}_weapon_ammo_max`] = ammoMax;
+      await setAttrsAsync(output, {silent: true});
+
+      // Post to-Hit table
+      const roll2 = await startRoll(toHitTable);
+      // console.log(roll2);
+      finishRoll(roll2.rollId);
+    } else if (trigger.includes('equipment-roll-button')) {
+      const equipmentTracking = int(v[`repeating_equipment_${id}_equipment_tracking`]); // 0:none, 1:uses, 2:quantity
+      const usesValid = await numbersOnly(v[`repeating_equipment_${id}_equipment_current`]);
+      const usesMaxValid = await numbersOnly(v[`repeating_equipment_${id}_equipment_current_max`]);
+      const quantityValid = await numbersOnly(v[`repeating_equipment_${id}_equipment_quantity`]);
+      const quantityMaxValid = await numbersOnly(v[`repeating_equipment_${id}_equipment_quantity_max`]);
+      const uses = usesValid ? int(v[`repeating_equipment_${id}_equipment_current`]) : v[`repeating_equipment_${id}_equipment_current`];
+      const usesMax = usesMaxValid ? int(v[`repeating_equipment_${id}_equipment_current_max`]) : v[`repeating_equipment_${id}_equipment_current_max`];
+      const currentUses = equipmentTracking === 1 && usesValid && uses >= 0 ? uses - 1 : uses; // allow negative for roll template
+      const quantity = quantityValid ? float(v[`repeating_equipment_${id}_equipment_quantity`]) : v[`repeating_equipment_${id}_equipment_quantity`];
+      const quantityMax = quantityMaxValid ? float(v[`repeating_equipment_${id}_equipment_quantity_max`]) : v[`repeating_equipment_${id}_equipment_quantity_max`];
+      const currentQuantity = equipmentTracking === 2 && quantityValid && quantity >= 0 ? quantity - 1 : quantity; // allow negative for roll template
+      const roll = await startRoll(roll_string);
+      // console.log(roll);
+      if (equipmentTracking === 0) {
+        console.log(`Equipment NONE Equipment and/or Row Not Tracked`);
+        finishRoll(roll.rollId, {
+          //'name of key': 'computed value'
+          uses: uses,
+          usesMax: usesMax,
+          quantity: quantity,
+          quantityMax: quantityMax,
+          usesTracking: 0,
+          quantityTracking: 0,
+        });
+      } else if (equipmentTracking === 1) {
+        console.log(`Equipment USES quantityValid:${quantityValid} quantityMaxValid:${quantityMaxValid} equipmentTracking:${equipmentTracking} current:${uses}`);
+        finishRoll(roll.rollId, {
+          //'name of key': 'computed value'
+          uses: currentUses, // allow negative for roll template
+          usesMax: usesMax,
+          quantity: quantity,
+          quantityMax: quantityMax,
+          usesTracking: 1,
+          quantityTracking: 0, // show raw
+        });
+        output[`repeating_equipment_${id}_equipment_current`] = usesValid ? Math.max(0, currentUses) : currentUses; // prevents setting a negative value
+        output[`repeating_equipment_${id}_equipment_current_max`] = usesMax;
+        await setAttrsAsync(output, {silent: true});
+      } else if (equipmentTracking === 2) {
+        console.log(`Equipment QUANTITY usesValid:${usesValid} usesMaxValid:${usesMaxValid} equipmentTracking:${equipmentTracking} quantity:${quantity}`);
+        finishRoll(roll.rollId, {
+          uses: uses,
+          usesMax: usesMax,
+          quantity: currentQuantity, // allow negative for roll template
+          quantityMax: quantityMax,
+          usesTracking: 0,
+          quantityTracking: 1,
+        });
+        output[`repeating_equipment_${id}_equipment_quantity`] = quantityValid ? Math.max(0, currentQuantity) : currentQuantity; // prevents setting a negative value
+        output[`repeating_equipment_${id}_equipment_quantity_max`] = quantityMax;
+        await setAttrsAsync(output, {silent: true});
+        await sumEquipmentWeight();
+      } else {
+        // equipmentTracking value not recognized use None
+        finishRoll(roll.rollId, {
+          //'name of key': 'computed value'
+          uses: uses,
+          usesMax: usesMax,
+          quantity: quantity,
+          quantityMax: quantityMax,
+          usesTracking: 0,
+          quantityTracking: 0,
+        });
+      }
+    } else if (trigger.includes('ability-roll-button') || trigger.includes('ability-npc-roll-button')) {
+      const abilityTracking = int(v[`repeating_ability_${id}_ability_tracking`]);
+      const usesValid = await numbersOnly(v[`repeating_ability_${id}_ability_current`]);
+      const usesMaxValid = await numbersOnly(v[`repeating_ability_${id}_ability_current_max`]);
+      const uses = usesValid ? int(v[`repeating_ability_${id}_ability_current`]) : v[`repeating_ability_${id}_ability_current`];
+      const usesMax = usesMaxValid ? int(v[`repeating_ability_${id}_ability_current_max`]) : v[`repeating_ability_${id}_ability_current_max`];
+      const currentUses = abilityTracking === 1 && usesValid && uses >= 0 ? uses - 1 : uses; // allow negative for roll template
+      console.log(`Ability USES abilityTracking:${abilityTracking} current:${uses}`);
+      const roll = await startRoll(roll_string);
+      // console.log(roll);
+      finishRoll(roll.rollId, {
+        uses: currentUses,
+        usesMax: usesMax,
+        usesTracking: abilityTracking,
+      });
+
+      if (abilityTracking === 1) {
+        output[`repeating_ability_${id}_ability_current`] = usesValid ? Math.max(0, currentUses) : currentUses; // prevents setting a negative value
+        await setAttrsAsync(output, {silent: true});
+      }
+    } else {
+      // NORMAL ROLL NO SPECIAL HANDLING NEEDED
+      // console.log(`Normal roll - No special handling`);
+      const roll = await startRoll(roll_string);
+      // console.log(roll);
+      finishRoll(roll.rollId);
+    }
+  },
+);
