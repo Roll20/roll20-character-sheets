@@ -1,9 +1,14 @@
 /* advantages_disadvantages start */
-on("change:nachteil_nachtblind",
+/* Nightblind */
+const attrsNightblind = [
+	'nachteil_nachtblind',
+];
+Object.freeze(attrsNightblind);
+
+on(attrsNightblind.map(attr => "change:" + attr).join(" ").toLowerCase(),
 	function() {
 		safeGetAttrs(
-			['nachteil_nachtblind', 'vorteil_daemmerungssicht', 'vorteil_nachtsicht'],
-			function(v) {
+			attrsNightblind, function(v) {
 				if(v.nachteil_nachtblind != "0")
 				{
 					safeSetAttrs({
@@ -14,11 +19,17 @@ on("change:nachteil_nachtblind",
 		});
 });
 
-on("change:vorteil_daemmerungssicht change:vorteil_nachtsicht",
+/* Enhanced vision */
+const attrsEnhancedVision = [
+	'vorteil_daemmerungssicht',
+	'vorteil_nachtsicht',
+];
+Object.freeze(attrsEnhancedVision);
+
+on(attrsEnhancedVision.map(attr => "change:" + attr).join(" ").toLowerCase(),
 	function() {
 		safeGetAttrs(
-			['nachteil_nachtblind', 'vorteil_daemmerungssicht', 'vorteil_nachtsicht'],
-			function(v) {
+			attrsEnhancedVision, function(v) {
 				if(v.vorteil_daemmerungssicht != "0" || v.vorteil_nachtsicht != "0")
 				{
 					safeSetAttrs({nachteil_nachtblind: "0"});
@@ -26,97 +37,472 @@ on("change:vorteil_daemmerungssicht change:vorteil_nachtsicht",
 		});
 });
 
-on(
-"change:safe-sheet-open " +
-"change:n_tollpatsch " +
-"change:n_wildemagie", function(eventInfo) {
-	var caller = "Action Listener (Crit Level Updater)";
-	var trigger = eventInfo["triggerName"];
-	var newValue = eventInfo["newValue"];
-	const attrsToGet = [
-		"n_tollpatsch",
-		"n_wildemagie"
-	];
-	safeGetAttrs(attrsToGet, function(v) {
-		var results = calcCritLevels({'Tollpatsch': v['n_tollpatsch'], 'wilde Magie': v['n_wildemagie']});
-		var attrsToChange = {
-			'cs_talent': results['talent']['success'],
-			'cf_talent': results['talent']['failure'],
-			'cs_kampf_at': results['kampf_at']['success'],
-			'cf_kampf_at': results['kampf_at']['failure'],
-			'cs_kampf_pa': results['kampf_pa']['success'],
-			'cf_kampf_pa': results['kampf_pa']['failure'],
-			'cs_kampf_fk': results['kampf_fk']['success'],
-			'cf_kampf_fk': results['kampf_fk']['failure'],
-			'cs_zauber': results['zauber']['success'],
-			'cf_zauber': results['zauber']['failure'],
-			'cs_ritual': results['ritual']['success'],
-			'cf_ritual': results['ritual']['failure']
-		}
-		safeSetAttrs(attrsToChange);
-	});
+/* Crit-level affecting advantages/disadvantages */
+const attrsCritLevel = [
+	'n_tollpatsch',
+	'n_wildemagie',
+];
+Object.freeze(attrsCritLevel);
+
+on( [ 'safe-sheet-open', ...attrsCritLevel ].map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		const caller = "Action Listener (Crit Level Updater, Advantages/Disadvantages)";
+		const trigger = eventInfo["triggerName"];
+		const newValue = eventInfo["newValue"];
+
+		safeGetAttrs(
+			attrsCritLevel, function(v) {
+				const results = calcCritLevels({'Tollpatsch': v['n_tollpatsch'], 'wilde Magie': v['n_wildemagie']});
+				let attrsToChange = {
+					'cs_talent': results['talent']['success'],
+					'cf_talent': results['talent']['failure'],
+					'cs_kampf_at': results['kampf_at']['success'],
+					'cf_kampf_at': results['kampf_at']['failure'],
+					'cs_kampf_pa': results['kampf_pa']['success'],
+					'cf_kampf_pa': results['kampf_pa']['failure'],
+					'cs_kampf_fk': results['kampf_fk']['success'],
+					'cf_kampf_fk': results['kampf_fk']['failure'],
+					'cs_zauber': results['zauber']['success'],
+					'cf_zauber': results['zauber']['failure'],
+					'cs_ritual': results['ritual']['success'],
+					'cf_ritual': results['ritual']['failure']
+				}
+				safeSetAttrs(attrsToChange);
+		});
 });
 
-on(
-"change:safe-sheet-open " +
-"change:v_festematrix " +
-"change:n_spruchhemmung " +
-"change:n_wildemagie", function(eventInfo) {
-	var caller = "Action Listener (Firm Matrix/Spell Inhibition/Clumsy Fellow/Wild Magic)";
-	const attrsToGet = [
-		"v_festematrix",
-		"n_spruchhemmung",
-		"n_wildemagie"
-	];
+/* Magical advantages/disadvantages of the Firm Matrix block (some are mutually exclusive) */
+const attrsFirmMatrixBlock = [
+	'v_festematrix',
+	'n_spruchhemmung',
+	'n_wildemagie',
+];
+Object.freeze(attrsFirmMatrixBlock);
 
-	safeGetAttrs(attrsToGet, function(v) {
-		var trigger = eventInfo["sourceAttribute"];
-		var newValue = eventInfo["newValue"];
-		var festeMatrix = v["v_festematrix"];
-		var spruchhemmung = v["n_spruchhemmung"];
-		var wildeMagie = v["n_wildemagie"];
+on( [ 'safe-sheet-open', ...attrsFirmMatrixBlock ].map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		const caller = "Action Listener (Firm Matrix block)";
 
-		var attrsToChange = {};
-		// Firm Matrix cannot be taken with either Spell Inhibition or Wild Magic
-		if (trigger === "v_festematrix" && newValue === "1")
-		{
-			attrsToChange["n_spruchhemmung"] = "0";
-			attrsToChange["n_wildemagie"] = "0";
-		}
-		if (
-			(trigger === "n_spruchhemmung" || trigger === "n_wildemagie")
-			&&
-			newValue === "1"
-		)
-		{
-			attrsToChange["v_festematrix"] = "0";
-		}
+		safeGetAttrs(
+			attrsFirmMatrixBlock, function(v) {
+				// Boilerplate
+				const trigger = eventInfo["sourceAttribute"];
+				const newValue = eventInfo["newValue"];
+				const firmMatrix = v["v_festematrix"];
+				const spellInhibition = v["n_spruchhemmung"];
+				const wildMagic = v["n_wildemagie"];
 
-		// If this is triggered by sheet opening and we find an impossible situation, rectify it.
-		if (trigger === "safe-sheet-open" && festeMatrix === "1")
-		{
-			if (
-				(spruchhemmung === "1" && wildeMagie === "0") ||
-				(spruchhemmung === "0" && wildeMagie === "1")
-			)
-			{
-				attrsToChange["n_spruchhemmung"] = "0";
-				attrsToChange["n_wildemagie"] = "0";
-			} else if (spruchhemmung === "1" && wildeMagie === "1")
-			{
-				attrsToChange["v_festematrix"] = "0";
-			}
-		}
+				let attrsToChange = {};
 
-		if (
-			!(
-				Object.keys(attrsToChange).length === 0 &&
-				Object.getPrototypeOf(attrsToChange) === Object.prototype
-			)
-		)
-		{
-			safeSetAttrs(attrsToChange);
-		}
-	});
+				// Firm Matrix cannot be taken with either Spell Inhibition or Wild Magic
+				if (trigger === "v_festematrix" && newValue === "1")
+				{
+					attrsToChange["n_spruchhemmung"] = "0";
+					attrsToChange["n_wildemagie"] = "0";
+				}
+				if (
+					(trigger === "n_spruchhemmung" || trigger === "n_wildemagie")
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["v_festematrix"] = "0";
+				}
+
+				// If this is triggered by sheet opening and we find an impossible situation, rectify it.
+				// This is a heuristic with the following assumptions:
+				// * If only either Spell Inhibition or Wild Magic is found Firm Matrix overrules this.
+				// * If both Spell Inhibition and Wild Magic are found Firm Matrix gets overruled.
+				if (trigger === "safe-sheet-open" && firmMatrix === "1")
+				{
+					if (
+						(spellInhibition === "1" && wildMagic === "0") ||
+						(spellInhibition === "0" && wildMagic === "1")
+					)
+					{
+						attrsToChange["n_spruchhemmung"] = "0";
+						attrsToChange["n_wildemagie"] = "0";
+					} else if (spellInhibition === "1" && wildMagic === "1")
+					{
+						attrsToChange["v_festematrix"] = "0";
+					}
+				}
+
+				// Apply changes only if there are any
+				if (
+					!(
+						Object.keys(attrsToChange).length === 0
+						&&
+						Object.getPrototypeOf(attrsToChange) === Object.prototype
+					)
+				)
+				{
+					safeSetAttrs(attrsToChange);
+				}
+		});
+});
+
+/* Agility (GE) and Movement (GS) affecting advantages/disadvantages
+
+Several advantages/disadvantages affect Movement (GS). There are pairs of mutually exclusive ones and one corner case regarding "Swift" (Flink).
+
+"Swift" may be taken twice if the first level of this advantage comes with the race, the culture or the profession. Goblins always have the first level of this advantage naturally.
+
+The mutually exclusive pairs are:
+* Swift (Flink) and Unhurried (Behäbig)
+* One-legged (Einbeinig) and Lame (Lahm)
+
+"Short Stature" (Kleinwüchsig) and "Dwarven Stature" (Zwergenwuchs) are not mutually exclusive, but would make for a very short dwarf (below ~1.1 m).
+
+The encumbrance reduction from Dwarven Stature is already accounted for in the encumbrance calculation.
+
+*/
+const attrsMovementAffecting = [
+	'vorteil_flink_i',
+	'vorteil_flink_ii',
+	'nachteil_behaebig',
+	'nachteil_einbeinig',
+	'nachteil_kleinwuechsig',
+	'nachteil_lahm',
+	'nachteil_zwergenwuchs',
+	'BE_RG',
+	'BE_Last',
+];
+Object.freeze(attrsMovementAffecting);
+
+on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		const caller = "Action Listener Movement (GS) affecting advantages/disadvantages";
+
+		safeGetAttrs(
+			attrsMovementAffecting, function(v) {
+				// Boilerplate
+				const trigger = eventInfo["sourceAttribute"];
+				const newValue = eventInfo["newValue"];
+				const encumbrance = v["BE_RG"] + (parseInt(v["BE_Last"]) | 0);
+				const defaultAgilityMod = 0;
+				const defaultMovementMod = 0;
+				const defaultEvadeMod = 0;
+				const swiftEncumbranceThresholds = {
+					"vorteil_flink_i": 5,
+					"vorteil_flink_ii": 7,
+				};
+				const agilityEffects = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": 0,
+					"nachteil_einbeinig": -5,
+					"nachteil_kleinwuechsig": 0,
+					"nachteil_lahm": -2,
+					"nachteil_zwergenwuchs": 0,
+				};
+				const movementEffects = {
+					"vorteil_flink_i": 1,
+					"vorteil_flink_ii": 1,
+					"nachteil_behaebig": -1,
+					"nachteil_einbeinig": -3,
+					"nachteil_kleinwuechsig": -1,
+					"nachteil_lahm": -1,
+					"nachteil_zwergenwuchs": -2,
+				};
+				const evadeMods = {
+					"vorteil_flink_i": -1,
+					"vorteil_flink_ii": -1,
+					"nachteil_behaebig": 1,
+					"nachteil_einbeinig": 0,
+					"nachteil_kleinwuechsig": 0,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": 1,
+				};
+				const counterAttackMods = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": 0,
+					"nachteil_einbeinig": 0,
+					"nachteil_kleinwuechsig": -1,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": -2,
+				};
+				const knockDownMods = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": 0,
+					"nachteil_einbeinig": 0,
+					"nachteil_kleinwuechsig": 0,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": -2,
+				};
+				const jumpMods = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": -1,
+					"nachteil_einbeinig": 0,
+					// Wege des Schwerts, p. 141
+					"nachteil_kleinwuechsig": -1,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": -2,
+				};
+
+				let attrsToChange = {};
+
+				// Dwarven Stature affects encumbrance calculation
+				let encumbranceMod = 0;
+
+				if (v["nachteil_zwergenwuchs"] === "1")
+				{
+					const encumbranceFactor = 0.5;
+
+					encumbranceMod = encumbranceFactor * encumbrance;
+					// This will be subtracted from the full encumbrance, rounding down is the inverse operation to rounding up the full encumbrance.
+					// But: Mods are only added, so switch the sign.
+					encumbranceMod = Math.floor(encumbranceMod);
+					encumbranceMod = -encumbranceMod;
+				}
+
+				attrsToChange["BE_mod_advantages_disadvantages"] = encumbranceMod;
+
+				// The advantages/disadvantages are mutually exclusive
+				/// Swift/Unhurried group
+				if (
+					trigger === "nachteil_behaebig"
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["vorteil_flink_i"] = "0";
+					attrsToChange["vorteil_flink_ii"] = "0";
+				}
+				if (
+					trigger === "vorteil_flink_i"
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["nachteil_behaebig"] = "0";
+				}
+				if (
+					trigger === "vorteil_flink_i"
+					&&
+					newValue === "0"
+				)
+				{
+					attrsToChange["vorteil_flink_ii"] = "0";
+				}
+				if (
+					trigger === "vorteil_flink_ii"
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["vorteil_flink_i"] = "1";
+					attrsToChange["nachteil_behaebig"] = "0";
+				}
+
+				/// One-legged/Lame group
+				if (
+					trigger === "nachteil_einbeinig"
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["nachteil_lahm"] = "0";
+				}
+				if (
+					trigger === "nachteil_lahm"
+					&&
+					newValue === "1"
+				)
+				{
+					attrsToChange["nachteil_einbeinig"] = "0";
+				}
+
+				// Calculate GE and GS mods based on new attribute states
+				let agilityMod = 0;
+				let movementMod = 0;
+				let evadeMod = 0;
+				let jumpMod = 0;
+				let swiftEncumbranceHint = false;
+				let dwarvenStatureEncumbranceHint = false;
+				let dwarvenStatureMarchHint = false;
+				const hints = {
+					"swiftEncumbrance": {
+						"state": false,
+						"attr": "BE_GS_mod_hint_swift",
+					},
+					"dwarvenStatureEncumbrance": {
+						"state": false,
+						"attr": "BE_GS_mod_hint_dwarven_stature",
+					},
+					"dwarvenStatureMarch": {
+						"state": false,
+						"attr": "BE_GS_march_hint_dwarven_stature",
+					},
+				};
+
+				const updatedAttrs = Object.assign(v, attrsToChange);
+
+				for (attr in updatedAttrs)
+				{
+					if (updatedAttrs[attr] === "1")
+					{
+						// Consider encumbrance for Swift I/II
+						if (attr in swiftEncumbranceThresholds)
+						{
+							if (encumbrance >= swiftEncumbranceThresholds[attr])
+							{
+								hints["swiftEncumbrance"]["state"] = true;
+								continue;
+							}
+						}
+						agilityMod += agilityEffects[attr];
+						movementMod += movementEffects[attr];
+						evadeMod += evadeMods[attr];
+						jumpMod += jumpMods[attr];
+					}
+				}
+				attrsToChange["GE_mod_advantages_disadvantages"] = agilityMod;
+				attrsToChange["GS_mod_advantages_disadvantages"] = movementMod;
+				attrsToChange["k_ausweichen_mod_vorteile_nachteile"] = evadeMod;
+				attrsToChange["jump_mod_advantages_disadvantages"] = jumpMod;
+
+				/// Dwarven Stature Encumbrance Hint
+				/// Dwarven Stature March Hint
+				if (v["nachteil_zwergenwuchs"] === "1")
+				{
+					hints["dwarvenStatureEncumbrance"]["state"] = true;
+					hints["dwarvenStatureMarch"]["state"] = true;
+				}
+
+				/// Process hints
+				for (hint in hints)
+				{
+					if (hints[hint]["state"])
+					{
+						attrsToChange[hints[hint]["attr"]] = 1;
+					} else {
+						attrsToChange[hints[hint]["attr"]] = 0;
+					}
+				}
+
+				// Calculate athletics speed bonus based on new attribute states (Swift I/II)
+				/// Successful athletics checks make you faster (1/10 GS per remaining point after the check)
+				/// This is truly a bonus, not a mod. The bonus gets added on top of the actual result.
+				/// Swift I/II increases this bonus.
+				let athleticsGSBonus = 1;
+				const athleticsGSBonusEffectSize = 1;
+
+				for (attr in updatedAttrs)
+				{
+					// Consider encumbrance for Swift I/II
+					if (
+						attr in swiftEncumbranceThresholds &&
+						updatedAttrs[attr] === "1"
+					)
+					{
+						if (encumbrance >= swiftEncumbranceThresholds[attr])
+						{
+							continue;
+						} else {
+							athleticsGSBonus += athleticsGSBonusEffectSize;
+						}
+					}
+				}
+				attrsToChange["t_ko_athletik_gsbonus"] = athleticsGSBonus;
+
+				// Calculate Counter Attack ("Gegenhalten") modifier
+				let counterAttackMod = 0;
+
+				for (attr in updatedAttrs)
+				{
+					if (updatedAttrs[attr] === "1")
+					{
+						counterAttackMod += counterAttackMods[attr];
+					}
+				}
+				attrsToChange["k_gegenhalten_mod_advantages_disadvantages"] = counterAttackMod;
+
+				// Calculate Counter Attack ("Gegenhalten") modifier
+				let knockDownMod = 0;
+
+				for (attr in updatedAttrs)
+				{
+					if (updatedAttrs[attr] === "1")
+					{
+						knockDownMod += knockDownMods[attr];
+					}
+				}
+				attrsToChange["k_umreissen_mod_advantages_disadvantages"] = knockDownMod;
+
+				// Toggle Charge ("Ausfall") modifier dialog
+				const chargeDwarvenStatureModDialog = "(?{Ist diese Attacke Teil eines bereits laufenden Ausfalls oder dient sie der Einleitung eines Ausfalls?|Teil eines laufenden Ausfalls,0|Einleitung eines Ausfalls,2})";
+				let chargeModDialog = "";
+
+				if (updatedAttrs["nachteil_zwergenwuchs"] === "1")
+				{
+					chargeModDialog = chargeDwarvenStatureModDialog;
+				}
+				attrsToChange["k_ausfall_mod_dialog_dwarven_stature"] = chargeModDialog;
+
+				// Apply changes
+				safeSetAttrs(attrsToChange);
+		});
+});
+
+/* Wound threshold (WS) affecting advantages/disadvantages */
+const attrsWoundThresholdAffecting = [
+	'Eisern',
+	'nachteil_glasknochen',
+];
+Object.freeze(attrsWoundThresholdAffecting);
+
+on(attrsWoundThresholdAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		const caller = "Action Listener Wound threshold affecting advantages/disadvantages";
+
+		safeGetAttrs(
+			attrsWoundThresholdAffecting, function(v) {
+				// Boilerplate
+				const trigger = eventInfo["sourceAttribute"];
+				const newValue = eventInfo["newValue"];
+				const defaultMod = 0;
+				const adamant = v["Eisern"];
+				const adamantMod = 2;
+				const glassBones = v["nachteil_glasknochen"];
+				const glassBonesMod = -2;
+
+				let attrsToChange = {};
+
+
+				// The advantages/disadvantages are mutually exclusive
+				if (
+					trigger === "eisern"
+					&&
+					newValue !== "0"
+				)
+				{
+					attrsToChange["nachteil_glasknochen"] = "0";
+				}
+				if (
+					trigger === "nachteil_glasknochen"
+					&&
+					newValue !== "0"
+				)
+				{
+					attrsToChange["Eisern"] = "0";
+				}
+
+				// Calculate WS mod based on new attribute states
+				if (adamant !== "0")
+				{
+					attrsToChange["WS_mod_advantages_disadvantages"] = adamantMod;
+				} else if (glassBones !== "0") {
+					attrsToChange["WS_mod_advantages_disadvantages"] = glassBonesMod;
+				} else {
+					attrsToChange["WS_mod_advantages_disadvantages"] = defaultMod;
+				}
+
+				// Apply changes
+				safeSetAttrs(attrsToChange);
+		});
 });
 /* advantages_disadvantages end */

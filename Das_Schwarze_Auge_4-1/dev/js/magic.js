@@ -373,9 +373,10 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			var TaPstar = effTaW;
 
 			// Negativer TaW: |effTaW| zu Teilwürfen addieren
+			const TaPstarSuccessMin = 0;
 			if (criticality >= 2)
 			{
-				TaPstar = TaW;
+				TaPstar = Math.max(TaPstarSuccessMin, TaW);
 				result = 1;
 			} else {
 				if (effTaW < 0)

@@ -101,4 +101,202 @@ var Sheet = Sheet || (function() {
 on("sheet:opened",function() {Sheet.checkForUpdate();});
 on("change:recalc1",function() {Sheet.checkForUpdate();});
 
+on("change:accurate change:cunning change:discreet change:persuasive change:quick change:resolute change:strong change:vigilant", function(eventInfo) {
+	let TriggerName = eventInfo.triggerName;
+
+	console.log("  TriggerName: " + TriggerName);
+	console.log("  eventInfo: " + JSON.stringify(eventInfo));
+	
+	getAttrs(["accurate", "cunning", "discreet", "persuasive", "quick", "resolute", "strong", "vigilant"], function(values) {
+		let Accurate = parseInt(values.accurate)||0;
+		let Cunning = parseInt(values.cunning)||0;
+		let Discreet = parseInt(values.discreet)||0;
+		let Persuasive = parseInt(values.persuasive)||0;
+		let Quick = parseInt(values.quick)||0;
+		let Resolute = parseInt(values.resolute)||0;
+		let Strong = parseInt(values.strong)||0;
+		let PainThreshold = Math.ceil(Strong/2);
+		let Vigilant = parseInt(values.vigilant)||0;
+		console.log("  Accurate: " + Accurate + " Cunning " + Cunning + " Discreet "  + Discreet + " Persuasive " + Persuasive + "  Quick " + Quick + " Resolute " + Resolute + " Strong "  + Strong + " Vigilant " + Vigilant);
+		console.log("  Toughness: " + Strong + " PainThreshold " + PainThreshold);
+
+		let AttributeTotal =  Accurate + Cunning + Discreet + Persuasive + Quick + Resolute + Strong + Vigilant;
+		console.log("  AttributeTotal: " +  AttributeTotal);
+			
+		setAttrs({ attribute_total: AttributeTotal, toughness: Strong, pain_threshold: PainThreshold});
+	});
+});
+
+on("change:death1 change:death2 change:death3", function(eventInfo) {
+	let TriggerName = eventInfo.triggerName;
+	let Name = eventInfo.triggerName.substring(8);
+
+	console.log("  TriggerName: " + TriggerName);
+	console.log("  Name: " + Name);
+	console.log("  eventInfo: " + JSON.stringify(eventInfo));
+	
+	getAttrs(["death_count", "death1", "death2", "death3"], function(values) {
+		let DeathCount = parseInt(values.death_count)||0;
+		let Death1 = parseInt(values.death1)||0;
+		let Death2 = parseInt(values.death2)||0;
+		let Death3 = parseInt(values.death3)||0;
+		console.log("  DeathCount: " + DeathCount + " Death1 " + Death1 + " Death2 "  + Death2 + " Death3 " + Death3);
+
+		let NewDeathCount = Death1 + Death2 + Death3;
+		console.log("  NewDeathCount: " +  NewDeathCount);
+		switch (NewDeathCount) {
+			case 0: Death1 = 0; Death2 = 0; Death3 = 0; break;
+			case 1: Death1 = 1; Death2 = 0; Death3 = 0; break;
+			case 2: Death1 = 1; Death2 = 1; Death3 = 0; break;
+			case 3: Death1 = 1; Death2 = 1; Death3 = 1; break;
+			default: 
+				console.log("  Invalid NewDeathCount: " + NewDeathCount);
+		}
+			
+		setAttrs({ death_count: NewDeathCount, death1: Death1, death2: Death2, death3: Death3});
+			
+		console.log("  After NewDeathCount: " + NewDeathCount + " Death1 " + Death1 + " Death2 "  + Death2 + " Death3 " + Death3);
+
+	});
+});
+
+on("clicked:DeathCheck", function(eventInfo) {
+	let TriggerName = eventInfo.triggerName;
+	let Name = eventInfo.triggerName.substring(8);
+
+	console.log("  TriggerName: " + TriggerName);
+	console.log("  Name: " + Name);
+	console.log("  eventInfo: " + JSON.stringify(eventInfo));
+	
+	getAttrs(["death_count", "death1", "death2", "death3"], function(values) {
+		let DeathCount = parseInt(values.death_count)||0;
+		let Death1 = parseInt(values.death1)||0;
+		let Death2 = parseInt(values.death2)||0;
+		let Death3 = parseInt(values.death3)||0;
+		console.log("  DeathCount: " + DeathCount + " Death1 " + Death1 + " Death2 "  + Death2 + " Death3 " + Death3);
+
+		//      value= "&{template:check} {{death=@{character-name}}} {{title=Dices with Death}}  {{Roll=[[1d20]]}}"		
+        let rollBase = "&{template:check} {{death=@{character_name}}} {{title=Dices with Death}}  {{Roll=[[1d20]]}}";
+		console.log("  rollBase = " + rollBase);
+
+	    startRoll(rollBase, rollResult => {
+			console.log("  Roll: " + JSON.stringify(rollResult.results.Roll));
+			let Result = rollResult.results.Roll.result;
+			console.log("   Result: " + Result);
+			if (Result > 10 && Result != 20) {
+				DeathCount += 1; 
+				console.log("  Now DeathCount: " + DeathCount);
+				if ( DeathCount > 3) { DeathCount = 3;}
+				switch (DeathCount) {
+					case 1: Death1 = 1; break;
+					case 2: Death1 = 1; Death2 = 1; break;
+					case 3: Death1 = 1; Death2 = 1; Death3 = 1; break;
+					default: 
+						console.log("  Invalid DeathCount: " + DeathCount);
+				}
+			} else if (Result == 20) {
+				Death1 = 1; Death2 = 1; Death3 = 1; DeathCount = 3;
+				console.log("  Fumble! DeathCount: " + DeathCount + " Death1 " + Death1 + " Death2 "  + Death2 + " Death3 " + Death3);
+			}
+			
+			setAttrs({ death_count: DeathCount, death1: Death1, death2: Death2, death3: Death3});
+			
+			console.log("  After DeathCount: " + DeathCount + " Death1 " + Death1 + " Death2 "  + Death2 + " Death3 " + Death3);
+			
+			finishRoll(
+				rollResult.rollId,
+				{
+
+				}
+			);
+		});
+	});
+});
+
+
+<!-- Encumbrance -->
+on("change:itemEnc change:repeatingEnc ", function(eventInfo) {
+	let TriggerName = eventInfo.triggerName;
+
+	console.log("  TriggerName: " + TriggerName);
+	console.log("  eventInfo: " + JSON.stringify(eventInfo));
+	
+	getAttrs(["itemEnc", "repeatingEnc", "encumbrance"], function(values) {
+		let ItemEnc = parseInt(values.itemEnc)||0;
+		let RepeatingEnc = parseInt(values.repeatingEnc)||0;
+		let OldEncumbrance = parseInt(values.encumbrance)||0;
+		Encumbrance = ItemEnc + RepeatingEnc; 
+		console.log("  Encumbrance: " + Encumbrance + " ItemEnc " + ItemEnc + " RepeatingEnc "  + RepeatingEnc + "  OldEncumbrance: " + OldEncumbrance);
+			
+		setAttrs({ encumbrance: Encumbrance});
+	});
+});
+
+<!-- Encumbrance -->
+on("change:item_sleeping_roll_quantity change:item_sleeping_roll_enc change:item_cooking_pan_quantity change:item_cooking_pan_enc change:item_firewood_quantity change:item_firewood_enc change:item_flint_and_steel_quantity change:item_flint_and_steel_enc change:item_rope_quantity change:item_rope_enc change:item_waterskin_quantity change:item_waterskin_enc", function(eventInfo) {
+	let TriggerName = eventInfo.triggerName;
+
+	console.log("  TriggerName: " + TriggerName);
+	console.log("  eventInfo: " + JSON.stringify(eventInfo));
+	
+	getAttrs(["item_sleeping_roll_quantity", "item_sleeping_roll_enc", "item_cooking_pan_quantity", "item_cooking_pan_enc", "item_firewood_quantity", "item_firewood_enc",
+	"item_flint_and_steel_quantity", "item_flint_and_steel_enc", "item_rope_quantity", "item_rope_enc", "item_waterskin_quantity", "item_waterskin_enc"	], function(values) {
+		let Quantity1 = parseInt(values.item_sleeping_roll_quantity)||0;
+		let Quantity2 = parseInt(values.item_cooking_pan_quantity)||0;
+		let Quantity3 = parseInt(values.item_firewood_quantity)||0;
+		let Quantity4 = parseInt(values.item_flint_and_steel_quantity)||0;
+		let Quantity5 = parseInt(values.item_rope_quantity)||0;
+		let Quantity6 = parseInt(values.item_waterskin_quantity)||0;
+		console.log("  Quantity1: " + Quantity1 + " Quantity2 " + Quantity2 + " Quantity3 "  + Quantity3 + "  Quantity4: " + Quantity4 + " Quantity5 " + Quantity5 + " Quantity6 "  + Quantity6);
+
+		let Enc1 = parseInt(values.item_sleeping_roll_enc)||0;
+		let Enc2 = parseInt(values.item_cooking_pan_enc)||0;
+		let Enc3 = parseInt(values.item_firewood_enc)||0;
+		let Enc4 = parseInt(values.item_flint_and_steel_enc)||0;
+		let Enc5 = parseInt(values.item_rope_enc)||0;
+		let Enc6 = parseInt(values.item_waterskin_enc)||0;
+		console.log("  Enc1: " + Enc1 + " Enc2 " + Enc2 + " Enc3 "  + Enc3 + "  Enc4: " + Enc4 + " Enc5 " + Enc5 + " Enc6 "  + Enc6);
+
+		let Encumbrance = Quantity1*Enc1 + Quantity2*Enc2 + Quantity3*Enc3 + Quantity4*Enc4 + Quantity5*Enc5 + Quantity6*Enc6;
+		console.log("  Known Items Encumbrance: " +  Encumbrance);
+			
+		setAttrs({ itemEnc: Encumbrance});
+	});
+});
+
+
+	// Walkthrough of repeating_item to recalcuate  encumbrance 						
+	on('change:repeating_item:item-quantity change:repeating_item:item-enc', () => {
+		console.log("In repeating_item when an item quantity or encumbrace changed");
+		getSectionIDs(`repeating_item`, function(idArray) {
+			// create a variable to hold all the needed attribute names
+			var fieldnames = [];
+			var TotalEnc = 0;
+	
+			for(var i = 0; i < idArray.length; i++) {
+				fieldnames.push(
+					"repeating_item_" + idArray[i] + "_item-name",
+					"repeating_item_" + idArray[i] + "_item-quantity",
+					"repeating_item_" + idArray[i] + "_item-enc"									
+				);
+			}
+			getAttrs(fieldnames, function(values) {
+				for(var i = 0; i < idArray.length; i++) {
+					// Extract characteristics
+					var name = values["repeating_item_" + idArray[i] + "_item-name"];
+					var quantity = values["repeating_item_" + idArray[i] + "_item-quantity"];
+					var encumbrance = values["repeating_item_" + idArray[i] + "_item-enc"];
+					let ItemEnc = quantity * encumbrance;
+
+					console.log(" Item: " + name + " Quantity: " + quantity + " Enc: " + encumbrance + " ItemEnc: " + ItemEnc);
+					TotalEnc += ItemEnc;
+
+					console.log("TotalEnc : " + TotalEnc);
+				}
+				console.log("   TotEnc = " + TotalEnc);
+				setAttrs({	repeatingEnc: TotalEnc});
+			});
+		});
+	});
+
 </script>

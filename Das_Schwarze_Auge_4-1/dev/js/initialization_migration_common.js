@@ -88,6 +88,12 @@ function migrationCheck()
 			// then we call the function with name "firstFunction"
 			if (functionsToCall.length > 0) {
 				functionsToCall.push("setCurrentVersion");
+				// Try to detect the game type
+				/// This might fail in a way that stops further execution of the action listener, so always call last.
+				if (initialized === false)
+				{
+					functionsToCall.push("initializeGameType");
+				}
 				console.log(caller, "functionsToCall", functionsToCall);
 				// shift() removes the first item of the array in place and returns it
 				const firstFunction = functionsToCall.shift();
@@ -96,12 +102,15 @@ function migrationCheck()
 	});
 }
 
-function setCurrentVersion()
+function setCurrentVersion(migrationChain)
 {
 	const caller = "setCurrentVersion:";
 	const currentVersion = versionsWithMigrations.at(-1);
+	const attrsToChange = { "data_version": currentVersion };
 	console.log(caller, "currentVersion:", currentVersion);
-	safeSetAttrs({ "data_version": currentVersion });
+	safeSetAttrs(attrsToChange, {}, function () {
+		callNextMigration(migrationChain);
+	});
 }
 
 function callNextMigration(migrationChain)
@@ -115,5 +124,22 @@ function callNextMigration(migrationChain)
 			window[nextMigration](migrationChain);
 		}
 	}
+}
+
+// Supports migration chaining, but is not intended to be run as non-last member of a migration chain due to its crashy nature
+function initializeGameType(migrationChain)
+{
+	const caller = "initializeGameType()";
+	debugLog(caller, "Running function prone to crashes.");
+
+	// Check Game Type
+	const gameType = detectGameType();
+	gameType.then(
+		(value) => {
+			safeSetAttrs(value, {}, function () {
+				callNextMigration(migrationChain);
+			});
+		}
+	);
 }
 /* initialization_migration_common end */

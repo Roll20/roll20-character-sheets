@@ -1537,6 +1537,24 @@
       </div>
     </section>
 
+    <section class="cycleeffects">
+      <div class="sectiontop">
+        <h2>CYCLE EFFECTS</h2>
+      </div>
+      <p>Add effects from enemies and Operatives below, then click CYCLE! to post them all to chat.</p>
+      <fieldset class="repeating_cycleeffects">
+        <label>Effect name
+          <input type="text" name="attr_effectname" placeholder="Effect name (optional)">
+        </label>
+        <label>Description
+          <textarea name="attr_effectdescription" placeholder="What happens each cycle?"></textarea>
+        </label>
+      </fieldset>
+      <div class="centerbtn">
+        <button class="btn" type="action" name="act_cycle">CYCLE!</button>
+      </div>
+    </section>
+
     <section class="camprogress">
         <h2 class="enemyheader">Military</h2>
       <div class="prog military">
@@ -1921,6 +1939,24 @@
       </div>
       <div class="centerbtn">
         <button class="dropbtn btn" type="action" name="act_drops">Generate Drops!</button>
+      </div>
+    </section>
+
+    <section class="cycleeffects">
+      <div class="sectiontop">
+        <h2>CYCLE EFFECTS</h2>
+      </div>
+      <p>Add effects below, then click CYCLE! to post them all to chat.</p>
+      <fieldset class="repeating_cycleeffects">
+        <label>Effect name
+          <input type="text" name="attr_effectname" placeholder="Effect name (optional)">
+        </label>
+        <label>Description
+          <textarea name="attr_effectdescription" placeholder="What happens each cycle?"></textarea>
+        </label>
+      </fieldset>
+      <div class="centerbtn">
+        <button class="btn" type="action" name="act_cycle">CYCLE!</button>
       </div>
     </section>
 
@@ -2443,6 +2479,20 @@
 </rolltemplate>
 
 
+<rolltemplate class="sheet-rolltemplate-cycle">
+  <div class="sheet-cycle-header">CYCLE EFFECTS</div>
+  {{#message}}
+    <div class="sheet-cycle-description">{{message}}</div>
+  {{/message}}
+  {{#allprops() message}}
+    <div class="sheet-cycle-effect">
+      <div class="sheet-cycle-name">{{key}}</div>
+      <div class="sheet-cycle-description">{{value}}</div>
+    </div>
+  {{/allprops() message}}
+</rolltemplate>
+
+
 <rolltemplate class="sheet-rolltemplate-mission">
   <div class="title">
     <span>Secondary Mission</span>
@@ -2882,7 +2932,7 @@ function getMechMshop(mechType) {
     case "Leftovers":
       return "The first Power or Munition you use on your turn each round does not cost any Biotech or Diesel.";
     case "The Predatower":
-      return "On your turn, you may spend 1 <Biotech> to roll a die. If you roll less than or equal to your highest Attribute, gain 2 Diesel. You may do this as often as you'd like. This is not an action.";
+      return "On your turn, you may spend 1 Biotech to roll a die. If you roll less than or equal to your highest Attribute, gain 2 Diesel. You may do this as often as you'd like. This is not an action.";
     case "Spider":
       return "At the start of each mission, gain a number of chits equal to your Cyber score. At any point before or after a roll, you can give yourself or a Close ally 1 chit to increase that roll by 1.";
     default:
@@ -3261,7 +3311,8 @@ function getDropForRoll(faction, roll) {
       return DropTableRewards.FUEL;
       break;
     case EnemyFactions.SWARM: 
-      if(roll >= 5) return DropTableRewards.HEALTH;
+      if(roll >= 6) return DropTableRewards.CONSTRUCTION_PIECE;
+      if(roll >= 4) return DropTableRewards.HEALTH;
       return DropTableRewards.FUEL;
       break;
     case EnemyFactions.INTERLOPER_SPACE: 
@@ -3889,6 +3940,43 @@ on("clicked:secondaryMech", function() {
 
 
 
+function escapeCycleText(text) {
+  // Sanitize text so it won't be interpreted as roll syntax, template properties.
+  return text.replace(/[&<>{}\[\]@%?=|\r\n]/g, character => `&#${character.charCodeAt(0)};`);
+}
+
+on("clicked:cycle", function() {
+  getSectionIDs("repeating_cycleeffects", function(ids) {
+    const attributes = ["_reporder_repeating_cycleeffects"];
+    ids.forEach(id => {
+      attributes.push(`repeating_cycleeffects_${id}_effectname`, `repeating_cycleeffects_${id}_effectdescription`);
+    });
+
+    getAttrs(attributes, function(values) {
+      const savedOrder = (values._reporder_repeating_cycleeffects || "").split(",");
+      const orderedIDs = savedOrder.filter((id, index) => ids.includes(id) && savedOrder.indexOf(id) === index);
+      ids.forEach(id => {
+        if (!orderedIDs.includes(id)) orderedIDs.push(id);
+      });
+
+      const effects = [];
+      orderedIDs.forEach(id => {
+        const name = (values[`repeating_cycleeffects_${id}_effectname`] || "").trim();
+        const description = (values[`repeating_cycleeffects_${id}_effectdescription`] || "").trim();
+        if (name || description) {
+          const heading = `${effects.length + 1}. ${name || "Unnamed effect"}`;
+          effects.push(`{{${escapeCycleText(heading)}=${escapeCycleText(description || "No description provided.")}}}`);
+        }
+      });
+
+      const output = effects.length ? effects.join(" ") : "{{message=No cycle effects have been added.}}";
+      startRoll(`&{template:cycle} ${output}`, function(results) {
+        finishRoll(results.rollId, {});
+      });
+    });
+  });
+});
+
 on("clicked:drops", function() {
    getAttrs(["briDead", "milDead", "intDead", "divDead", "bonusDrops", "briny", "spaceIntDead", "swarmDead", "spaceDead"], (values) => {
     const isBriny = values.briny === "on";
@@ -4073,7 +4161,6 @@ const basebuttonlist = ["mainbase", "subbase", "hivebase"];
     });
 
 </script>
-
 
 
 
