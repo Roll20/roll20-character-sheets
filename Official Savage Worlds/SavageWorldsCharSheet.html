@@ -881,7 +881,7 @@ const setWildDie = function () {
   getAttrs(['is_npc'], function (lvalue) {
     //console.log("<==== Updating whether to Roll the Wild Die ====>");
     //console.log("is_npc value: " + lvalue.is_npc);
-    if (lvalue.is_npc === '0') {
+    if (String(lvalue.is_npc) === '0') {
       console.log('Is a Wild Card: Roll a Wild Die');
       setAttrs({ wdNum: 1 });
     } else {
@@ -896,6 +896,12 @@ const setWildDie = function () {
 on('change:is_npc', function () {
   //'use strict';
   setWildDie();
+});
+
+on('sheet:opened', function () {
+  getAttrs(['is_npc'], function (v) {
+    if (String(v.is_npc) === '0') setAttrs({ wdNum: 1 });
+  });
 });
 
 //Animal Intelligence
@@ -5318,7 +5324,7 @@ on("sheet:opened", function() {
 const descStatBlock = function() {
     let chardesc = "{{name=@{character_name}}}";
     getAttrs(["is_npc", "physdescription"], function(v) {
-        if (v.is_npc === "0") {
+        if (String(v.is_npc) === "0") {
             //is Wild Card
             chardesc += " {{wci=@{WCI}}}";
         }
@@ -5331,7 +5337,7 @@ const descStatBlock = function() {
     });
 };
 
-on("change:is_npc change:physdescription", function() {
+on("sheet:opened change:is_npc change:physdescription", function() {
     descStatBlock();
 });
 
@@ -5909,8 +5915,8 @@ on(
         importAttrs["tufnessMod"] = jsonObj.toughnessMod - jsonObj.size;
         importAttrs["money"] = jsonObj.wealth;
         jsonObj.wildcard ?
-            (importAttrs["is_npc"] = 0) :
-            (importAttrs["is_npc"] = 1);
+            (importAttrs["is_npc"] = "0") :
+            (importAttrs["is_npc"] = "1");
         importAttrs["wounds"] = jsonObj.wounds;
         importAttrs["wounds_max"] = jsonObj.woundsMax;
         //get the Attributes
