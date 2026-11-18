@@ -574,7 +574,7 @@
               </label>
               <label class="inline-flex">
                 <span data-i18n="unarmored" class="double">Unarmored</span>
-                <input readonly type="number" name="attr_aacAcUnarmored" />
+                <input readonly type="number" name="attr_aacAcUnarmored" value="10" />
               </label>
               <label class="inline-flex">
                 <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
@@ -589,7 +589,7 @@
               </label>
               <label class="inline-flex">
                 <span data-i18n="unarmored" class="double">Unarmored</span>
-                <input readonly type="number" name="attr_dacAcUnarmored" />
+                <input readonly type="number" name="attr_dacAcUnarmored" value="9" />
               </label>
               <label class="inline-flex">
                 <span data-i18n="thac0" class="double">THAC0</span>
@@ -699,9 +699,9 @@
         <p data-i18n="base-movement-rate-note">Base mv. rate = 120, unless encumbered</p>
         <label class="inline-flex">
           <span data-i18n="movement-en-abbr">En</span>
-          <input readonly type="number" name="attr_movementEncounter"/>
+          <input readonly type="number" name="attr_movementEncounter" value="40" />
         </label>
-        <p data-i18n="overland-movement-note">Overland: 1/5 base mv. rate (miles/day)</p>
+        <p data-i18n="encounter-movement-note">Encounter: 1/3 base mv. rate (feet/round)</p>
         <label class="inline-flex">
           <span data-i18n="movement-ex-abbr">Ex</span>
           <input type="number" name="attr_movementExploration" value="120"/>
@@ -709,9 +709,9 @@
         <p data-i18n="exploration-movement-note">Exploration: base mv. rate (feet/turn)</p>
         <label class="inline-flex">
           <span data-i18n="movement-ov-abbr">Ov</span>
-          <input readonly type="number" name="attr_movementOverland"/>
+          <input readonly type="number" name="attr_movementOverland" value="24"/>
         </label>
-        <p data-i18n="encounter-movement-note">Encounter: 1/3 base mv. rate (feet/round)</p>
+        <p data-i18n="overland-movement-note">Overland: 1/5 base mv. rate (miles/day)</p>
       </div>
 
       <h1 data-i18n="languages">Languages</h1>
@@ -758,7 +758,7 @@
         <option value="1" selected>&lt;</option>
         <option value="2">&gt;</option>
       </select>
-      <input type="number" min="1" max="6" name="attr_OpenDoor" readonly/>
+      <input type="number" min="1" max="6" name="attr_OpenDoor" readonly value="1"/>
       <input type="text" name="attr_openStuckDoorDescription" data-i18n-placeholder="based-on-str"
         placeholder="(based on STR)" />
       <input type="checkbox" name="attr_openStuckDoorGmOnly" value="/w gm " />
@@ -892,13 +892,15 @@
         <span class="item-location-header" data-i18n="location">Location</span>
       </div>
       <div class="sheet-armor sheet-repeat">
+        <input type="hidden" name="attr_armorClassType" value="aac" />
         <fieldset class="repeating_armor">
           <div class="compendium-drop-target">
             <input type="hidden" name="attr_armorBenefit" />
             <div class="armor-grid">
               <input type="text" name="attr_armorName" accept="Name" placeholder="Armor Name"
                 data-i18n-placeholder="armor-name-placeholder" />
-              <input type="text" name="attr_armorValue" accept="Armor Class" value="0" />
+              <input type="text" name="attr_armorValue" accept="Ascending Armor Class" value="0" class="armor-value-aac" />
+              <input type="text" name="attr_armorValue" accept="Descending Armor Class" value="0" class="armor-value-dac" />
               <input type="number" min="0" name="attr_armorWeight" accept="Weight" value="0" class="armor-weight-input" />
               <div class="checkbox">
                 <input type="checkbox" name="attr_armorWorn" checked />
@@ -1068,21 +1070,22 @@
 </div>
 
 <!-- Monster Sheet -->
-<div class="sheet-monster">
+<div class="sheet-monster compendium-drop-target monsters">
+  <input type="hidden" name="attr_monsterCompendiumData" accept="data" value="" />
   <div class="flex roll">
     <label class="inline-flex">
       <span data-i18n="name">Name</span>
-      <input type="text" name="attr_character_name" />
+      <input type="text" name="attr_character_name" accept="Name"/>
     </label>
     <label class="inline-flex">
       <span class="double" data-i18n="description">Description</span>
-      <input type="text" name="attr_monsterDescription" />
+      <input type="text" name="attr_monsterDescription" accept="Description"/>
     </label>
   </div>
   <div class="flex roll">
     <label class="inline-flex">
       <span class="double" data-i18n="saves-as">Saves As</span>
-      <select name="attr_class">
+      <select name="attr_class" accept="Saves As">
         <option value="" selected="selected">--</option>
         <option value="Monster" data-i18n="monster">Monster</option>
         <option value="Normal Human" data-i18n="normal-human">Normal Human</option>
@@ -1152,7 +1155,7 @@
         </optgroup>
       </select>
       <input type="hidden" name="attr_savesAs" value="character" />
-      <input type="number" min="0" name="attr_level" value="1" />
+      <input type="number" min="0" name="attr_level" value="1" accept="Level"/>
     </label>
     <label class="inline-flex">
       <button type="roll" name="monsterHpRoll" data-i18n="hit-dice-number-abbr" title="Hit Dice"
@@ -1160,13 +1163,13 @@
         value="/w gm &{template:simple} {{roll=^{hp-for} @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">
         # HD
       </button>
-      <input type="number" min="0" name="attr_monsterHitDice" value="1" />
+      <input type="number" min="0" name="attr_monsterHitDice" value="1" accept="Hit Dice"/>
       <span>+</span>
-      <input type="number" name="attr_monsterHitDiceModifier" value="0" />
+      <input type="number" name="attr_monsterHitDiceModifier" value="0" accept="Hit Dice Modifier"/>
     </label>
     <label class="inline-flex">
       <span data-i18n="alignment-abbr">AL</span>
-      <input type="text" name="attr_alignment" data-i18n-placeholder="alignment" placeholder="Alignment" />
+      <input type="text" name="attr_alignment" data-i18n-placeholder="alignment" placeholder="Alignment" accept="Alignment"/>
     </label>
   </div>
   <div class="flex roll">
@@ -1176,8 +1179,8 @@
         data-i18n-title="number-appearing-abbr" title="Number Appearing" data-i18n="number-appearing-abbr">
         NA
       </button>
-      <input type="text" class="input-as-number" name="attr_numberAppearingWandering" value="0" placeholder="1d4" />
-      <input type="text" class="input-as-number" name="attr_numberAppearingLair" value="0" placeholder="2d4+2" />
+      <input type="text" class="input-as-number" name="attr_numberAppearingWandering" value="0" placeholder="1d4" accept="Number Appearing Dungeon"/>
+      <input type="text" class="input-as-number" name="attr_numberAppearingLair" value="0" placeholder="2d4+2" accept="Number Appearing Wilderness"/>
     </label>
     <label class="shrink">
       <button type="roll" name="monsterReactionRoll"
@@ -1192,16 +1195,16 @@
         title="Morale" data-i18n-title="morale" data-i18n="morale-abbr">
         ML
       </button>
-      <input type="number" min="2" max="12" name="attr_monsterMorale" value="7" />
+      <input type="number" min="2" max="12" name="attr_monsterMorale" value="7" accept="Morale"/>
     </label>
     <label class="inline-flex">
       <span data-i18n="experience-abbr">XP</span>
-      <input type="number" min="0" name="attr_monsterXPValue" />
+      <input type="number" min="0" name="attr_monsterXPValue" accept="XP"/>
     </label>
     <label class="inline-flex">
       <span data-i18n="treasure-type-abbr">TT</span>
-      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeGroup" />
-      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeIndividual" />
+      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeGroup" accept="Treasure Type Group"/>
+      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeIndividual" accept="Treasure Type Individual"/>
     </label>
   </div>
 
@@ -1214,7 +1217,7 @@
             <button type="action" name="act_setAverageHP" class="double" data-i18n="hit-points-average">
               Average HP
             </button>
-            <input readonly type="number" name="attr_averageHP" value="" />
+            <input readonly type="number" name="attr_averageHP" value="0" />
           </label>
           <label class="inline-flex">
             <span data-i18n="hit-points-abbr">HP</span>
@@ -1244,15 +1247,19 @@
           <label class="inline-flex show-aac">
             <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
               data-i18n-title="base-attack-bonus">BAB</span>
-            <input type="number" name="attr_monsterBAB" value="0" />
+            <input type="number" name="attr_monsterBAB" value="0" accept="Base Attack Bonus"/>
           </label>
           <label class="inline-flex show-dac">
             <span data-i18n="thac0" class="double">THAC0</span>
-            <input type="number" name="attr_monsterThac0" value="0" />
+            <input type="number" name="attr_monsterThac0" value="0" accept="THAC0"/>
           </label>
-          <label class="inline-flex">
+          <label class="inline-flex show-aac">
             <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
-            <input type="number" name="attr_monsterAc" value="0" />
+            <input type="number" name="attr_monsterAAc" accept="Ascending Armor Class" value="0" />
+          </label>
+          <label class="inline-flex show-dac">
+            <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
+            <input type="number" name="attr_monsterDAc" accept="Descending Armor Class" value="0" />
           </label>
         </div>
       </div>
@@ -1270,10 +1277,10 @@
           <tbody>
             <tr>
               <td>
-                <input readonly type="number" name="attr_movementEncounter" value="" />
+                <input readonly type="number" name="attr_movementEncounter" value="40" />
               </td>
               <td>
-                <input type="number" min="0" name="attr_movementExploration" value="120" />
+                <input type="number" min="0" name="attr_movementExploration" value="120" accept="Movement"/>
               </td>
             </tr>
           </tbody>
@@ -1361,9 +1368,9 @@
           <button type="roll" name="dacAttackRoll" class="attack-roll attack-roll-dac"
             value="&{template:simple} {{roll=@{character_name} ^{attacks-with} @{weaponName}}} {{attack=[[1d20+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}]]}} {{description=@{weaponDescription}}} {{attackMatrix9=@{monsterAttackMatrix9}}} {{attackMatrix8=@{monsterAttackMatrix8}}} {{attackMatrix7=@{monsterAttackMatrix7}}} {{attackMatrix6=@{monsterAttackMatrix6}}} {{attackMatrix5=@{monsterAttackMatrix5}}} {{attackMatrix4=@{monsterAttackMatrix4}}} {{attackMatrix3=@{monsterAttackMatrix3}}} {{attackMatrix2=@{monsterAttackMatrix2}}} {{attackMatrix1=@{monsterAttackMatrix1}}} {{attackMatrix0=@{monsterAttackMatrix0}}} {{attackMatrixNeg1=@{monsterAttackMatrixNeg1}}} {{attackMatrixNeg2=@{monsterAttackMatrixNeg2}}} {{attackMatrixNeg3=@{monsterAttackMatrixNeg3}}}"></button>
           <input type="number" min="0" name="attr_weaponAttacks" value="1" />
-          <input type="text" name="attr_weaponName" accept="Name" placeholder="Weapon" data-i18n-placeholder="weapon" />
+          <input type="text" name="attr_weaponName" placeholder="Weapon" data-i18n-placeholder="weapon" />
           <input type="text" name="attr_weaponDamageDie" accept="Damage" value="1d6" class="input-as-number" />
-          <input type="text" name="attr_weaponDescription" accept="Description" value="" />
+          <input type="text" name="attr_weaponDescription" value="" />
         </div>
       </div>
     </fieldset>
@@ -1472,7 +1479,7 @@
 
   <div class="sheet-notes-section">
     <h1 data-i18n="notes">Notes</h1>
-    <textarea name="attr_monsterNotes"></textarea>
+    <textarea name="attr_monsterNotes" accept="Notes"></textarea>
   </div>
 </div>
 
@@ -2079,43 +2086,51 @@
   };
 
   function calculateBasicEncumbranceMovement() {
-    getSectionIDs("repeating_armor", function (idArray) {
-      const attributes = idArray.reduce(
-        (m, id) => [
-          ...m,
-          `repeating_armor_${id}_armorWorn`,
-          `repeating_armor_${id}_armorType`,
-        ],
-        ["carryingTreasure"]
-      );
-      getAttrs(attributes, function (values) {
-        const heaviestType = idArray.reduce((heaviest, id) => {
-          const worn = values[`repeating_armor_${id}_armorWorn`] === "on";
-          const type = values[`repeating_armor_${id}_armorType`] || "unarmored";
-          return worn && armorTypeRank[type] > armorTypeRank[heaviest]
-            ? type
-            : heaviest;
-        }, "unarmored");
-        const carryingTreasure = values.carryingTreasure === "1";
-        setAttrs({
-          movementExploration:
-            basicEncumbranceMovement[heaviestType][
-              carryingTreasure ? "withTreasure" : "withoutTreasure"
-            ],
+    getAttrs(["class"], function (classValues) {
+      if (classValues.class === "Monster") return;
+
+      getSectionIDs("repeating_armor", function (idArray) {
+        const attributes = idArray.reduce(
+          (m, id) => [
+            ...m,
+            `repeating_armor_${id}_armorWorn`,
+            `repeating_armor_${id}_armorType`,
+          ],
+          ["carryingTreasure"]
+        );
+        getAttrs(attributes, function (values) {
+          const heaviestType = idArray.reduce((heaviest, id) => {
+            const worn = values[`repeating_armor_${id}_armorWorn`] === "on";
+            const type = values[`repeating_armor_${id}_armorType`] || "unarmored";
+            return worn && armorTypeRank[type] > armorTypeRank[heaviest]
+              ? type
+              : heaviest;
+          }, "unarmored");
+          const carryingTreasure = values.carryingTreasure === "1";
+          setAttrs({
+            movementExploration:
+              basicEncumbranceMovement[heaviestType][
+                carryingTreasure ? "withTreasure" : "withoutTreasure"
+              ],
+          });
         });
       });
     });
   }
 
   function calculateDetailedEncumbranceMovement(encumbrance) {
-    const weight = parseInt(encumbrance, 10) || 0;
-    let movement;
-    if (weight <= 400) movement = 120;
-    else if (weight <= 600) movement = 90;
-    else if (weight <= 800) movement = 60;
-    else if (weight <= 1600) movement = 30;
-    else movement = 0;
-    setAttrs({ movementExploration: movement });
+    getAttrs(["class"], function (classValues) {
+      if (classValues.class === "Monster") return;
+
+      const weight = parseInt(encumbrance, 10) || 0;
+      let movement;
+      if (weight <= 400) movement = 120;
+      else if (weight <= 600) movement = 90;
+      else if (weight <= 800) movement = 60;
+      else if (weight <= 1600) movement = 30;
+      else movement = 0;
+      setAttrs({ movementExploration: movement });
+    });
   }
 
   /* ===== ITEM-BASED ENCUMBRANCE (Carcass Crawler Issue 2, p.28-29) ==========
@@ -2193,18 +2208,22 @@
   }
 
   function calculateItemBasedEncumbranceMovement() {
-    getAttrs(["encumbranceType", "BonusSTR"], function (settings) {
-      const strMod =
-        settings.encumbranceType === "itemBasedStr"
-          ? parseInt(settings.BonusSTR, 10) || 0
-          : 0;
-      sumItemBasedEncumbrance(function (equippedTotal, packedTotal) {
-        setAttrs({
-          movementExploration: movementForItemBasedCounts(
-            equippedTotal,
-            packedTotal,
-            strMod
-          ),
+    getAttrs(["class"], function (classValues) {
+      if (classValues.class === "Monster") return;
+
+      getAttrs(["encumbranceType", "BonusSTR"], function (settings) {
+        const strMod =
+          settings.encumbranceType === "itemBasedStr"
+            ? parseInt(settings.BonusSTR, 10) || 0
+            : 0;
+        sumItemBasedEncumbrance(function (equippedTotal, packedTotal) {
+          setAttrs({
+            movementExploration: movementForItemBasedCounts(
+              equippedTotal,
+              packedTotal,
+              strMod
+            ),
+          });
         });
       });
     });
@@ -2212,7 +2231,7 @@
 
   // Set base movement speed when the Encumbrance setting or its inputs change
   on("sheet:opened change:encumbranceType", function () {
-    getAttrs(["encumbranceType", "encumbrance"], function (values) {
+    getAttrs(["encumbranceType", "encumbrance", "class"], function (values) {
       if (values.encumbranceType === "basic") {
         calculateBasicEncumbranceMovement();
       } else if (values.encumbranceType === "detailed") {
@@ -2223,6 +2242,8 @@
       ) {
         calculateItemBasedEncumbranceMovement();
       } else {
+        // Monsters keep the movement rate they were dropped with.
+        if (values.class === "Monster") return;
         setAttrs({ movementExploration: 120 });
       }
     });
@@ -3363,6 +3384,162 @@
     getAttrs(["numberAppearingWandering"], function (values) {
       setAttrs({ numberAppearing: values.numberAppearingWandering });
     });
+  });
+
+  on("change:monsterCompendiumData", async (eventInfo) => {
+    if (!eventInfo.newValue) return;
+    let monster;
+
+    try {
+      monster = JSON.parse(eventInfo.newValue);
+    } catch (error) {
+      console.error("Invalid monster Compendium data:", error);
+      return;
+    }
+
+    let attacks = [];
+
+    try {
+      attacks = JSON.parse(monster.Attacks || "[]");
+    } catch (error) {
+      console.error("Invalid monster attacks data:", error);
+    }
+
+    let abilities = null;
+
+    if (monster.Abilities !== undefined) {
+      try {
+        abilities = JSON.parse(monster.Abilities || "[]");
+      } catch (error) {
+        console.error("Invalid monster abilities data:", error);
+      }
+    }
+
+    const updates = {};
+
+    const savesClassOptions = ["Monster", "Normal Human", "Custom", "Cleric", "Fighter", "Magic-User", "Thief", "Necromancer", "Acrobat", "Assassin", "Barbarian", "Bard", "Drow", "Druid", "Duergar", "Dwarf", "Elf", "Gnome", "Half-Elf", "Halfling", "Half-Orc", "Illusionist", "Knight", "Paladin", "Ranger", "Svirfneblin", "Acolyte", "Gargantua", "Goblin", "Hephaestan", "Kineticist", "Mage", "Phase Elf", "Wood Elf", "Beast Master", "Dragonborn", "Mutoid", "Mycelian", "Tiefling", "Arcane Bard", "Halfling Hearthsinger", "Halfling Reeve", "Changeling", "Ratling", "Dwarf Brewmaster", "Dwarf Runesmith", "Chaos Knight", "Warden"];
+    const savesAs = String(monster["Saves As"] || "").trim();
+    const savesMatch = savesAs.match(/^(.*?)[\s:,-]*(?:level\s*)?(\d+)?$/i);
+    const savesClass = savesMatch
+      ? savesClassOptions.find(
+          (option) => option.toLowerCase() === savesMatch[1].trim().toLowerCase()
+        )
+      : undefined;
+    if (savesClass) {
+      updates.class = savesClass;
+      if (savesMatch[2]) updates.level = parseInt(savesMatch[2], 10);
+    }
+
+    // Remove existing monster attack rows before creating new ones.
+    const existing = await getSectionIDs("repeating_weapons");
+
+    if (existing && existing.length > 0) {
+      existing.forEach((id) => {
+        updates[`repeating_weapons_${id}_weaponName`] = "";
+        updates[`repeating_weapons_${id}_weaponAttacks`] = "";
+        updates[`repeating_weapons_${id}_weaponDamageDie`] = "";
+        updates[`repeating_weapons_${id}_weaponDescription`] = "";
+      });
+    }
+
+    attacks.forEach((attack) => {
+      const rowId = generateRowID();
+
+      updates[`repeating_weapons_${rowId}_weaponName`] =
+        attack.name || "";
+
+      updates[`repeating_weapons_${rowId}_weaponAttacks`] =
+        attack.count || 1;
+
+      updates[`repeating_weapons_${rowId}_weaponDamageDie`] =
+        attack.damage || "1d6";
+
+      updates[`repeating_weapons_${rowId}_weaponDescription`] =
+        attack.description || "";
+    });
+
+    // Show the monster tab for dropped monsters.
+    updates.sheetTab = "monster";
+
+    // Only replace abilities when the compendium entry provides them.
+    if (Array.isArray(abilities)) {
+      const existingAbilities = await getSectionIDs("repeating_abilities");
+
+      if (existingAbilities && existingAbilities.length > 0) {
+        existingAbilities.forEach((id) => {
+          updates[`repeating_abilities_${id}_abilityName`] = "";
+          updates[`repeating_abilities_${id}_abilityDescription`] = "";
+        });
+      }
+
+      abilities.forEach((ability) => {
+        const rowId = generateRowID();
+
+        updates[`repeating_abilities_${rowId}_abilityName`] =
+          ability.name || "";
+
+        updates[`repeating_abilities_${rowId}_abilityDescription`] =
+          ability.description || "";
+      });
+    }
+
+    await setAttrs(updates);
+  });
+
+  // Set default token attributes for characters created by a compendium drop.
+  on("sheet:compendium-drop", function () {
+    getAttrs(
+      [
+        "monsterHitDice",
+        "monsterHitDiceModifier",
+        "armorClassType",
+        "monsterAAc",
+        "monsterDAc",
+        "movementExploration",
+        "monsterCompendiumData",
+      ],
+      function (values) {
+        console.log("Compendium drop values:", values);
+        const hitDice = parseFloat(values.monsterHitDice) || 0;
+        const modifier = parseInt(values.monsterHitDiceModifier, 10) || 0;
+
+        const hp = Math.max(Math.floor(hitDice * 4.5) + modifier, 1);
+
+        const armorClass =
+          String(values.armorClassType).toLowerCase() === "dac"
+            ? values.monsterDAc
+            : values.monsterAAc;
+        const encounterMovement = Math.floor(
+          (parseInt(values.movementExploration, 10) || 0) / 3
+        );
+
+        // Token Size is in feet; 5 ft = 70 px. Fall back to one square if it is
+        // missing or invalid, since NaN geometry prevents the token appearing.
+        let sizeFeet = NaN;
+        try {
+          sizeFeet = parseFloat(JSON.parse(values.monsterCompendiumData)["Token Size"]);
+        } catch (error) {
+          console.error("Unable to read monster Token Size:", error);
+        }
+        const tokenSize = sizeFeet > 0 ? Math.round((sizeFeet / 5) * 70) : 70;
+
+        setDefaultToken({
+          width: tokenSize,
+          height: tokenSize,
+          // Nameplate visible to the GM only.
+          showname: true,
+          showplayers_name: false,
+          playersedit_name: false,
+          bar3_value: hp,
+          bar3_max: hp,
+          bar2_value: parseInt(armorClass, 10) || 0,
+          bar1_value: encounterMovement,
+          showplayers_bar1: false,
+          showplayers_bar2: false,
+          showplayers_bar3: false,
+        });
+      }
+    );
   });
 </script>
 
