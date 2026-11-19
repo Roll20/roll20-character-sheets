@@ -510,7 +510,8 @@
           <span class="hidden rangetext" name="attr_rangetext" value=""></span>
           <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
           <div class="upgrade-info" style="font-size: 0.8em; color: #666; margin-top: 2px;">
-            <span name="attr_upgrades"></span> upgrades, blows a fuse if second-highest die is <span name="attr_upgrades_plus_one"></span> or less.
+            <input type="hidden" name="attr_upgrades_plus_one" value="1">
+            <span name="attr_upgrades"></span> upgrades, blows a fuse if second-highest die is <span name="attr_upgrades_plus_one"></span> or less. With one or fewer dice, the fuse automatically blows.
           </div>
         </div>
         <hr class="armament-divider">
@@ -628,7 +629,8 @@
                     </span>
                     <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
                     <div class="upgrade-info" style="font-size: 0.8em; color: #666; margin-top: 2px;">
-                      <span name="attr_upgrades"></span> upgrades, blows a fuse if second-highest die is <span name="attr_upgrades_plus_one"></span> or less.
+                      <input type="hidden" name="attr_upgrades_plus_one" value="1">
+                      <span name="attr_upgrades"></span> upgrades, blows a fuse if second-highest die is <span name="attr_upgrades_plus_one"></span> or less. With one or fewer dice, the fuse automatically blows.
                     </div>
                   </div>
                   <hr class="armament-divider">
@@ -2444,6 +2446,37 @@
            {{range}}
         </div>
       {{/range}}
+      {{#actionRoll}}
+        <div class="sheet-roll">
+          <div class="sheet-main-roll">{{attribute}}: {{computed::action}}</div>
+          <div class="sheet-results-roll">{{results}}</div>
+        </div>
+        <div class="sheet-result">
+          {{#rollBetween() computed::action 1 2}}
+            <span class="sheet-reprecussion">{{success_at_cost}}</span>
+          {{/rollBetween() computed::action 1 2}}
+          {{#rollBetween() computed::action 3 4}}
+            <span class="sheet-reprecussion">You succeed, but {{success_at_cost}}</span>
+          {{/rollBetween() computed::action 3 4}}
+          {{#rollBetween() computed::action 5 6}}
+            <span class="sheet-success">Success!</span>
+          {{/rollBetween() computed::action 5 6}}
+        </div>
+        <div class="sheet-fuse">
+          {{#automaticFuse}}
+            One or fewer dice: the fuse automatically blows.
+          {{/automaticFuse}}
+          {{^automaticFuse}}
+            Fuse die: {{computed::fuse}} (blows on {{fuseThreshold}} or less).
+            {{#rollTotal() computed::blown 1}}
+              You blew a fuse!
+            {{/rollTotal() computed::blown 1}}
+            {{#rollTotal() computed::blown 0}}
+              Fuse intact.
+            {{/rollTotal() computed::blown 0}}
+          {{/automaticFuse}}
+        </div>
+      {{/actionRoll}}
       
 
 </rolltemplate>
@@ -3486,6 +3519,7 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 });
 
 on("clicked:repeating_arm:rollarm", function(eventInfo) {
+    const blownAttribute = eventInfo.sourceAttribute.replace(/_rollarm$/, "_blown");
     getAttrs([
       "repeating_arm_armname",
       "repeating_arm_rangetext",
@@ -3493,6 +3527,13 @@ on("clicked:repeating_arm:rollarm", function(eventInfo) {
       "repeating_arm_upgrades",
       "repeating_arm_harm",
       "repeating_arm_blown",
+      "smash",
+      "sly",
+      "cyber",
+      "dicemod",
+      "smash_fail",
+      "sly_fail",
+      "cyber_fail",
     ], function(values) {
           if(values.repeating_arm_blown === "on") {
             const armamentName = values.repeating_arm_armname;
@@ -3506,10 +3547,31 @@ on("clicked:repeating_arm:rollarm", function(eventInfo) {
             values.repeating_arm_rangetext = "";
           }
           
-      startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}}  {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}}`,(results) => {
-          finishRoll(results.rollId, {});
-        }
-      );
+      // Attribute query
+      startRoll("! {{attribute=[[?{Attribute|Smash,0|Sly,1|Cyber,2}]]}}", (selection) => {
+        finishRoll(selection.rollId, {});
+        const attribute = ["smash", "sly", "cyber"][selection.results.attribute.result];
+        const numDice = (parseInt(values[attribute]) || 0) + (parseInt(values.dicemod) || 0);
+        const poolSize = numDice <= 0 ? 2 : numDice;
+        const diceNames = Array.from({ length: poolSize }, (_, index) => `die${index}`);
+        const poolRolls = diceNames.map(name => `{{${name}=[[d6]]}}`).join(" ");
+        const diceResults = poolSize === 1 ? "$[[0]]" : getResults(poolSize);
+        const fuseThreshold = (parseInt(values.repeating_arm_upgrades) || 0) + 1;
+        const automaticFuse = numDice <= 1 ? "{{automaticFuse=true}}" : "";
+
+        startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}} {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}} {{actionRoll=true}} {{attribute=${attribute}}} ${poolRolls} {{results=${diceResults}}} {{action=[[0]]}} {{fuse=[[0]]}} {{blown=[[0]]}} {{fuseThreshold=${fuseThreshold}}} {{success_at_cost=${values[attribute + "_fail"]}}} ${automaticFuse}`, (results) => {
+          const dice = diceNames.map(name => results.results[name].result).sort((a, b) => b - a);
+          const blown = numDice <= 1 || dice[1] <= fuseThreshold;
+          finishRoll(results.rollId, {
+            action: numDice <= 0 ? dice[dice.length - 1] : dice[0],
+            fuse: numDice <= 1 ? 0 : dice[1],
+            blown: blown ? 1 : 0
+          });
+          if(blown) {
+            setAttrs({ [blownAttribute]: "on" });
+          }
+        });
+      });
   });
 });
 
@@ -3731,6 +3793,17 @@ on("change:hivedecayroom1 change:hivedecayroom2 change:hivedecayroom3 change:hiv
 
 on("sheet:opened", () => {
 console.log("Load");
+  getSectionIDs("repeating_arm", (ids) => {
+    if(ids.length === 0) return;
+    getAttrs(ids.map(id => `repeating_arm_${id}_upgrades`), (values) => {
+      const thresholds = {};
+      ids.forEach(id => {
+        thresholds[`repeating_arm_${id}_upgrades_plus_one`] =
+          (parseInt(values[`repeating_arm_${id}_upgrades`]) || 0) + 1;
+      });
+      setAttrs(thresholds);
+    });
+  });
   // Initialize our default values. Not necessary if we used translation.
   getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "dicemod", "sublockedroom6"], (values) => {
     const sm = values.smash_fail;
@@ -4161,7 +4234,4 @@ const basebuttonlist = ["mainbase", "subbase", "hivebase"];
     });
 
 </script>
-
-
-
 
