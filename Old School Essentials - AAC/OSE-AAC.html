@@ -3125,30 +3125,26 @@
           const level = parseInt(values.level, 10);
           const monsterHitDice = Math.ceil(values.monsterHitDice); // Round up
 
-          if (charClass === "monster" && Number.isInteger(monsterHitDice)) {
-            // Ensure we always use the highest saves and such for HD 22+
+          if (charClass === "monster") {
             const clampedMonsterHitDice =
               monsterHitDice > 22 ? 22 : monsterHitDice;
-            const { bab, thac0, saves, xp } = classData["monster"][
-              clampedMonsterHitDice - 1
-            ];
-            const [baseXP, baseXPPlus] = xp;
+            const saveLevel = Math.min(Math.max(level || 1, 1), 22);
+            const { saves } = classData["monster"][saveLevel - 1];
             const hitDiceModifier = parseInt(values.monsterHitDiceModifier, 10);
             const mirroredHitDice = `${clampedMonsterHitDice}d8${
               hitDiceModifier ? (hitDiceModifier > 0 ? `+${hitDiceModifier}` : hitDiceModifier) : ""
             }`;
-            setAttrs({
-              monsterBAB: bab,
-              monsterThac0: thac0,
-              bab: bab,
-              hitdice: mirroredHitDice,
+            const monsterUpdate = {
               saveD: saves[0],
               saveW: saves[1],
               saveP: saves[2],
               saveB: saves[3],
               saveS: saves[4],
-              monsterXPValue: hitDiceModifier ? baseXPPlus : baseXP,
-            });
+            };
+            if (Number.isInteger(monsterHitDice)) {
+              monsterUpdate.hitdice = mirroredHitDice;
+            }
+            setAttrs(monsterUpdate);
           } else if (charClass === "normal human") {
             const { hd, bab, thac0, saves } = classData["normal human"][0];
             setAttrs({
@@ -3240,11 +3236,10 @@
   // Set savesAs to hide/show savesAs level for monsters
   on("sheet:opened change:class", function () {
     getAttrs(["class"], function (values) {
-      if (
-        ["monster", "normal human", "custom"].indexOf(
-          values.class.toLowerCase()
-        ) >= 0
-      ) {
+      const charClass = values.class.toLowerCase();
+      if (charClass === "monster") {
+        setAttrs({ savesAs: "monsterLevel" });
+      } else if (["normal human", "custom"].indexOf(charClass) >= 0) {
         setAttrs({ savesAs: "monster" });
       } else {
         setAttrs({ savesAs: "character" });
