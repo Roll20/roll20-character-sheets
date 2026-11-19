@@ -2,8 +2,13 @@ const {src, dest, watch, parallel, series} = require('gulp');
 const include = require('gulp-include');
 const rename = require('gulp-rename');
 const pug = require('gulp-pug');
+const fs = require('fs');
 
-function compile_pug() {
+function compile_pug(done) {
+    // No pug sources yet : gulp 5 fails on a missing folder, so skip the task
+    if (!fs.existsSync('pug')) {
+        return done();
+    }
     return src('pug/*.pug')
         .pipe(pug({pretty: true}))
         .on('error', console.log)

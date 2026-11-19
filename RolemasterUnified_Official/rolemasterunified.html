@@ -2934,6 +2934,9 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <option value="8">Huge</option>
         <option value="9">Gigantic</option>
         <option value="10">Enormous</option>
+        <option value="11">Immense</option>
+        <option value="12">Behemoth</option>
+        <option value="13">Leviathan</option>
       </select>
       <span>Crit. Red.</span>
       <select style='width:100%' class='fancyselect' name='attr_target_crit'>
@@ -7750,6 +7753,9 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <option value="8">Huge</option>
         <option value="9">Gigantic</option>
         <option value="10">Enormous</option>
+        <option value="11">Immense</option>
+        <option value="12">Behemoth</option>
+        <option value="13">Leviathan</option>
       </select>
       <span>Crit. Red.</span>
       <select style='width:100%' class='fancyselect' name='attr_target_crit'>
@@ -11139,7 +11145,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 7c6dd4228b5617ae107dde97b72287a08ed81682
+Revision 17da653f0b179748a39fd4bac3a57f5c9c82cdb0
 
 
 <hr>
@@ -12668,6 +12674,20 @@ function miscAttrSet(attr, name, value) {
 	const str = ev[toget];
 	const newstr = miscBonusSet(str, name, value);
 	setAttrsPending({[toget]: newstr});
+    });
+}
+
+function miscAttrSetNoPending(attr, name, value) {
+    'use strict';
+    let toget = attr;
+    if (!attr.endsWith("_misc")) {
+	rmuerror("Use of default _misc on miscAttrSet ", attr, name, value);
+	toget = attr + "_misc";
+    }
+    getAttrs([toget], (ev) => {
+	const str = ev[toget];
+	const newstr = miscBonusSet(str, name, value);
+	setAttrs({[toget]: newstr});
     });
 }
 
@@ -17264,7 +17284,7 @@ function doLevelUp(chdata) {
     // Increment level, and save it for everyone.
     updates.level = parseIntDefault(updates.level, 0) + 1;
     
-      miscAttrSet("dp_used_misc", levelstr, dpspent);
+      miscAttrSetNoPending("dp_used_misc", levelstr, dpspent);
     // Make sure this matches the number of calls... or it gets wierd
     outstanding = 4;
     doLevelUpStatGain(levelup.statgains, updates, alldone)

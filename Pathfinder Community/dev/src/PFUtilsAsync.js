@@ -3,7 +3,7 @@ import _ from 'underscore';
 import TAS from './TheAaronSheet.js';
 import * as SWUtils from './SWUtils';
 import PFConst from './PFConst';
-import * as PFUtils  from './PFUtils';
+import * as PFUtils from './PFUtils';
 
 /****************************ASYNCHRONOUS UTILITIES ***********************************
  ***************************************************************************************/
@@ -16,13 +16,14 @@ import * as PFUtils  from './PFUtils';
  * @param {boolean} silently if quiet or not
  * @param {string} useFindAbility true if @{} around values in the dropdown
  */
-export function setDropdownValue (readField, writeFields, callback, silently,useFindAbility) {
-    var functionToPass = null;
-    if(useFindAbility){
-        functionToPass=PFUtils.findAbilityInString;
-    }
-    SWUtils.setDropdownValue(readField, writeFields, functionToPass, callback, silently);
+export function setDropdownValue(readField, writeFields, callback, silently, useFindAbility) {
+  var functionToPass = null;
+  if (useFindAbility) {
+    functionToPass = PFUtils.findAbilityInString;
+  }
+  SWUtils.setDropdownValue(readField, writeFields, functionToPass, callback, silently);
 }
+
 /** calls setDropdownValue for a dropdown in a repeating section
  * @param {string} section the string between "repeating_" and "_<id>"
  * @param {string} id optional- the id of this row, blank if in context of the current row
@@ -32,72 +33,91 @@ export function setDropdownValue (readField, writeFields, callback, silently,use
  * @param {boolean} silently if quiet or not
  * @param {string} useFindAbility true if @{} around values in the dropdown
  */
-export function setRepeatingDropdownValue (section, id, from, to, callback,silently,useFindAbility) {
-    var idStr = SWUtils.getRepeatingIDStr(id),
-    prefix = "repeating_" + section + "_" + idStr,
+export function setRepeatingDropdownValue(section, id, from, to, callback, silently, useFindAbility) {
+  var idStr = SWUtils.getRepeatingIDStr(id),
+    prefix = 'repeating_' + section + '_' + idStr,
     functionToPass = null;
-    if(useFindAbility){
-        functionToPass=PFUtils.findAbilityInString;
-    }
-    //setDropdownValue(prefix + from, prefix + to, callback,silently);
-    SWUtils.setDropdownValue(prefix + from,  prefix + to, functionToPass, callback, silently);
+  if (useFindAbility) {
+    functionToPass = PFUtils.findAbilityInString;
+  }
+  //setDropdownValue(prefix + from, prefix + to, callback,silently);
+  SWUtils.setDropdownValue(prefix + from, prefix + to, functionToPass, callback, silently);
 }
+
 /** sets the _row_id fields for all rows in the section
  * @param {string} section the fieldset (name after "section_")
  */
-export function setRowIds (section) {
-    getSectionIDs("repeating_" + section, function (ids) {
-        var setter = {};
-        _.each(ids, function (id) {
-            setter["repeating_" + section + "_" + id + "_row_id"] = id;
-        });
-        SWUtils.setWrapper(setter);
+export function setRowIds(section) {
+  getSectionIDs('repeating_' + section, function (ids) {
+    var setter = {};
+    _.each(ids, function (id) {
+      setter['repeating_' + section + '_' + id + '_row_id'] = id;
     });
+    SWUtils.setWrapper(setter);
+  });
 }
+
 /* toggles default header images */
 const header_images = {
-    'header_image-pf_spell': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_spell.png)",
-    'header_image-pf_attack-melee': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_melee.png)",
-    'header_image-pf_attack-dual': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_dual.png)",
-    'header_image-pf_attack-ranged': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_ranged.png)",
-    'header_image-pf_attack-cmb': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_cmb.png)",
-    'header_image-pf_defense': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_defense.png)",
-    'header_image-pf_generic': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic.png)",
-    'header_image-pf_ability': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_ability.png)",
-    'header_image-pf_block': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block.png)",
-    'header_image-pf_generic-skill': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic.png)",
-    'header_image-pf_generic-init': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic_initiative.png)",
-    'header_image-pf_block-item': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block_item.png)",
-    'header_image-pf_block-check': "[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block_ability_check.png)"
+  'header_image-pf_spell': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_spell.png)',
+  'header_image-pf_attack-melee': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_melee.png)',
+  'header_image-pf_attack-dual': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_dual.png)',
+  'header_image-pf_attack-ranged': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_ranged.png)',
+  'header_image-pf_attack-cmb': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_attack_cmb.png)',
+  'header_image-pf_defense': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_defense.png)',
+  'header_image-pf_generic': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic.png)',
+  'header_image-pf_ability': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_ability.png)',
+  'header_image-pf_block': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block.png)',
+  'header_image-pf_generic-skill': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic.png)',
+  'header_image-pf_generic-init': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_generic_initiative.png)',
+  'header_image-pf_block-item': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block_item.png)',
+  'header_image-pf_block-check': '[default](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Community/Images/pf_block_ability_check.png)',
 };
+
 const header_image_names = Object.keys(header_images);
-on("change:header_images_toggle", function () {
-    getAttrs(header_image_names.concat(['header_images_toggle']), function (values) {
-        const tempToggle = +values.header_images_toggle || 0;
-        let tempImages = {};
-        header_image_names.forEach(image => {
-            const currentImage = values[image];
-            if (currentImage === header_images[image] || currentImage === '') {
-                tempImages[image] = tempToggle > 0 ? header_images[image] : '';
-            }
-        });
-        if(tempImages) setAttrs(tempImages);
+on('change:header_images_toggle', function () {
+  getAttrs(header_image_names.concat(['header_images_toggle']), function (values) {
+    const tempToggle = +values.header_images_toggle || 0;
+    let tempImages = {};
+    header_image_names.forEach((image) => {
+      const currentImage = values[image];
+      const defaultImage = header_images[image];
+      if (tempToggle === 0) {
+        // Force everything to None
+        if (currentImage !== '') {
+          tempImages[image] = '';
+        }
+      } else {
+        // Only reset to default if it's currently empty. Respects "Custom"
+        if (currentImage === '') {
+          tempImages[image] = defaultImage;
+        }
+      }
     });
+    if (Object.keys(tempImages).length > 0) {
+      setAttrs(tempImages, {silent: true});
+    }
+  });
 });
 
 export function registerEventHandlers() {
-    //REPEATING SECTIONS set IDs
-    _.each(PFConst.repeatingSections, function (section) {
-        var eventToWatch = "change:repeating_" + section + ":ids-show";
-        on(eventToWatch, TAS.callback(function eventCheckIsNewRow(eventInfo) {
-            var setter={},id;
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-            if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                id = SWUtils.getRowId(eventInfo.sourceAttribute);
-                setter["repeating_" + section + "_"+id+"_row_id"]=id;
-                SWUtils.setWrapper(setter,PFConst.silentParams);
-            }
-        }));
-    });
+  //REPEATING SECTIONS set IDs
+  _.each(PFConst.repeatingSections, function (section) {
+    var eventToWatch = 'change:repeating_' + section + ':ids-show';
+    on(
+      eventToWatch,
+      TAS.callback(function eventCheckIsNewRow(eventInfo) {
+        var setter = {},
+          id;
+        TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
+        if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+          id = SWUtils.getRowId(eventInfo.sourceAttribute);
+          setter['repeating_' + section + '_' + id + '_row_id'] = id;
+          SWUtils.setWrapper(setter, PFConst.silentParams);
+        }
+      }),
+    );
+  });
 }
+
 registerEventHandlers();

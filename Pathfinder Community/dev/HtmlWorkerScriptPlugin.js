@@ -24,8 +24,9 @@ class HtmlWorkerScriptPlugin {
           let updatedHtml = htmlSource + `\n<script type="text/worker">${jsSource}</script>`;
 
           // Replace placeholder
-          const currentDate = new Date().toUTCString();
-          updatedHtml = updatedHtml.replace('$$CURRENTRELEASEDATE$$', currentDate);
+          // const currentDate = new Date().toUTCString();
+          const currentDate = new Date().toLocaleDateString();
+          updatedHtml = updatedHtml.replaceAll('$$CURRENTRELEASEDATE$$', currentDate);
 
           // Strip dev warning in prod
           if (process.env.NODE_ENV === 'production') {

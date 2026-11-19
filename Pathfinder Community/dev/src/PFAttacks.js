@@ -138,10 +138,11 @@ function setAdvancedMacroCheckbox() {
         hasAnyMacros = _.reduce(
           v,
           function (tot, value, fieldname) {
+            let total = tot;
             if (fieldname !== 'adv_macro_show' && !(value === '' || value === '0' || value === undefined || value === null)) {
-              tot += 1;
+              total += 1;
             }
-            return tot;
+            return total;
           },
           0,
         );
@@ -376,7 +377,7 @@ function updateRepeatingWeaponDamage(id, eventInfo) {
       //Multiplier only applies to an Ability bonus.
       if (ability <= 0) {
         abilityMult = 1;
-        TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + ability);
+        TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + ability);
       }
       abilityTot = Math.floor(Math.min(abilityMult * (ability + damagePowerAttack), maxA));
       totalDamage = abilityTot + damageBuffs + miscDmg + enhance;
@@ -410,8 +411,8 @@ function updateRepeatingWeaponCrit(id, v, setter, wasChecked) {
     attackTypeBonusField = '',
     attackTypeBonus = 0,
     newBonus = 0;
+  const output = setter || {};
   try {
-    setter = setter || {};
     critConfirmBonus = v[critConfirmField] || 0;
     if (wasChecked || (v[attkTypeField] !== '0' && v[attkTypeField] !== 'dual')) {
       attkTypeForGrid = v[attkTypeField].replace('attk-', '');
@@ -423,13 +424,13 @@ function updateRepeatingWeaponCrit(id, v, setter, wasChecked) {
     // newBonus = critConfirmBonus + attackTypeBonus + critConfirmTemp + attackBuff;
     newBonus = critConfirmBonus + attackTypeBonus + attackBuff;
     // if (newBonus !== (v[critConfirmTotalField] || 0)) {
-    //   setter[critConfirmTotalField] = newBonus; // sets crit_conf_mod
+    //   output[critConfirmTotalField] = newBonus; // sets crit_conf_mod
     // }
-    setter[critConfirmTotalField] = newBonus;
+    output[critConfirmTotalField] = newBonus;
   } catch (err) {
     TAS.error('updateRepeatingWeaponCrit: error updating crit for id  ' + id, err);
   } finally {
-    return setter;
+    return output;
   }
 }
 /** Updates crit_conf_mod for row. Called when crit_confirm is updated on a row
@@ -458,7 +459,7 @@ function updateRepeatingWeaponCritAsync(id, eventInfo) {
   getAttrs(attrs, function (v) {
     var setter = {};
     try {
-      v = _.mapObject(v, function (val, key) {
+      var values = _.mapObject(v, function (val, key) {
         if (/attack\-type$/i.test(key) || /damage\-ability$/i.test(key) || /damage\-ability\-max$/i.test(key) || /damage_ability_mult$/i.test(key)) {
           return val;
         } else {
@@ -466,7 +467,7 @@ function updateRepeatingWeaponCritAsync(id, eventInfo) {
         }
       });
 
-      updateRepeatingWeaponCrit(id, v, setter);
+      updateRepeatingWeaponCrit(id, values, setter);
     } catch (err) {
       TAS.error('updateRepeatingWeaponCritAsync: error updating crit for id  ' + id, err);
     } finally {
@@ -504,7 +505,7 @@ function updateRepeatingWeaponsFromCritAsync(attacktype, eventInfo) {
       var globalCritBonus = parseInt(v[globalCritBonusField], 10) || 0,
         setter = {};
       try {
-        v = _.mapObject(v, function (val, key) {
+        var values = _.mapObject(v, function (val, key) {
           if (/attack\-type$/i.test(key) || /damage\-ability$/i.test(key) || /damage\-ability\-max$/i.test(key) || /damage_ability_mult$/i.test(key)) {
             return val;
           } else {
@@ -520,7 +521,7 @@ function updateRepeatingWeaponsFromCritAsync(attacktype, eventInfo) {
             currRowTot = 0;
           //TAS.debug("row:"+id+" attacktypefield:"+v[attackTypeField]+", ability:"+ PFUtils.findAbilityInString(v[attackTypeField]) +", type is:"+attacktype);
           if (v[attackTypeField] === 'attk-' + attacktype) {
-            updateRepeatingWeaponCrit(id, v, setter, true);
+            updateRepeatingWeaponCrit(id, values, setter, true);
           }
         });
       } catch (err) {
@@ -603,7 +604,7 @@ function getRecalculatedDamageOnly(id, v) {
       //Multiplier only applies to an Ability bonus.
       if (abilitydmg <= 0) {
         abilityMult = 1;
-        TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
+        TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
       }
       abilityTotDmg = Math.floor(Math.min(abilityMult * (abilitydmg + damagePowerAttack), maxAbility));
       newTotalDamage = abilityTotDmg + damageBuffs + dmgMacroMod + enhance;
@@ -669,7 +670,11 @@ export function updateAssociatedAttacksFromParents(callback) {
   });
   getSectionIDs('repeating_weapon', function (ids) {
     var doneOne,
-      attrs = [];
+      attrs = [],
+      lowerIDs = [],
+      lowerSpellIDs = [],
+      lowerItemIDs = [],
+      lowerAbilityIDs = [];
     if (_.size(ids) === 0) {
       done();
       return;
@@ -683,29 +688,29 @@ export function updateAssociatedAttacksFromParents(callback) {
     });
     attrs = _.flatten(attrs);
     getAttrs(attrs, function (v) {
-      ids = _.map(ids, function (id) {
+      lowerIDs = _.map(ids, function (id) {
         return id.toLowerCase();
       });
       getSectionIDs('repeating_spells', function (spellIDs) {
-        spellIDs = _.map(spellIDs, function (id) {
+        lowerSpellIDs = _.map(spellIDs, function (id) {
           return id.toLowerCase();
         });
         getSectionIDs('repeating_item', function (itemIDs) {
-          itemIDs = _.map(itemIDs, function (id) {
+          lowerItemIDs = _.map(itemIDs, function (id) {
             return id.toLowerCase();
           });
           getSectionIDs('repeating_ability', function (abilityIDs) {
             var setter = {};
-            abilityIDs = _.map(abilityIDs, function (id) {
+            lowerAbilityIDs = _.map(abilityIDs, function (id) {
               return id.toLowerCase();
             });
-            TAS.debug('################', 'Checking linked attacks. attack links, spellids, itemids, abilityids', v, spellIDs, itemIDs, abilityIDs);
-            _.each(ids, function (id) {
+            TAS.debug('################', 'Checking linked attacks. attack links, spellids, itemids, abilityids', v, lowerSpellIDs, lowerItemIDs, lowerAbilityIDs);
+            _.each(lowerIDs, function (id) {
               if (v['repeating_weapon_' + id + '_source-item']) {
                 TAS.debug('checking ' + id + ' for item:' + v['repeating_weapon_' + id + '_source-item']);
                 if (v['repeating_weapon_' + id + '_source-item'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-item'] + ' in item list');
-                  if (_.size(itemIDs > 0) && _.contains(itemIDs, v['repeating_weapon_' + id + '_source-item'])) {
+                  if (_.size(lowerItemIDs > 0) && _.contains(lowerItemIDs, v['repeating_weapon_' + id + '_source-item'])) {
                     PFInventory.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-item'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' item link is not found:' + v['repeating_weapon_' + id + '_source-item']);
@@ -716,7 +721,7 @@ export function updateAssociatedAttacksFromParents(callback) {
                 TAS.debug('checking ' + id + ' for spell:' + v['repeating_weapon_' + id + '_source-spell']);
                 if (v['repeating_weapon_' + id + '_source-spell'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-spell'] + ' in spell list');
-                  if (_.size(spellIDs > 0) && _.contains(spellIDs, v['repeating_weapon_' + id + '_source-spell'])) {
+                  if (_.size(lowerSpellIDs > 0) && _.contains(lowerSpellIDs, v['repeating_weapon_' + id + '_source-spell'])) {
                     PFSpells.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-spell'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' spell link is not found:' + v['repeating_weapon_' + id + '_source-spell']);
@@ -727,7 +732,7 @@ export function updateAssociatedAttacksFromParents(callback) {
                 TAS.debug('checking ' + id + ' for ability:' + v['repeating_weapon_' + id + '_source-ability']);
                 if (v['repeating_weapon_' + id + '_source-ability'] !== 'DELETED') {
                   TAS.debug('looking for ' + v['repeating_weapon_' + id + '_source-ability'] + ' in ability list');
-                  if (_.size(abilityIDs > 0) && _.contains(abilityIDs, v['repeating_weapon_' + id + '_source-ability'])) {
+                  if (_.size(lowerAbilityIDs > 0) && _.contains(lowerAbilityIDs, v['repeating_weapon_' + id + '_source-ability'])) {
                     PFAbility.createAttackEntryFromRow(v['repeating_weapon_' + id + '_source-ability'], doneOne, true, null, id);
                   } else {
                     TAS.warn('weapon ' + id + ' ability link is not found:' + v['repeating_weapon_' + id + '_source-ability']);
@@ -820,7 +825,7 @@ function getRecalculatedAttack(id, v, setter) {
     //Multiplier only applies to an Ability bonus.
     if (abilitydmg <= 0) {
       abilityMult = 1;
-      TAS.debug('~~~~~~ Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
+      TAS.debug('Multiplier only applies to an Ability bonus. Current Ability-Mod: ' + abilitydmg);
     }
     abilityTotDmg = Math.min(Math.floor(abilityMult * (abilitydmg + damagePowerAttack)), maxAbility);
     newTotalDamage = abilityTotDmg + damageBuffs + dmgMacroMod + enhance;
@@ -896,12 +901,13 @@ function getRecalculatedAttack(id, v, setter) {
  * @param {*} setter
  */
 function syncDefaultDamageDice(id, v, setter, useSizeMod, prefix) {
+  let repPrefix = '';
   if (!prefix) {
-    prefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
+    repPrefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
   }
-  if (!useSizeMod || !parseInt(v[prefix + 'size_affects'], 10)) {
-    setter[prefix + 'default_damage-dice-num'] = v[prefix + 'damage-dice-num'] || 0;
-    setter[prefix + 'default_damage-die'] = v[prefix + 'damage-die'] || 0;
+  if (!useSizeMod || !parseInt(v[repPrefix + 'size_affects'], 10)) {
+    setter[repPrefix + 'default_damage-dice-num'] = v[repPrefix + 'damage-dice-num'] || 0;
+    setter[repPrefix + 'default_damage-die'] = v[repPrefix + 'damage-die'] || 0;
   }
   return setter;
 }
@@ -966,27 +972,28 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
     defSize = 0,
     sizeDiff = 0,
     newDice = {};
+  let repPrefix = '';
   try {
     if (!prefix) {
-      prefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
+      repPrefix = 'repeating_weapon_' + SWUtils.getRepeatingIDStr(id);
     }
-    //TAS.debug("#########","PFAttacks.adjustDamageDice for "+prefix,v);
-    currNotDefault = parseInt(v[prefix + 'not_default_size'], 10) || 0;
-    if (parseInt(v[prefix + 'size_affects'], 10)) {
-      currDice = parseInt(v[prefix + 'damage-dice-num'], 10) || 0;
-      currDie = parseInt(v[prefix + 'damage-die'], 10) || 0;
+    //TAS.debug("#########","PFAttacks.adjustDamageDice for "+repPrefix,v);
+    currNotDefault = parseInt(v[repPrefix + 'not_default_size'], 10) || 0;
+    if (parseInt(v[repPrefix + 'size_affects'], 10)) {
+      currDice = parseInt(v[repPrefix + 'damage-dice-num'], 10) || 0;
+      currDie = parseInt(v[repPrefix + 'damage-die'], 10) || 0;
       //TAS.debug("PFAttacks.adjustDamageDice curr size:"+ currCharSize+" and current dmg: "+currDice+"d"+currDie);
       if (!(currDice === 0 || currDie === 0)) {
         defSize = parseInt(v['default_char_size'], 10);
-        defWeaponSize = parseInt(v[prefix + 'default_size'], 10);
-        defDice = parseInt(v[prefix + 'default_damage-dice-num'], 10) || 0;
-        defDie = parseInt(v[prefix + 'default_damage-die'], 10) || 0;
+        defWeaponSize = parseInt(v[repPrefix + 'default_size'], 10);
+        defDice = parseInt(v[repPrefix + 'default_damage-dice-num'], 10) || 0;
+        defDie = parseInt(v[repPrefix + 'default_damage-die'], 10) || 0;
         //TAS.debug("PFAttacks.adjustDamageDice default is:"+defDice+"d"+defDie+", for size:"+defWeaponSize+", "+"def char size:"+defSize+", and curr char size:"+ currCharSize);
 
         //check for errors
         if (isNaN(defWeaponSize)) {
           defWeaponSize = defSize;
-          setter[prefix + 'default_size'] = defWeaponSize;
+          setter[repPrefix + 'default_size'] = defWeaponSize;
         }
         if (isNaN(defSize)) {
           defSize = currCharSize;
@@ -994,20 +1001,20 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
         if (defDice === 0 || defDie === 0) {
           defDice = currDice;
           defDie = currDie;
-          setter[prefix + 'default_damage-dice-num'] = defDice;
-          setter[prefix + 'default_damage-die'] = defDie;
+          setter[repPrefix + 'default_damage-dice-num'] = defDice;
+          setter[repPrefix + 'default_damage-die'] = defDie;
         }
         //check for change
         if (currCharSize !== defSize) {
           if (!currNotDefault) {
-            setter[prefix + 'not_default_size'] = 1;
+            setter[repPrefix + 'not_default_size'] = 1;
           }
           sizeDiff = PFSize.getSizeLevelChange(currCharSize, defSize);
           //TAS.debug("PFAttacks update dice, char size change is "+sizeDiff);
         }
         if (defWeaponSize !== defSize) {
           if (!currNotDefault) {
-            setter[prefix + 'not_default_size'] = 1;
+            setter[repPrefix + 'not_default_size'] = 1;
           }
           weaponSizeDiff = PFSize.getSizeLevelChange(defWeaponSize, defSize);
           //TAS.debug("PFAttacks update dice, weapon size change is "+weaponSizeDiff);
@@ -1018,29 +1025,29 @@ function adjustDamageDice(id, currCharSize, v, setter, prefix) {
           newDice = PFSize.updateDamageDice(sizeDiff, defSize, defDice, defDie);
           TAS.debug('###########', 'PFAttacks.adjustDamageDice NEW DAMAGE is:' + newDice.dice + 'd' + newDice.die + ', for sizeDiff:' + sizeDiff);
           if (currDice !== newDice.dice || currDie !== newDice.die) {
-            setter[prefix + 'damage-dice-num'] = newDice.dice;
-            setter[prefix + 'damage-die'] = newDice.die;
+            setter[repPrefix + 'damage-dice-num'] = newDice.dice;
+            setter[repPrefix + 'damage-die'] = newDice.die;
           }
         } else {
           if (currNotDefault) {
-            setter[prefix + 'not_default_size'] = 0;
+            setter[repPrefix + 'not_default_size'] = 0;
           }
           if (currDice !== defDice || currDie !== defDie) {
-            setter[prefix + 'damage-dice-num'] = defDice;
-            setter[prefix + 'damage-die'] = defDie;
+            setter[repPrefix + 'damage-dice-num'] = defDice;
+            setter[repPrefix + 'damage-die'] = defDie;
           }
         }
       } else {
         //size affects was 1, but no damage dice
-        setter[prefix + 'size_affects'] = 0;
+        setter[repPrefix + 'size_affects'] = 0;
       }
     } else {
       //TAS.debug("PFAttacks.adjustDamageDice: size_affects is blank so reset regular to default")
       if (!(currDice === 0 || currDie === 0)) {
-        setter[prefix + 'damage-dice-num'] = v[prefix + 'default_damage-dice-num'];
-        setter[prefix + 'damage-die'] = v[prefix + 'default_damage-die'];
+        setter[repPrefix + 'damage-dice-num'] = v[repPrefix + 'default_damage-dice-num'];
+        setter[repPrefix + 'damage-die'] = v[repPrefix + 'default_damage-die'];
         if (currNotDefault) {
-          setter[prefix + 'not_default_size'] = 0;
+          setter[repPrefix + 'not_default_size'] = 0;
         }
       }
     }
@@ -1160,15 +1167,17 @@ export function setDualWieldVals(params, setter, id, updMode) {
     prefix = '',
     tempStr = '',
     tempStr2 = '';
-
+  let rowID = '';
+  const output = setter || {};
   try {
     TAS.debug('PFAttacks.setDualWieldVals', params);
-    setter = setter || {};
     if (!id) {
-      id = generateRowID();
-      //TAS.debug("the new id is "+id);
+      rowID = generateRowID();
+      //TAS.debug("the new id is "+rowID);
+    } else {
+      rowID = id;
     }
-    prefix = 'repeating_weapon_' + id + '_';
+    prefix = 'repeating_weapon_' + rowID + '_';
     //TAS.debug("prefix is "+prefix);
     if (updMode) {
       currMacro = params['macro-text'];
@@ -1189,30 +1198,30 @@ export function setDualWieldVals(params, setter, id, updMode) {
     if (!tempStr) {
       tempStr = 'Dual Wield';
     }
-    setter[prefix + 'dualwield'] = 1;
-    setter[prefix + 'source-main'] = params.mainhand_id;
-    setter[prefix + 'source-off'] = params.offhand_id;
+    output[prefix + 'dualwield'] = 1;
+    output[prefix + 'source-main'] = params.mainhand_id;
+    output[prefix + 'source-off'] = params.offhand_id;
     //for update of existing just for this version:
-    setter[prefix + 'group'] = tempStr;
+    output[prefix + 'group'] = tempStr;
     if (!updMode) {
-      setter[prefix + 'group'] = tempStr;
-      setter[prefix + 'source-main-name'] = params.mainhand_name || '';
-      setter[prefix + 'source-off-name'] = params.offhand_name || '';
-      setter[prefix + 'name'] = tempStr + ' ' + (params.mainhand_name || '') + '/' + (params.offhand_name || '');
-      setter[prefix + 'iterative_attack1_name'] = params.mainhand_name + ' [[@{repeating_weapon_' + params.mainhand_id + '_total-attack} + ' + params.mainhand_penalty + ']]';
+      output[prefix + 'group'] = tempStr;
+      output[prefix + 'source-main-name'] = params.mainhand_name || '';
+      output[prefix + 'source-off-name'] = params.offhand_name || '';
+      output[prefix + 'name'] = tempStr + ' ' + (params.mainhand_name || '') + '/' + (params.offhand_name || '');
+      output[prefix + 'iterative_attack1_name'] = params.mainhand_name + ' [[@{repeating_weapon_' + params.mainhand_id + '_total-attack} + ' + params.mainhand_penalty + ']]';
     }
-    setter[prefix + 'link_type'] = linkedAttackType.weapon;
-    setter[prefix + 'size_affects'] = 0;
+    output[prefix + 'link_type'] = linkedAttackType.weapon;
+    output[prefix + 'size_affects'] = 0;
     //by filling it in we make sure template rolls
-    setter[prefix + 'attack-type'] = 'dual';
-    setter[prefix + 'attack-type-mod'] = 0;
-    setter[prefix + 'damage-ability'] = 'dual';
-    setter[prefix + 'damage-ability-mod'] = 0;
-    setter[prefix + 'damage'] = '0';
-    setter[prefix + 'damage-mod'] = 0;
+    output[prefix + 'attack-type'] = 'dual';
+    output[prefix + 'attack-type-mod'] = 0;
+    output[prefix + 'damage-ability'] = 'dual';
+    output[prefix + 'damage-ability-mod'] = 0;
+    output[prefix + 'damage'] = '0';
+    output[prefix + 'damage-mod'] = 0;
     currAttack = 1;
-    setter[prefix + 'damage'] = '0';
-    setter[prefix + 'damage-mod'] = 0;
+    output[prefix + 'damage'] = '0';
+    output[prefix + 'damage-mod'] = 0;
     //macroText
     //mainhand attack:
     macroText =
@@ -1275,11 +1284,11 @@ export function setDualWieldVals(params, setter, id, updMode) {
       currMacro = ' ' + tempMacroArray.join(' ');
       macroText += currMacro;
     }
-    setter[prefix + 'macro-text'] = macroText;
-    setter[prefix + 'NPC-macro-text'] = macroText;
-    setter[prefix + 'attack'] = params.mainhand_penalty;
-    setter[prefix + 'attack-mod'] = params.mainhand_penalty;
-    setter[prefix + 'total-attack'] = params.mainhand_penalty;
+    output[prefix + 'macro-text'] = macroText;
+    output[prefix + 'NPC-macro-text'] = macroText;
+    output[prefix + 'attack'] = params.mainhand_penalty;
+    output[prefix + 'attack-mod'] = params.mainhand_penalty;
+    output[prefix + 'total-attack'] = params.mainhand_penalty;
     //rest of attacks
     numAttacks = Math.floor(params.bab / 5) + 1;
     totAttacks = numAttacks + params.offhand_improved;
@@ -1293,7 +1302,7 @@ export function setDualWieldVals(params, setter, id, updMode) {
         mainPen -= 5;
         tempStr = macroIter.replace(/REPLACEHAND/g, params.mainhand_id);
         tempInt = mainPen + params.mainhand_penalty;
-        setter[prefix + 'iterative_attack' + currAttack + '_name'] =
+        output[prefix + 'iterative_attack' + currAttack + '_name'] =
           params.mainhand_name + ' [[ @{repeating_weapon_' + params.mainhand_id + '_total-attack} - ' + Math.abs(mainPen) + ' - ' + Math.abs(params.mainhand_penalty) + ' ]]';
       } else {
         //offhand
@@ -1305,16 +1314,16 @@ export function setDualWieldVals(params, setter, id, updMode) {
           tempStr = tempStr.replace(/REPLACEMULT/g, '');
         }
         tempInt = offPen + params.offhand_penalty;
-        setter[prefix + 'iterative_attack' + currAttack + '_name'] =
+        output[prefix + 'iterative_attack' + currAttack + '_name'] =
           params.offhand_name + ' [[@{repeating_weapon_' + params.offhand_id + '_total-attack} - ' + Math.abs(offPen) + ' - ' + Math.abs(params.offhand_penalty) + ']]';
         offPen -= 5;
         offhandCountdown--;
       }
       tempStr = tempStr.replace(/REPLACEITER/g, currAttack);
 
-      setter[prefix + 'iterative_attack' + currAttack + '_value'] = tempInt;
-      setter[prefix + 'var_iterative_attack' + currAttack + '_macro'] = tempStr;
-      setter[prefix + 'toggle_iterative_attack' + currAttack] = '@{var_iterative_attack' + currAttack + '_macro}';
+      output[prefix + 'iterative_attack' + currAttack + '_value'] = tempInt;
+      output[prefix + 'var_iterative_attack' + currAttack + '_macro'] = tempStr;
+      output[prefix + 'toggle_iterative_attack' + currAttack] = '@{var_iterative_attack' + currAttack + '_macro}';
       currAttack++;
     }
     if (currAttack <= 8) {
@@ -1322,17 +1331,17 @@ export function setDualWieldVals(params, setter, id, updMode) {
       tempStr = macroIter.replace(/REPLACEHAND/g, params.mainhand_id);
       tempStr = tempStr.replace(/REPLACEITER/g, currAttack);
       tempInt = origMainPen + params.mainhand_penalty;
-      setter[prefix + 'iterative_attack' + currAttack + '_name'] = 'Extra full BAB MH attack';
-      setter[prefix + 'iterative_attack' + currAttack + '_value'] = tempInt;
-      setter[prefix + 'var_iterative_attack' + currAttack + '_macro'] = tempStr;
+      output[prefix + 'iterative_attack' + currAttack + '_name'] = 'Extra full BAB MH attack';
+      output[prefix + 'iterative_attack' + currAttack + '_value'] = tempInt;
+      output[prefix + 'var_iterative_attack' + currAttack + '_macro'] = tempStr;
       //this one is off by default
-      //setter[prefix+'toggle_iterative_attack'+currAttack]="@{var_iterative_attack"+currAttack+"_macro}";
+      //output[prefix+'toggle_iterative_attack'+currAttack]="@{var_iterative_attack"+currAttack+"_macro}";
     }
   } catch (err) {
     TAS.error('PFAttacks.setDualWieldVals outererr', err);
   } finally {
-    //TAS.debug("PFAttacks.setDualWieldVals returning:",setter);
-    return setter;
+    //TAS.debug("PFAttacks.setDualWieldVals returning:",output);
+    return output;
   }
 }
 /** Updates all existing dual wield attacks.
@@ -1347,17 +1356,10 @@ export function updateDualWieldAttacks(callback, eventInfo) {
       }
     }),
     finished = _.once(function () {
-      if (eventInfo) {
-        SWUtils.setWrapper({update_twoweapon_attack: 0}, PFConst.silentParams, done);
-      } else {
-        done();
-      }
-    });
-  getAttrs(['update_twoweapon_attack', 'mainhand_penalty', 'offhand_penalty', 'offhand_improved', 'bab', 'offhand_str_mult'], function (vout) {
-    if (eventInfo && !parseInt(vout.update_twoweapon_attack, 10)) {
       done();
-      return;
-    }
+    });
+
+  getAttrs(['mainhand_penalty', 'offhand_penalty', 'offhand_improved', 'bab', 'offhand_str_mult'], function (vout) {
     getSectionIDs('repeating_weapon', function (ids) {
       var fields,
         mhpen = 0,
@@ -1457,73 +1459,69 @@ export function createDualWieldAsync(callback) {
     setDualWield = function (setter) {
       //TAS.debug("back at set Dual WIeld",setter);
       if (setter && _.size(setter)) {
-        setter.create_twoweapon_attack = 0;
-        setter.mainhand_id = '';
-        setter.offhand_id = '';
         SWUtils.setWrapper(setter, PFConst.silentParams, function () {
           PFAttackGrid.resetCommandMacro();
           done();
         });
       } else {
-        SWUtils.setWrapper({create_twoweapon_attack: 0}, PFConst.silentParams, done);
+        done();
       }
     };
-  getAttrs(['create_twoweapon_attack', 'mainhand_id', 'mainhand_penalty', 'offhand_id', 'offhand_penalty', 'offhand_improved', 'bab', 'offhand_str_mult'], function (v) {
+
+  getAttrs(['mainhand_id', 'mainhand_penalty', 'offhand_id', 'offhand_penalty', 'offhand_improved', 'bab', 'offhand_str_mult'], function (v) {
     try {
-      if (parseInt(v.create_twoweapon_attack, 10) === 1) {
-        getSectionIDs('repeating_weapon', function (ids) {
-          var fields = [],
-            setter = {};
-          try {
-            if (!ids || _.size(ids) === 0) {
-              setDualWield();
-              return;
-            }
-            //TAS.debug("PFAttacks.createDualWield ids are ",ids);
-            if (_.contains(ids, v.mainhand_id) && _.contains(ids, v.offhand_id)) {
-              //TAS.debug("the ids contain the two variables");
-              getAttrs(['repeating_weapon_' + v.mainhand_id + '_name', 'repeating_weapon_' + v.offhand_id + '_name'], function (w) {
-                v.mainhand_name = w['repeating_weapon_' + v.mainhand_id + '_name'];
-                v.offhand_name = w['repeating_weapon_' + v.offhand_id + '_name'];
-                TAS.debug('they are there! calling with ', v, w);
-                setter = createDualWield(v);
-                setDualWield(setter);
-              });
-            } else {
-              //TAS.debug("ids do not contain variables, check the names");
-              fields = ids.map(function (id) {
-                return 'repeating_weapon_' + id + '_name';
-              });
-              //TAS.debug("getting ",fields);
-              getAttrs(fields, function (w) {
-                var mainhandid = '',
-                  offhandid = '';
-                //TAS.debug("the names are ",w);
-                _.each(w, function (val, key) {
-                  TAS.debug('comparing ' + v.mainhand_id + ' to ' + val + ' of row ' + key);
-                  if (val === v.mainhand_id) {
-                    mainhandid = SWUtils.getRowId(key);
-                    v.mainhand_name = val;
-                    v.mainhand_id = mainhandid;
-                  } else if (val === v.offhand_id) {
-                    offhandid = SWUtils.getRowId(key);
-                    v.offhand_name = val;
-                    v.offhand_id = offhandid;
-                  }
-                });
-                if (mainhandid && offhandid) {
-                  TAS.debug('calling createDualWield with :', v);
-                  setter = createDualWield(v);
-                }
-                setDualWield(setter);
-              });
-            }
-          } catch (ierr) {
-            TAS.error('PFAttacks.createDualWieldAsync ierr', ierr);
+      getSectionIDs('repeating_weapon', function (ids) {
+        var fields = [],
+          setter = {};
+        try {
+          if (!ids || _.size(ids) === 0) {
             setDualWield();
+            return;
           }
-        });
-      }
+          //TAS.debug("PFAttacks.createDualWield ids are ",ids);
+          if (_.contains(ids, v.mainhand_id) && _.contains(ids, v.offhand_id)) {
+            //TAS.debug("the ids contain the two variables");
+            getAttrs(['repeating_weapon_' + v.mainhand_id + '_name', 'repeating_weapon_' + v.offhand_id + '_name'], function (w) {
+              v.mainhand_name = w['repeating_weapon_' + v.mainhand_id + '_name'];
+              v.offhand_name = w['repeating_weapon_' + v.offhand_id + '_name'];
+              TAS.debug('they are there! calling with ', v, w);
+              setter = createDualWield(v);
+              setDualWield(setter);
+            });
+          } else {
+            //TAS.debug("ids do not contain variables, check the names");
+            fields = ids.map(function (id) {
+              return 'repeating_weapon_' + id + '_name';
+            });
+            //TAS.debug("getting ",fields);
+            getAttrs(fields, function (w) {
+              var mainhandid = '',
+                offhandid = '';
+              //TAS.debug("the names are ",w);
+              _.each(w, function (val, key) {
+                TAS.debug('comparing ' + v.mainhand_id + ' to ' + val + ' of row ' + key);
+                if (val === v.mainhand_id) {
+                  mainhandid = SWUtils.getRowId(key);
+                  v.mainhand_name = val;
+                  v.mainhand_id = mainhandid;
+                } else if (val === v.offhand_id) {
+                  offhandid = SWUtils.getRowId(key);
+                  v.offhand_name = val;
+                  v.offhand_id = offhandid;
+                }
+              });
+              if (mainhandid && offhandid) {
+                TAS.debug('calling createDualWield with :', v);
+                setter = createDualWield(v);
+              }
+              setDualWield(setter);
+            });
+          }
+        } catch (ierr) {
+          TAS.error('PFAttacks.createDualWieldAsync ierr', ierr);
+          setDualWield();
+        }
+      });
     } catch (err) {
       TAS.error('PFAttack.createDualWieldAsync outererror', err);
       setDualWield();
@@ -1558,28 +1556,28 @@ function recalcRepeatingNonMacroFields(ids, callback) {
       modifyDiceGlobal = 0,
       currSize = 0;
     //set values to int so we don't have to do it over and over per row.
-    v = _.mapObject(v, function (val, key) {
+    var values = _.mapObject(v, function (val, key) {
       if (/attack\-type$/i.test(key) || /damage\-ability$/i.test(key) || /damage\-ability\-max$/i.test(key) || /damage_ability_mult$/i.test(key)) {
         return val;
       } else {
         return parseInt(val, 10) || 0;
       }
     });
-    currSize = parseInt(v.size, 10) || 0;
-    modifyDiceGlobal = parseInt(v.modify_dmg_by_size, 10) || 0;
-    //TAS.debug("PFAttacks.recalcOtherFields has values ",v);
+    currSize = parseInt(values.size, 10) || 0;
+    modifyDiceGlobal = parseInt(values.modify_dmg_by_size, 10) || 0;
+    //TAS.debug("PFAttacks.recalcOtherFields has values ",values);
     setter = _.reduce(
       ids,
       function (m, id) {
         var xtra = {},
           useSize = 0;
         try {
-          if (modifyDiceGlobal && v['repeating_weapon_' + id + '_size_affects']) {
+          if (modifyDiceGlobal && values['repeating_weapon_' + id + '_size_affects']) {
             useSize = 1;
           }
-          if (v['repeating_weapon_' + id + '_attack-type'] !== 'dual') {
-            xtra = getRecalculatedAttack(id, v);
-            resetWeaponSizeAndDamage(id, currSize, v, xtra, useSize);
+          if (values['repeating_weapon_' + id + '_attack-type'] !== 'dual') {
+            xtra = getRecalculatedAttack(id, values);
+            resetWeaponSizeAndDamage(id, currSize, values, xtra, useSize);
             _.extend(m, xtra);
           }
         } catch (erri) {
@@ -1766,8 +1764,8 @@ export function removeLinkedAttack(callback, linkType, linkid) {
 }
 function setNewDefaults(ids, v, setter) {
   var localsetter, defaultSize;
+  const output = setter || {};
   try {
-    setter = setter || {};
     defaultSize = parseInt(v['size'], 10) || 0;
     localsetter = _.reduce(
       ids,
@@ -1795,11 +1793,11 @@ function setNewDefaults(ids, v, setter) {
       },
       {},
     );
-    _.extend(setter, localsetter);
+    _.extend(output, localsetter);
   } catch (errout) {
     TAS.error('PFAttacks.getNewDefaults errout ', errout);
   } finally {
-    return setter;
+    return output;
   }
 }
 export function setNewDefaultsAsync(callback) {
@@ -2197,19 +2195,19 @@ function registerEventHandlers() {
     }),
   );
   on(
-    'change:create_twoweapon_attack',
+    'clicked:create-twoweapon-attack',
     TAS.callback(function eventCreateTwoWeaponAttack(eventInfo) {
-      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
-        TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType + ' trigger: ' + eventInfo.triggerName.split('_').pop());
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api' || eventInfo.triggerName.split(':').pop() === 'create-twoweapon-attack') {
         createDualWieldAsync();
       }
     }),
   );
   on(
-    'change:update_twoweapon_attack',
+    'clicked:update-twoweapon-attack',
     TAS.callback(function eventUpdateDualWield(eventInfo) {
-      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
-        TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType + ' trigger: ' + eventInfo.triggerName.split('_').pop());
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api' || eventInfo.triggerName.split(':').pop() === 'update-twoweapon-attack') {
         updateDualWieldAttacks(null, eventInfo);
       }
     }),

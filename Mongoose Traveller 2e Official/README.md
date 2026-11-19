@@ -154,5 +154,13 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Fixed bad compendium item weight/mass by checking for NaN
 - Fixed encumberance carry capacity for Athletics specialties
 
+### Version 1.1.17
+- Added ability to select a custom characteristic and have that used in skill checks by selecting CUSTOM from the dropdown lists
+
+### Version 1.1.18:
+- Added mod field to skill specialities
+- Fixed formatting issue with custom characteristics on NPCs & Robots
+- Added category 'classes' to compendium drop targets so drag and drop of vehicles and animals creates a character sheet on the canvas
+- 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
