@@ -1,3 +1,16 @@
+### Version 2.48 (2026-02)
+- by Anduh: stops the sheet stretching too wide (started happening after 2.47 update)
+- minor code cleanup
+
+### Version 2.47 (2026-01)
+- by Anduh: Update CSS so Settings Menu(cogwheel) text is readable in Roll20 Light Mode (was white on white)
+
+### Version 2.46 (2024-05/06)
+- by Roll20 staff: add new line to code to retrigger something
+
+### Version 2.45 (2023-05)
+- by ChinoSkeleton: Changing the skill list name "perskills" into "perckills" so the skill name suggestions works for perception skills.
+
 ### Version 2.44 (2022-08):
 - fix broken style at character sheet background
 

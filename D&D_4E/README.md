@@ -52,6 +52,24 @@ stealth
 streetwise
 thievery
 
+Powers:
+
+Each power card has up and down buttons that move that power between slots. The
+slots themselves stay numbered 1-100; the contents move between them.
+
+The Sort control above the cards orders every filled power by usage (At-Will,
+Encounter, Daily, Item), level (lowest first), power action, or name, and moves
+the empty slots to the end. Powers that tie keep the order you gave them. It
+asks for confirmation first, because it can move nearly every power at once and
+cannot be undone.
+
+Note what this means for token actions and macros kept outside the sheet. A
+reference like @{power-3-macro} or %{CharacterName|-power-3} names the *slot*,
+not the power sitting in it. After a reorder it still works, but it now rolls
+whichever power moved into slot 3 - so a token action labelled for one power can
+end up rolling another. If you keep token actions for your powers, re-check them
+after rearranging.
+
 Updates:
 
 2014-04-23 14:27 :

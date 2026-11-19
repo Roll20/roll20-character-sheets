@@ -1,4 +1,4 @@
-/* liturgies begin */
+/* liturgies start */
 on('clicked:eidsegen-action', async (info) => {
 	results = await startRoll(
 		"@{gm_roll_opt} " +

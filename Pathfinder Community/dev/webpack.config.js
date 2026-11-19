@@ -74,6 +74,7 @@ const webpackConfig = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     }),
     new HtmlWebpackPlugin({
+      filename: mode === 'production' ? 'pathfinder_community.html' : 'index.html',
       template: path.join(__dirname, 'src/index.html'),
       inlineSource: /\.js$/,
       minify: false, // handled by webpack^5 optimization. see below
@@ -85,7 +86,7 @@ const webpackConfig = {
       patterns: [
         {
           from: path.join(__dirname, 'src/pathfinder.css'),
-          to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist'),
+          to: path.join(__dirname, mode === 'production' ? 'prod/pathfinder_community.css' : 'dist/pathfinder.css'),
           force: true,
         },
         {

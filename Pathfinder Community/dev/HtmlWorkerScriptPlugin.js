@@ -1,3 +1,4 @@
+const mode = process.env.NODE_ENV;
 class HtmlWorkerScriptPlugin {
   apply(compiler) {
     compiler.hooks.thisCompilation.tap('HtmlWorkerScriptPlugin', (compilation) => {
@@ -7,11 +8,12 @@ class HtmlWorkerScriptPlugin {
           stage: compilation.constructor.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
         },
         (assets) => {
-          const htmlAsset = assets['index.html'];
+          const htmlFileName = mode === 'production' ? 'pathfinder_community.html' : 'index.html';
+          const htmlAsset = assets[htmlFileName];
           const jsAsset = assets['index.js'];
 
           if (!htmlAsset || !jsAsset) {
-            console.warn('HtmlWorkerScriptPlugin: Required assets missing (index.html or index.js)');
+            console.warn(`HtmlWorkerScriptPlugin: Required assets missing (${htmlFileName} or index.js)`);
             return;
           }
 
@@ -22,8 +24,9 @@ class HtmlWorkerScriptPlugin {
           let updatedHtml = htmlSource + `\n<script type="text/worker">${jsSource}</script>`;
 
           // Replace placeholder
-          const currentDate = new Date().toUTCString();
-          updatedHtml = updatedHtml.replace('$$CURRENTRELEASEDATE$$', currentDate);
+          // const currentDate = new Date().toUTCString();
+          const currentDate = new Date().toLocaleDateString();
+          updatedHtml = updatedHtml.replaceAll('$$CURRENTRELEASEDATE$$', currentDate);
 
           // Strip dev warning in prod
           if (process.env.NODE_ENV === 'production') {
@@ -31,7 +34,7 @@ class HtmlWorkerScriptPlugin {
           }
 
           // Replace index.html asset with modified version
-          compilation.updateAsset('index.html', {
+          compilation.updateAsset(htmlFileName, {
             source: () => updatedHtml,
             size: () => Buffer.byteLength(updatedHtml, 'utf8'),
           });

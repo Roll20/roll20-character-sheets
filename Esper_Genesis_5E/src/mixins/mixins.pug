@@ -16,6 +16,40 @@ mixin abilityList()
     each ability in ABILTIES
       +ability(ability)
 
+mixin abilityBarCol(name, abbr)
+  .ability-col
+    .ability-header
+      button(type='roll' name=`roll_${name}` value!=`@{wtype}&{template:simple} {{rname=^{${name}-u}}} {{mod=@{${name}_mod}@{jack_bonus}}} {{r1=[[@{d20}+@{${name}_mod}@{jack_attr}[${abbr}]]]}} @{rtype}+@{${name}_mod}@{jack_attr}[${abbr}]]]}} @{charname_output} {{licensedsheet=@{licensedsheet}}}` data-i18n=`${abbr.toLowerCase()}-u`)= abbr
+      input.baseattr(type='text' name=`attr_${name}_base` title=`@{${name}}` value!='10')
+      input(type='hidden' name=`attr_${name}` value!='10')
+      input.attr-flag(type='hidden' name=`attr_${name}_flag` value!='0')
+      span.finalattr(name=`attr_${name}`)
+    .ability-modifiers
+      .ability-mod-block
+        .ability-val-box
+          input(type='hidden' name=`attr_${name}_mod` value='0')
+          button(type='roll' name=`roll_${name}` value!=`@{wtype}&{template:simple} {{rname=^{${name}-u}}} {{mod=@{${name}_mod}@{jack_bonus}}} {{r1=[[@{d20}+@{${name}_mod}@{jack_attr}[${abbr}]]]}} @{rtype}+@{${name}_mod}@{jack_attr}[${abbr}]]]}} @{charname_output} {{licensedsheet=@{licensedsheet}}}`)
+            span.attr(name=`attr_${name}_mod` title=`@{${name}_mod}`) 0
+        span.ab-label Mod
+      .ability-save-block
+        .ability-val-box
+          input(type='hidden' name=`attr_${name}_save_bonus` value='0')
+          button(type='roll' name=`roll_${name}_save` value!=`@{wtype}&{template:simple} {{rname=^{${name}-save-u}}} {{mod=@{${name}_save_bonus}}} {{r1=[[@{d20}+@{${name}_save_bonus}@{pbd_safe}]]}} @{rtype}+@{${name}_save_bonus}@{pbd_safe}]]}} {{global=@{global_save_mod}}} @{charname_output} {{licensedsheet=@{licensedsheet}}}`)
+            span.save-val(name=`attr_${name}_save_bonus` title=`@{${name}_save_bonus}`) 0
+        input(type='checkbox' name=`attr_${name}_save_prof` title=`@{${name}_save_prof}` value!='(@{pb})')
+        span.ab-label Save
+
+mixin abilitiesBar()
+  .abilities-bar
+    +abilityBarCol('strength', 'STR')
+    +abilityBarCol('dexterity', 'DEX')
+    +abilityBarCol('constitution', 'CON')
+    +abilityBarCol('intelligence', 'INT')
+    +abilityBarCol('wisdom', 'WIS')
+    +abilityBarCol('charisma', 'CHA')
+    .ab-section-label
+      span(data-i18n='abilities-u') ABILITIES
+
 mixin powerHeader(rank, tp)
   span.rank
     span(data-i18n='max-rank-u')

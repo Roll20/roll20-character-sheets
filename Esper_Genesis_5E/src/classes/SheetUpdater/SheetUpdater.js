@@ -55,7 +55,7 @@ class SheetUpdater {
                 });
                 console.groupEnd();
             }
-            if(this._versionAttribute in values) console.log(`%cD&D 5th Edition by Roll20 Version ${values[this._versionAttribute]}`, 'color: green; font-weight:bold');
+            if(this._versionAttribute in values) console.log(`%cEsper Genesis 5E Sheet v3.1 (data model ${values[this._versionAttribute]})`, 'color: green; font-weight:bold');
             console.log('---------------------------------------------');
         }); 
     }

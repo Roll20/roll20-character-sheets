@@ -30,7 +30,7 @@ export function resetCommandMacro(dummy, eventInfo, callback) {
         callback();
       }
     }),
-    repeatingSpellAttrs = ['spell_level', 'spellclass_number', 'name', 'school', 'slot', 'metamagic', 'used', 'isDomain', 'isMythic'],
+    repeatingSpellAttrs = ['spell_level', 'spellclass_number', 'name', 'school', 'slot', 'metamagic', 'used', 'cast', 'isDomain', 'isMythic'],
     class0BaseMacro =
       '&{template:pf_block} @{toggle_spell_accessible} @{toggle_rounded_flag}{{font=@{apply_specfont_chat}@{use_specfont}}} {{scroll_desc=@{scroll-desc}}} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=@{spellclass-0-name} ^{spells}}} {{concentration=@{Concentration-0}}} {{casterlevel=@{spellclass-0-level-total}}} {{row01=**^{checks}**}} {{row02=[^{caster-level-check}](~@{character_id}|Spell-Class-0-CL-Check) [^{concentration-check}](~@{character_id}|Concentration-Check-0) [^{spell-failure}](~@{character_id}|Spell-Fail-Check)}}',
     class1BaseMacro =
@@ -181,6 +181,8 @@ export function resetCommandMacro(dummy, eventInfo, callback) {
                     classStr = '',
                     isDomain = 0,
                     isMythic = 0,
+                    used = 0,
+                    cast = 0,
                     uses = 0,
                     name = '';
                   try {
@@ -199,7 +201,9 @@ export function resetCommandMacro(dummy, eventInfo, callback) {
                     classStr = 'class' + (values[prefix + 'spellclass_number'] || '0');
                     isDomain = parseInt(values[prefix + 'isDomain'], 10) || 0;
                     isMythic = usesMythic * parseInt(values[prefix + 'isMythic'], 10) || 0;
-                    uses = parseInt(values[prefix + 'used'], 10) || 0;
+                    cast = Math.abs(parseInt(values[prefix + 'cast'], 10)) || 0;
+                    used = parseInt(values[prefix + 'used'], 10) || 0;
+                    uses = Math.max(0, used - cast);
                     name = values[prefix + 'name'] || '';
                   } catch (errmap) {
                     TAS.error('PFSpells.resetCommandMacro errmap on id ' + id, errmap);
@@ -326,7 +330,7 @@ export function resetCommandMacro(dummy, eventInfo, callback) {
   );
 }
 
-/** update spells if a user changes "uses" on spell row
+/** update spells if a user changes "uses" or "cast" on spell row
  * @param {string} dummy normally id but not used
  * @param {map} eventInfo from event, not used
  * @param {function} callbackwhen done
@@ -342,6 +346,7 @@ function updateSpellsPerDay(dummy, eventInfo, callback, silently) {
     fields = [
       'total_spells_manually',
       'repeating_spells_used',
+      'repeating_spells_cast',
       'repeating_spells_spellclass_number',
       'repeating_spells_spell_level',
       'repeating_spells_slot',
@@ -356,7 +361,7 @@ function updateSpellsPerDay(dummy, eventInfo, callback, silently) {
       fieldname2 = '',
       initialtot = {};
     try {
-      //TAS.debug("PFSpells.updateSpellsPerDay: ",v);
+      TAS.debug('PFSpells.updateSpellsPerDay: ', v);
       if (!parseInt(v.total_spells_manually, 10)) {
         spellLevel = parseInt(v.repeating_spells_spell_level, 10) || 0;
         //TAS.debug("total spells manually is off spellLEvel is "+spellLevel);
@@ -376,20 +381,26 @@ function updateSpellsPerDay(dummy, eventInfo, callback, silently) {
         fieldname2 = 'spellclass-' + classNum + '-level-' + spellLevel + '-spells-prepared';
         initialtot[fieldname] = 0;
         initialtot[fieldname2] = 0;
-        //TAS.debug("about to set "+fieldname+", and "+ fieldname2);
+        TAS.debug('about to set ' + fieldname + ', and ' + fieldname2);
         TAS.repeating('spells')
           .attrs(fieldname, fieldname2)
-          .fields('row_id', 'used', 'spell_level', 'metamagic', 'slot')
+          .fields('row_id', 'used', 'cast', 'spell_level', 'metamagic', 'slot')
           .reduce(
             function (m, r) {
+              let memo = m || 0;
               try {
                 if (r.I.spell_level === spellLevel || (r.I.metamagic && r.I.slot === spellLevel)) {
-                  m += r.I.used;
+                  // updated to handle #cast
+                  const used = parseInt(r.I.used, 10) || 0;
+                  const cast = Math.abs(parseInt(r.I.cast, 10)) || 0;
+                  // specific row
+                  let remaining = used - cast;
+                  memo += Math.max(0, remaining);
                 }
               } catch (innererr) {
                 TAS.error('PFSpells.updateSpellsPerDay innererr', innererr);
               } finally {
-                return m;
+                return memo;
               }
             },
             0,
@@ -443,7 +454,8 @@ function getSpellTotals(ids, v, setter) {
         classNum = 0,
         metamagic = 0,
         slot,
-        uses = 0;
+        used = 0,
+        cast = 0;
       try {
         spellLevel = parseInt(v[prefix + 'spell_level'], 10) || 0;
         classNum = parseInt(v[prefix + 'spellclass_number'], 10);
@@ -463,8 +475,13 @@ function getSpellTotals(ids, v, setter) {
         }
         totalListed[classNum][spellLevel] += 1;
         if (!doNotProcess) {
-          uses = parseInt(v[prefix + 'used'], 10) || 0;
-          totalPrepped[classNum][spellLevel] += uses;
+          // updated to handle #cast
+          used = parseInt(v[prefix + 'used'], 10) || 0;
+          cast = Math.abs(parseInt(v[prefix + 'cast'], 10)) || 0;
+          //totalPrepped[classNum][spellLevel] += used - cast;
+          // ensure never drop below 0
+          let remaining = used - cast;
+          totalPrepped[classNum][spellLevel] += Math.max(0, remaining);
         }
       } catch (err2) {
         TAS.error('PFSpells.getSpellTotals err2', err2);
@@ -556,41 +573,41 @@ export function resetSpellsTotals(dummy, eventInfo, callback, silently) {
 function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName) {
   let notes = '',
     attackType = '';
-  setter = setter || {};
+  const output = setter || {};
   try {
     TAS.debug('UPDATING SPELL ATTACK: ' + spellPrefix, v);
     attackType = PFUtils.findAbilityInString(v[spellPrefix + 'spell-attack-type']);
     if (v[spellPrefix + 'name']) {
       if (!noName) {
-        setter[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
+        output[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
       }
-      setter[weaponPrefix + 'source-spell-name'] = v[spellPrefix + 'name'];
+      output[weaponPrefix + 'source-spell-name'] = v[spellPrefix + 'name'];
     }
     if (attackType) {
-      setter[weaponPrefix + 'attack-type'] = v[spellPrefix + 'spell-attack-type'];
+      output[weaponPrefix + 'attack-type'] = v[spellPrefix + 'spell-attack-type'];
       if (/CMB/i.test(attackType)) {
-        setter[weaponPrefix + 'vs'] = 'cmd';
+        output[weaponPrefix + 'vs'] = 'cmd';
       } else {
-        setter[weaponPrefix + 'vs'] = 'touch';
+        output[weaponPrefix + 'vs'] = 'touch';
       }
     }
     if (v[spellPrefix + 'range_numeric']) {
-      setter[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'];
+      output[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'];
     }
     if (v[spellPrefix + 'range'] && v[spellPrefix + 'range_pick'] === 'see_text') {
       notes += 'Range: ' + v[spellPrefix + 'range'];
     }
 
     if (v[spellPrefix + 'damage-macro-text']) {
-      setter[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+      output[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+        output[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       }
     }
     if (v[spellPrefix + 'damage-type']) {
-      setter[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
+      output[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
+        output[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
       }
     }
     if (v[spellPrefix + 'save']) {
@@ -624,12 +641,12 @@ function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName) {
       }
     }
     if (notes) {
-      setter[weaponPrefix + 'notes'] = notes;
+      output[weaponPrefix + 'notes'] = notes;
     }
   } catch (err) {
     TAS.error('PFSpells.setAttackEntryVals', err);
   } finally {
-    return setter;
+    return output;
   }
 }
 
@@ -651,7 +668,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
       done();
       return;
     }
-    itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
+    itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.triggerName) : '');
     idStr = SWUtils.getRepeatingIDStr(itemId);
     item_entry = 'repeating_spells_' + idStr;
 
@@ -733,6 +750,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
 
 export function updateAssociatedAttack(id, callback, silently, eventInfo) {
   let done = _.once(function () {
+      //TAS.debug("leaving PFSpells.updateAssociatedAttack");
       if (typeof callback === 'function') {
         callback();
       }
@@ -741,9 +759,31 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
     item_entry = '',
     attrib = '',
     attributes = [];
-  try {
-    itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
-    item_entry = 'repeating_spells_' + SWUtils.getRepeatingIDStr(itemId);
+  itemId = id || (eventInfo ? SWUtils.getRowId(eventInfo.sourceAttribute) : '');
+  item_entry = 'repeating_spells_' + SWUtils.getRepeatingIDStr(itemId);
+  attrib = eventInfo ? SWUtils.getAttributeName(eventInfo.sourceAttribute) : '';
+  attributes = [];
+  //TAS.debug("at PFSpells updateAssociatedAttack: for row" + id   );
+  if (attrib) {
+    attributes = [item_entry + attrib];
+    if (/range/i.test(attrib)) {
+      attributes = [item_entry + 'range_pick', item_entry + 'range', item_entry + 'range_numeric'];
+    } else {
+      attributes = [
+        item_entry + 'range_pick',
+        item_entry + 'range',
+        item_entry + 'range_numeric',
+        item_entry + 'damage-macro-text',
+        item_entry + 'damage-type',
+        item_entry + 'sr',
+        item_entry + 'savedc',
+        item_entry + 'save',
+        item_entry + 'spell-attack-type',
+        item_entry + 'name',
+        item_entry + 'toggle_attack_entry',
+      ];
+    }
+  } else {
     attributes = [
       item_entry + 'range_pick',
       item_entry + 'range',
@@ -753,26 +793,12 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
       item_entry + 'sr',
       item_entry + 'savedc',
       item_entry + 'save',
-      item_entry + 'spell-attack-type',
+      item_entry + 'abil-attack-type',
       item_entry + 'name',
       item_entry + 'toggle_attack_entry',
     ];
-    /*
-        attrib = (eventInfo ? SWUtils.getAttributeName(eventInfo.sourceAttribute) : "");
-        if (attrib){
-            attributes = [item_entry+attrib];
-            if ((/range/i).test(attrib)){
-                attributes =[item_entry+'range_pick',item_entry+'range',item_entry+'range_numeric'];
-            }
-        } else {
-            attributes = ["range_pick", "range", "range_numeric", "damage-macro-text", "damage-type", "sr", "savedc", "save", "spell-attack-type", "name"];
-        }
-        */
-  } catch (erro) {
-    TAS.error('PFSpells.updateAssociatedAttack erro', erro, id, eventInfo);
-    done();
-    return;
   }
+
   getAttrs(attributes, function (spellVal) {
     getSectionIDs('repeating_weapon', function (idarray) {
       // get the repeating set
@@ -794,16 +820,16 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
             let prefix = 'repeating_weapon_' + currentID + '_';
             if (v[prefix + 'source-spell'] === itemId) {
               idlist.push(currentID);
-              setter = setAttackEntryVals(item_entry, prefix, spellVal, setter, true);
+              setter = setAttackEntryVals(item_entry, prefix, spellVal, setter);
             }
           });
-          if (silently) {
-            params = PFConst.silentParams;
-          }
         } catch (err) {
           TAS.error('PFSpells.updateAssociatedAttack', err);
         } finally {
           if (_.size(setter) > 0) {
+            if (silently) {
+              params = PFConst.silentParams;
+            }
             SWUtils.setWrapper(setter, params, function () {
               PFAttackOptions.resetSomeOptions(idlist);
             });
@@ -1410,6 +1436,7 @@ function updateSpell(id, eventInfo, callback, doNotUpdateTotals) {
     prefix + 'Concentration-mod',
     prefix + 'spell_options',
     prefix + 'used',
+    prefix + 'cast',
     prefix + 'slot',
     prefix + 'metamagic',
     spellLevelField,
@@ -1734,9 +1761,10 @@ function updateSpellsOld(callback, silently, eventInfo) {
  *@param {object} eventInfo used to find row id since id param will be null
  */
 export function importFromCompendium(id, eventInfo) {
+  let rowId = id;
   if (eventInfo) {
-    if (!id) {
-      id = SWUtils.getRowId(eventInfo.sourceAttribute);
+    if (!rowId) {
+      rowId = SWUtils.getRowId(eventInfo.sourceAttribute);
     }
   }
   getAttrs(
@@ -1955,7 +1983,7 @@ export function importFromCompendium(id, eventInfo) {
       setSilent['repeating_spells_effect_from_compendium'] = '';
       if (_.size(setSilent) > 0) {
         SWUtils.setWrapper(setSilent, PFConst.silentParams, function () {
-          updateSpell(id, eventInfo);
+          updateSpell(rowId, eventInfo);
         });
       }
     },
@@ -1974,7 +2002,7 @@ export let recalculate = TAS.callback(function callPFSpellsRecalculate(callback,
     }),
     recalcTotals = _.once(function () {
       resetSpellsPrepared();
-      resetSpellsTotals(null, null, null, silently);
+      resetSpellsTotals();
       resetCommandMacro();
       PFSpellOptions.resetOptions();
       done();
@@ -2027,7 +2055,7 @@ export function setCasterTypeSpells(eventInfo) {
           thisCastingType = spellClass2;
         }
         thisCastingType === 1 ? (thisCastingType = 0) : (thisCastingType = 1);
-        // TAS.debug(`~~~ Casting Type Set for: ${id} ~~~`);
+        TAS.debug(`Casting Type Set for: ${id}`);
         output[`repeating_spells_${id}_toggle_casting_type`] = thisCastingType;
       });
       setAttrs(output, {
@@ -2055,7 +2083,7 @@ function setCasterTypeRow(eventInfo) {
       thisCastingType = spellClass2;
     }
     thisCastingType === 1 ? (thisCastingType = 0) : (thisCastingType = 1);
-    // TAS.debug(`~~~ Casting Type Set for: ${id} ~~~`);
+    TAS.debug(`Casting Type Set for: ${id}`);
     output[`repeating_spells_${id}_toggle_casting_type`] = thisCastingType;
     setAttrs(output, {
       silent: true,
@@ -2069,13 +2097,15 @@ let events = {
   repeatingSpellEventsPlayer: {
     'change:repeating_spells:compendium_category': [importFromCompendium],
     'change:repeating_spells:used': [updateSpellsPerDay, updatePreparedSpellState, resetCommandMacro],
+    'change:repeating_spells:cast': [updateSpellsPerDay, updatePreparedSpellState, resetCommandMacro],
     'change:repeating_spells:metamagic': [toggleMetaMagic],
     'change:repeating_spells:name': [updateSpell],
   },
-  repeatingSpellMenuUpdatePlayer: ['name', 'spellclass_number', 'spell_level', 'slot', 'used', 'school', 'metamagic', 'isDomain', 'isMythic'],
+  repeatingSpellMenuUpdatePlayer: ['name', 'spellclass_number', 'spell_level', 'slot', 'used', 'cast', 'school', 'metamagic', 'isDomain', 'isMythic'],
   repeatingSpellAttackEventsPlayer: ['range_pick', 'range', 'damage-macro-text', 'damage-type', 'save', 'spell-attack-type', 'name'],
   repeatingSpellAttackEventsAuto: ['range_numeric', 'sr', 'savedc', 'toggle_attack_entry'],
 };
+
 function registerEventHandlers() {
   let tempstr = '';
   // combined all tempstr reduce functions
@@ -2141,6 +2171,23 @@ function registerEventHandlers() {
       }
     }),
   );
+
+  on(
+    'change:total_spells_manually',
+    TAS.callback(function playerUpdateSpell(eventInfo) {
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+        getAttrs(['total_spells_manually'], (v) => {
+          const doNotProcess = parseInt(v.total_spells_manually, 10) || 0;
+          if (!doNotProcess) {
+            resetSpellsTotals();
+            resetCommandMacro();
+          }
+        });
+      }
+    }),
+  );
+
   _.each(events.repeatingSpellEventsPlayer, function (functions, eventToWatch) {
     _.each(functions, function (methodToCall) {
       on(
@@ -2203,10 +2250,10 @@ function registerEventHandlers() {
     }),
   );
   on(
-    'change:repeating_spells:create-attack-entry',
-    TAS.callback(function eventcreateAttackEntryFromSpell(eventInfo) {
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
-      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
+    'clicked:repeating_spells:create-attack-entry',
+    TAS.callback(function eventcreateAttackEntryFromRow(eventInfo) {
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType + ' trigger: ' + eventInfo.triggerName.split('_').pop());
+      if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api' || eventInfo.triggerName.split('_').pop() === 'create-attack-entry') {
         createAttackEntryFromRow(null, null, false, eventInfo);
       }
     }),
@@ -2214,28 +2261,15 @@ function registerEventHandlers() {
   on(
     tempstr,
     TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
-      let attr;
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
-      attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
+      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
       if (eventInfo.sourceType === 'player' || eventInfo.sourceType === 'api') {
-        updateAssociatedAttack(null, null, null, eventInfo);
-      }
-    }),
-  );
-  on(
-    tempstr,
-    TAS.callback(function eventupdateAssociatedSpellAttack(eventInfo) {
-      let attr;
-      TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
-      attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
-      if (eventInfo.sourceType === 'sheetworker' || eventInfo.sourceType === 'api') {
         updateAssociatedAttack(null, null, null, eventInfo);
       }
     }),
   );
   // sync repeating_spells with settings>attacks>link spells
   on('change:include_link_spells', function (eventInfo) {
-    TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
+    TAS.debug('caught ' + eventInfo.sourceAttribute + ' event: ' + eventInfo.sourceType);
     if (eventInfo.sourceType === 'sheetworker' || eventInfo.sourceType === 'player') {
       updateIncludeLink();
     }
@@ -2248,4 +2282,5 @@ function registerEventHandlers() {
     }
   });
 }
+
 registerEventHandlers();

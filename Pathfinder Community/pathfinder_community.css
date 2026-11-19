@@ -126,6 +126,11 @@
     margin-inline: 2px;
 }
 
+.charsheet .small-label2:has(button[type="action"]) {
+    vertical-align: bottom;
+    width: 5em;
+}
+
 .charsheet h1 {
     font-size: 1.5rem;
     line-height: 1em;
@@ -189,21 +194,26 @@
     display: inline;
 }
 
-/* turn off spinners for disabled number fields in chrome */
-.charsheet input::-webkit-outer-spin-button,
-.charsheet input::-webkit-inner-spin-button,
-.charsheet input[type="number"].calc:hover,
-.charsheet input[type="number"].calc:focus,
-.charsheet input[type="number"].calc,
-.charsheet input[type="number"]:disabled {
-    -webkit-appearance: none;
+/* Force spin buttons to stay completely hidden on hover and focus in Roll20 */
+.charsheet input[type="number"]::-webkit-outer-spin-button,
+.charsheet input[type="number"]::-webkit-inner-spin-button,
+.charsheet input[type="number"]:hover::-webkit-outer-spin-button,
+.charsheet input[type="number"]:hover::-webkit-inner-spin-button,
+.charsheet input[type="number"]:focus::-webkit-outer-spin-button,
+.charsheet input[type="number"]:focus::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: none !important;
+    margin: 0 !important;
 }
 
-/* turn off spinners for all number field in firefox */
+/* Firefox fallback + balanced padding for centered text */
 .charsheet input[type="number"] {
     -moz-appearance: textfield !important;
-    -moz-padding-end: .5em;
-    padding-inline-end: .5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-align: center;
+    box-sizing: border-box;
 }
 
 .charsheet input[type="text"],
@@ -310,6 +320,14 @@
     overflow: hidden;
 }
 
+.charsheet .inline-attribute-macro {
+    display: inline-grid;
+    gap: 2px;
+    grid-template-columns: auto 1fr;
+    padding-block: .5em;
+    width: calc(100% - 1em);
+}
+
 /* macro-text field pop-up */
 .charsheet details[open]:focus-within summary,
 .charsheet details[open]:hover summary,
@@ -328,18 +346,24 @@
 
 .charsheet details[open] summary + textarea.skill-macro-text,
 .charsheet details[open] summary + * {
-    background-color: #f0f8ff;
-    color: revert;
+    background-color: #fffded;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px #000;
+    color: #222222;
     display: flex;
     height: auto;
     left: 1em;
+    outline: 2px solid #101010;
     position: absolute;
     width: calc(100% - 2em);
     word-break: normal;
     z-index: 2;
-    border-radius: 0;
-    outline: 2px solid #e20c0c;
-    box-shadow: 2px 2px 5px #000;
+}
+
+.charsheet details[open] summary + textarea.skill-macro-text.third-width {
+    left: auto;
+    right: 1em;
+    width: 33%;
 }
 
 .charsheet details[open]:focus-within summary + textarea.skill-macro-text,
@@ -358,32 +382,36 @@
     position: relative;
 }
 
-.charsheet .skills .table-row span.table-cell > textarea:focus {
-    height: 4em;
-    left: auto;
-    margin-top: -1em;
-    right: 2em;
-    width: 33%;
+.charsheet .skills .table-row span.table-cell:has(> textarea:focus-visible) {
+    position: relative;
+}
+
+.charsheet .skills .table-row span.table-cell > textarea:focus-visible {
+    background-color: #fffded;
+    box-shadow: 2px 2px 5px #000;
+    color: #222222;
+    height: 2.85em;
+    left: 0;
+    min-width: max-content;
+    outline: 2px solid #101010;
+    position: absolute;
+    top: 0;
     z-index: 5;
 }
 
-.charsheet .skills .table-row input.macro-text-inline:focus,
-.charsheet .section-skills span input.macro-text-inline:focus,
-.charsheet .section-defenses .table-row input.macro-text-inline:focus {
+.charsheet .skills .table-row input.macro-text-inline:focus-visible,
+.charsheet .section-skills span input.macro-text-inline:focus-visible,
+.charsheet .section-defenses .table-row input.macro-text-inline:focus-visible {
     margin-top: -1em;
 }
 
-.charsheet .abilities .attack-damage .small-label2.entry-med:focus-within::before,
-.charsheet .section-abilities div.small-label2.entry-med:focus-within::before,
-.charsheet .section-abilities label.small-label2.entry-10p-shrink:focus-within::before,
-.charsheet .attacks label.small-label2.entry-short.highlight:focus-within::before,
-.charsheet .items label.small-label2.entry-med:focus-within::before,
-.charsheet .section-spells label.small-label2.entry-med:focus-within::before {
+/* prevents lower label from "jumping" opening macro popover */
+.charsheet label:has(.macro-text-inline):focus-within::before {
     content: '...';
     display: inline-block;
     position: relative;
     width: 7em;
-    height: 24px;
+    height: 25px;
     visibility: hidden;
 }
 
@@ -392,6 +420,7 @@
     pointer-events: none;
     z-index: -1;
 }
+
 /* ability basis-name 'Other' is editable */
 .charsheet .other-editable:checked + label:has(.calc) {
     pointer-events: auto;
@@ -404,38 +433,27 @@
     background-color: transparent;
 }
 
-.charsheet .abilities input.macro-text-inline:focus,
-.charsheet .section-abilities input.macro-text-inline:focus,
-.charsheet .attack-grid input.macro-text-inline:focus,
-.charsheet .attacks label > input.macro-text-inline:focus,
-.charsheet .defense-grid input.macro-text-inline:focus,
-.charsheet .section-defenses input.macro-text-inline:focus,
-.charsheet .items input.macro-text-inline:focus,
-.charsheet .items textarea.macro-text-inline:focus,
-.charsheet .saves input.macro-text-inline:focus,
-.charsheet .sect-buff input.macro-text-inline:focus,
-.charsheet .section-core input.macro-text-inline:focus,
-.charsheet .section-npc input.macro-text-inline:focus,
-.charsheet .section-spells .macro-text-inline:focus,
-.charsheet .section-spells input.macro-text-inline:focus,
-.charsheet .skills input.macro-text-inline:focus,
-.charsheet .section-skills textarea.macro-text-inline:focus,
-.charsheet .section-skills input.macro-text-inline:focus {
-    background-color: #f0f8ff;
-    color: revert;
+.ui-dialog .tab-content .charsheet .macro-text-inline:focus-visible {
+    background-color: #fffded;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px #000;
+    color: #222222;
     display: block;
     height: 2.85em;
+    left: auto;
     margin: 0;
     max-width: none;
+    min-width: auto;
+    outline: 2px solid #101010;
     position: absolute;
-    width: 26em;
+    width: clamp(15em, 17vw, 25em);
     word-break: normal;
     z-index: 4;
 }
 
 /* acts as a placeholder to prevent collapsing row */
-.charsheet .linked-tablecell:has(input.macro-text-inline:focus)::before,
-.charsheet .table-cell:has(input.macro-text-inline:focus)::before {
+.charsheet .linked-tablecell:has(.macro-text-inline:focus-visible)::before,
+.charsheet .table-cell:has(.macro-text-inline:focus-visible)::before {
     content: '...';
     display: block;
     height: 2em;
@@ -445,8 +463,8 @@
     visibility: hidden;
 }
 
-.charsheet input.macro-text-inline.float-right:focus,
-.charsheet .macro-text-inline.float-right:focus {
+.charsheet input.macro-text-inline.float-right:focus-visible,
+.charsheet .macro-text-inline.float-right:focus-visible {
     left: auto;
     right: 1em;
 }
@@ -462,25 +480,20 @@
 /* keeps textarea and readonly number attribute to right inline with each other in one .table cell */
 .charsheet .small-label2.linked-tablecell,
 .charsheet .table-cell.linked-tablecell {
-    display: inline-grid;
-    grid-template-columns: minmax(auto, 3.5em) auto;
-    justify-content: center;
-    min-width: max-content;
+    display: inline-block;
+    min-width: 7em;
     padding: 0 2px 0 2px;
-    vertical-align: text-top;
+    position: relative;
     white-space: nowrap;
-    width: auto;
 }
 
 .charsheet .table-cell.linked-tablecell-short {
-    width: 7.8em;
     min-width: 6.5em;
     white-space: nowrap;
+    width: 7.8em;
 }
 
-.charsheet .linked-fields .macro-text-inline.linked-cellfield,
-.charsheet .linked-tablecell select.linked-cellfield,
-.charsheet .linked-tablecell .macro-text-inline.linked-cellfield {
+.ui-dialog .tab-content .charsheet .linked-cellfield {
     display: inline-block;
     max-width: none;
     min-width: auto;
@@ -488,8 +501,7 @@
     width: 4em;
 }
 
-.charsheet .linked-tablecell-short select.linked-cellfield,
-.charsheet .linked-tablecell-short .macro-text-inline.linked-cellfield {
+.ui-dialog .tab-content .charsheet .linked-tablecell-short .linked-cellfield {
     width: calc(100% - 2.9em);
     max-width: calc(100% - 2.9em);
 }
@@ -584,6 +596,7 @@
 
 .charsheet button[type="roll"].no-decoration::before {
     content: "";
+    display: block;
 }
 
 .charsheet button[type="roll"].no-decoration:hover {
@@ -1064,18 +1077,18 @@ pf-wrapper,
 }
 
 /* narrow only when in readonly/compact mode:  */
-.charsheet .readonly-show:not(:checked) ~ .main input[type="number"].narrow-numbers-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .narrow-numbers-readonly input[type="number"],
-.charsheet .readonly-show:not(:checked) ~ .main .narrow-numbers-readonly .number,
-.charsheet .readonly-show:not(:checked) ~ .main .narrow-numbers-readonly input[type="text"].number {
+.charsheet .pf-wrapper.is-readonly input[type="number"].narrow-numbers-readonly,
+.charsheet .pf-wrapper.is-readonly .narrow-numbers-readonly input[type="number"],
+.charsheet .pf-wrapper.is-readonly .narrow-numbers-readonly .number,
+.charsheet .pf-wrapper.is-readonly .narrow-numbers-readonly input[type="text"].number {
     width: 2.5em;
 }
 
 /* reduce header text in readonly/compact mode */
-.charsheet .readonly-show:not(:checked) ~ .main .table-header,
-.charsheet .readonly-show:not(:checked) ~ .main .small-label2 span:not(.autoexpand),
-.charsheet .readonly-show:not(:checked) ~ .main .npc-statblock-row .small-label2 span:not(.autoexpand),
-.charsheet .readonly-show:not(:checked) ~ .main .table-cell.small-label span {
+.charsheet .pf-wrapper.is-readonly .table-header,
+.charsheet .pf-wrapper.is-readonly .small-label2 span:not(.autoexpand),
+.charsheet .pf-wrapper.is-readonly .npc-statblock-row .small-label2 span:not(.autoexpand),
+.charsheet .pf-wrapper.is-readonly .table-cell.small-label span {
     font-size: 1rem;
     padding: 0;
 }
@@ -1093,6 +1106,17 @@ pf-wrapper,
 .charsheet .small-label2 span:not(.autoexpand) {
     cursor: help;
     font-size: 1.125rem;
+    line-height: normal;
+    text-align: center;
+    text-wrap-style: pretty;
+}
+
+.charsheet .compendium-note.hide-readonly span:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 12em;
+    padding-right: 2px;
+    text-align: end;
 }
 
 .charsheet .monster-indicator label:has(.condition-exists.npc-show:not(:checked)),
@@ -1151,7 +1175,7 @@ pf-wrapper,
 }
 
 .charsheet .three-columns,
-.charsheet .readonly-show:not(:checked) ~ .main .h3-section .three-columns.h3-section.wide-readonly {
+.charsheet .pf-wrapper.is-readonly .h3-section .three-columns.h3-section.wide-readonly {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-column-gap: 1em;
@@ -1313,7 +1337,7 @@ also need 1 more level in selector or base css will override border */
     vertical-align: bottom;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section > .notes {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section > .notes {
     padding: .125em .125em .125em .25em;
 }
 
@@ -1436,9 +1460,11 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .section-config {
     background-color: #737373;
+    border-radius: 4px;
     margin-bottom: -11rem;
     margin-inline: auto;
     outline: 2px solid #e20c0c;
+    overflow: hidden;
     padding-bottom: 1rem;
     position: relative;
     top: -4em;
@@ -1641,7 +1667,8 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .pf-wrapper span.super::after,
-.charsheet .pf-wrapper .h2.super::after {
+.charsheet .pf-wrapper h2.super::after,
+.charsheet .pf-wrapper h3.super::after {
     font-weight: normal;
     font-family: 'Roboto Mono', monospace;
     font-size: 1rem;
@@ -1680,22 +1707,26 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .pf-wrapper span.note-a::after,
-.charsheet .pf-wrapper .h2.note-a::after {
+.charsheet .pf-wrapper h2.note-a::after,
+.charsheet .pf-wrapper h3.note-a::after {
     content: '(a)';
 }
 
 .charsheet .pf-wrapper span.note-b::after,
-.charsheet .pf-wrapper .h2.note-b::after {
+.charsheet .pf-wrapper h2.note-b::after,
+.charsheet .pf-wrapper h3.note-b::after {
     content: '(b)';
 }
 
 .charsheet .pf-wrapper span.note-c::after,
-.charsheet .pf-wrapper .h2.note-c::after {
+.charsheet .pf-wrapper h2.note-c::after,
+.charsheet .pf-wrapper h3.note-c::after {
     content: '(c)';
 }
 
 .charsheet .pf-wrapper span.note-d::after,
-.charsheet .pf-wrapper .h2.note-d::after {
+.charsheet .pf-wrapper h2.note-d::after,
+.charsheet .pf-wrapper h3.note-d::after {
     content: '(d)';
 }
 
@@ -1717,20 +1748,23 @@ also need 1 more level in selector or base css will override border */
 
 /******************************* API COMMAND BUTTONS *************************************/
 
-.charsheet button[type="roll"].command-button {
+.charsheet button[type="roll"].command-button,
+.charsheet button[type="action"].command-button {
     background-color: #fff;
-    color: #333;
-    padding: 0 0.4rem 0 0.4rem;
-    margin: 0.2rem;
-    font-weight: normal;
-    display: inline-block;
     border: 0.1rem solid #789;
     border-radius: 0.4rem;
+    color: #333;
+    display: inline-block;
     font-size: 1.4rem;
+    font-weight: normal;
+    margin: 0.2rem;
+    padding: 0 0.4rem 0 0.4rem;
 }
 
 .charsheet button[type="roll"].command-button:hover,
-.charsheet button[type="roll"].command-button:focus {
+.charsheet button[type="roll"].command-button:focus-visible,
+.charsheet button[type="action"].command-button:hover,
+.charsheet button[type="action"].command-button:focus-visible {
     color: #e20c0c;
     box-shadow: 0.1rem 0.1rem 0.2rem #333;
 }
@@ -1791,8 +1825,10 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet button[type="roll"].custom-button::before,
-.charsheet button[type="roll"].command-button::before {
+.charsheet button[type="roll"].command-button::before,
+.charsheet button[type="action"].command-button::before {
     content: "" !important;
+    display: block;
 }
 
 /************************************* BUFFS ******************************************/
@@ -2178,6 +2214,63 @@ also need 1 more level in selector or base css will override border */
     display: block !important;
 }
 
+.charsheet .abilities .tabinput ~ span.selected-tabtitle ~ .sla-only {
+    display: none;
+}
+
+.charsheet .abilities .tabinput ~ span.selected-tabtitle ~ .sla-only button {
+    opacity: .35;
+    pointer-events: none;
+}
+
+.charsheet .abilities .tabinput ~ span.selected-tabtitle ~ .sla-only input:checked + button {
+    opacity: 1;
+    pointer-events: initial;
+}
+
+.charsheet .abilities .tabinput.tab6:checked ~ .selected-tabtitle.tab6 ~ .sla-only,
+.charsheet .abilities .tabinput.tab10:checked ~ .selected-tabtitle.tab10 ~ .sla-only {
+    display: inline-flex;
+    left: initial;
+    margin: 2px;
+    margin-left: 5%;
+}
+
+.charsheet .abilities .tabinput ~ span.selected-tabtitle ~ .sla-only > span:first-child {
+    display: grid;
+    grid-template-columns: 2em 6.25em minmax(0, auto);
+    justify-items: stretch;
+    width: 100%;
+}
+
+.charsheet .abilities .tabinput ~ span.selected-tabtitle ~ .sla-only > span:last-child {
+    display: grid;
+    grid-template-columns: 2em 6.25em minmax(0, auto);
+    justify-items: stretch;
+    margin-left: 1em;
+    width: min-content;
+}
+
+.charsheet .sla-only .or-B-show:not(:checked) ~ .either-or-sect {
+    display: inline-grid;
+    visibility: collapse;
+}
+
+.charsheet .sla-only .or-A-show:checked ~ label.nor-sect,
+.charsheet .sla-only .or-B-show:checked ~ label.nor-sect {
+    display: inline-grid;
+    grid-template-columns: 0;
+    visibility: collapse;
+    width: auto;
+}
+
+.charsheet .sla-only .or-A-show:not(:checked) ~ .nor-sect,
+.charsheet .sla-only .or-B-show:not(:checked) ~ .nor-sect {
+    display: inline-grid;
+    grid-template-columns: minmax(0, min-content);
+    visibility: visible;
+}
+
 /* extra abilities tab: hide old .sections */
 .charsheet .tabs.custbordernav.abilitiesnav ~ .tabinput.tab0:not(:checked) ~ .tabinput.tab99:not(:checked) ~ .section0,
 .charsheet .tabs.custbordernav.abilitiesnav ~ .tabinput.tab1:not(:checked) ~ .tabinput.tab99:not(:checked) ~ .section1,
@@ -2376,8 +2469,8 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .showsect,
-.charsheet .h3.clickheader,
-.charsheet .h2.clickheader {
+.charsheet h3.clickheader,
+.charsheet h2.clickheader {
     display: inline-block;
     margin-left: -.2rem;
 }
@@ -2539,13 +2632,6 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .npc-statblock-row span.small-label2 span + input {
     display: inline-block;
-}
-
-.charsheet .npc-statblock-row .small-label2 span:not(.autoexpand) {
-    cursor: default;
-    font-size: 1.3rem;
-    font-style: normal;
-    margin: 0 2px 0 2px;
 }
 
 .charsheet .sect.expand .attack-damage,
@@ -2748,6 +2834,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 /* .charsheet .cssbutton.readonly-show:not(:checked) + span::before, */
 .charsheet .cssbutton.config-show:checked + span::before {
+    color: #fff;
     outline: 2px solid #e20c0c;
     outline-offset: -1px;
 }
@@ -2854,7 +2941,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     /*'⛨☤';*/
 }
 
-.charsheet .cssbutton-label {
+.ui-dialog .tab-content .charsheet .cssbutton-label {
     cursor: help;
     font-size: 1rem;
     font-style: italic;
@@ -2918,30 +3005,47 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     min-height: 3em;
 }
 
-.charsheet .sheetconfig .merge-buffs label:nth-child(2) {
+.charsheet .sheetconfig .table-row .table-cell label:has(.cssbutton) {
     background-color: #fff;
     border-radius: 4px;
+    max-height: 1.6em;
     outline: 1px solid #333;
     padding: 4px;
     width: fit-content;
+}
+
+.charsheet .sheetconfig .table-row .table-cell label:has(.cssbutton):hover {
+    box-shadow: 0.1rem 0.1rem 0.2rem #333;
+}
+
+.charsheet .sheetconfig .table-row .table-cell label.table-cell:has(.cssbutton):hover > span {
+    color: #e20c0c;
 }
 
 .charsheet .allrows-note span {
     vertical-align: middle;
 }
 
-.charsheet .allrows-note {
-    margin-inline: 1em;
-    opacity: 0;
+.ui-dialog .tab-content .charsheet .allrows-note {
+    background: #fff;
+    display: inline-block;
+    margin-left: 0.5em;
     outline: 2px solid #e20c0c;
-    padding: 2px;
+    padding: 5px;
     pointer-events: none;
+    position: absolute;
+    z-index: 5;
 }
 
 .charsheet .deletesect-show:checked ~ .allrows-note,
 .charsheet .sheetconfig label:has(.deletesect-show:checked) + .allrows-note {
     opacity: 1;
     pointer-events: all;
+}
+
+.charsheet .deletesect-show:checked ~ .allrows-note:hover,
+.charsheet .sheetconfig label:has(.deletesect-show:checked) + .allrows-note:hover {
+    cursor: pointer;
 }
 
 .charsheet .small-label2 .createattackbutton + span::before {
@@ -3020,6 +3124,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     display: inline-block;
     position: relative;
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .charsheet .repeating-rollbutton {
@@ -3207,10 +3312,14 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 .charsheet .compendium-note {
     align-items: center;
-    display: flex;
+    display: inline-flex;
     float: right;
-    max-height: 2rem;
-    position: relative;
+    max-height: 2.5rem;
+    padding-top: 2px;
+}
+
+.charsheet .repitem .compendium-drop-target.active-drop-target {
+    border-color: #0078d4 !important;
 }
 
 .charsheet .vertical-middle {
@@ -3221,13 +3330,6 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     font-weight: bold;
     font-size: 2.4rem;
     vertical-align: sub;
-}
-
-.charsheet .compendium-icon {
-    font-weight: bold;
-    font-family: Pictos;
-    font-size: 1.8rem;
-    vertical-align: middle;
 }
 
 .charsheet .repcontainer .repitem,
@@ -3303,6 +3405,29 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     color: #000;
 }
 
+.charsheet .repeating-fields .repeating-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 5px;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.charsheet .repeating-fields .repcontrol:has(.repcontrol_add:hover) ~ .add-tooltip {
+    display: block;
+    left: 5.5em;
+}
+
+.charsheet .repeating-fields .repcontrol:not(.editmode):has(.repcontrol_edit:hover) ~ .edit-tooltip {
+    display: block;
+    right: 5.5em;
+}
+
+.charsheet .repeating-fields .repcontrol.editmode:has(.repcontrol_edit:hover) ~ .done-tooltip {
+    display: block;
+    right: 5.5em;
+}
+
 .charsheet .repcontrol .repcontrol_edit:after {
     font-weight: bold;
     content: '☰';
@@ -3339,7 +3464,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     box-shadow: none;
 }
 
-.charsheet .repcontrol .btn:focus {
+.charsheet .repcontrol .btn:focus-visible {
     outline: 0;
 }
 
@@ -3414,8 +3539,8 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     white-space: normal;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .options-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .options-readonly .table-cell {
+.charsheet .pf-wrapper.is-readonly .options-readonly,
+.charsheet .pf-wrapper.is-readonly .options-readonly .table-cell {
     background-color: WhiteSmoke;
 }
 
@@ -3482,6 +3607,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 /* use an outline for invalid input/calculation or to bring attention to the field */
 .charsheet .warn-show:checked + textarea.highlight,
 .charsheet .warn-show:checked + input.highlight,
+.charsheet .section-status .warn-show:checked ~ label input.highlight,
 .charsheet .warn-mshow:checked ~ input.highlight,
 .charsheet .warn-mshow:checked ~ textarea.highlight,
 .charsheet .warn-show:checked + .highlight input,
@@ -3511,9 +3637,9 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 }
 
 .charsheet .table-group {
+    border-collapse: collapse;
     display: table-row-group;
     overflow: hidden;
-    border-collapse: collapse;
 }
 
 .charsheet .table-group-head {
@@ -3574,7 +3700,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     margin: auto;
     place-items: center;
     position: relative;
-    vertical-align: top;
+    vertical-align: text-top;
 }
 
 .charsheet .core-details .small-label2 {
@@ -3631,18 +3757,17 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 .ui-dialog .charsheet .pf-wrapper input.selectable,
 .ui-dialog .charsheet .pf-wrapper input.selectable.calc {
-    background-color: #fbf5d0;
+    background-color: #fffded;
     border: 1px solid lightgrey;
     border-radius: 4px;
     box-sizing: content-box;
     color: #5f5207;
     display: inline-block;
-    height: 1.5rem;
-    margin: 0;
-    padding: .125rem;
+    max-height: 1.5rem;
+    max-width: 11em;
+    padding: 2px;
     text-align: center;
     white-space: nowrap;
-    width: auto;
 }
 
 .charsheet .repeating-id {
@@ -3655,12 +3780,12 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 .charsheet .repeating-id .small-label2 span.selectable,
 .charsheet .repeating-id .small-label2 span,
 .charsheet .repeating-id .small-label2 {
-    font-weight: normal;
-    font-style: normal;
     color: initial;
-    white-space: nowrap;
-    height: auto;
     display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    vertical-align: baseline;
+    white-space: nowrap;
 }
 
 .charsheet .small-label2 > input:not(.cssbutton),
@@ -3675,6 +3800,45 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     top: 0;
 }
 
+.ui-dialog .tab-content .charsheet input.selectable.calc:focus-visible,
+.ui-dialog .tab-content .charsheet .skill-macro-text.calc:focus-visible {
+    color: #222222;
+    outline: 1px auto #101010;
+}
+
+.ui-dialog .tab-content .charsheet input[type="text"]:not(.calc):focus-visible,
+.ui-dialog .tab-content .charsheet input[type="number"]:not(.calc):focus-visible,
+.ui-dialog .tab-content .charsheet select:focus-visible,
+.ui-dialog .tab-content .charsheet .inline-textarea:focus-visible,
+.ui-dialog .tab-content .charsheet textarea.macro-text:focus-visible,
+.ui-dialog .tab-content .charsheet textarea.macro-text-inline:focus-visible {
+    background-color: #fffded;
+    color: #222222;
+    outline: 1px auto #101010;
+}
+
+.charsheet input[type="text"]:not(.calc):hover,
+.charsheet input[type="number"]:not(.calc):hover,
+.charsheet select:hover,
+.charsheet .inline-textarea:hover,
+.charsheet textarea.macro-text:hover,
+.charsheet textarea.macro-text-inline:hover,
+.charsheet input.selectable.calc:hover,
+.charsheet .skill-macro-text.calc:hover {
+    outline: 1px auto #10101080;
+}
+
+.charsheet input[type="checkbox"]:not(.calc):hover,
+.charsheet input[type="radio"]:not(.calc):hover {
+    outline: 1px auto #10101080;
+    outline-offset: 2px;
+}
+
+.charsheet input[type="checkbox"]:not(.calc):focus-visible,
+.charsheet input[type="radio"]:not(.calc):focus-visible {
+    outline: 1px auto #101010;
+    outline-offset: 2px;
+}
 
 /* added for ability level basis inline formulas */
 .charsheet .small-label2 > input.error-mshow {
@@ -3685,14 +3849,18 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     padding: 0;
 }
 
-/* webkit (chrome) needs different css firefox centers perfectly, not chrome.must make it equal to 1.825 */
 .charsheet .small-label2 > input[type="checkbox"]:not(.cssbutton),
 .charsheet .small-label2 > input[type="radio"]:not(.cssbutton) {
     margin: auto;
-    width: 3rem;
-    height: 1.5rem;
+    max-width: 3rem;
+    max-height: 1.5rem;
     border: none;
     box-shadow: none;
+}
+
+.charsheet .hit-points input:not(.calc),
+.charsheet .hit-points-calcs2 input:not(.calc) {
+    background-color: #fff;
 }
 
 .charsheet .hit-points,
@@ -3701,7 +3869,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     color: initial;
     display: inline-block;
     margin-right: .125em;
-    min-height: 4em;
+    min-height: 11.66em;
     min-width: 15em;
     width: calc(30% - 4px);
 }
@@ -3719,19 +3887,14 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     position: relative;
 }
 
-.charsheet .wound-threshold,
-.charsheet .h2-section.wound-threshold {
+.charsheet .wound-threshold {
+    background-color: WhiteSmoke;
     display: inline-block;
     height: auto;
     margin-right: .125em;
-    background-color: WhiteSmoke;
     min-height: 11.8em;
     min-width: 11.5em;
     width: auto;
-}
-
-.charsheet .readonly-show:checked ~ .main .section-core .wounds-show:checked ~ .wound-threshold {
-    width: 20%;
 }
 
 .charsheet .hit-point-calcs {
@@ -3746,15 +3909,12 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     max-width: calc(49% - 4px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .h2-section.initiative {
+.charsheet .pf-wrapper.is-readonly .initiative {
+    display: inline-block;
     min-width: 9em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .initiative {
-    display: inline-block;
-}
-
-.charsheet .readonly-show:not(:checked) ~ .main .speeds {
+.charsheet .pf-wrapper.is-readonly .speeds {
     display: inline-block;
     min-width: 26em;
 }
@@ -3766,26 +3926,19 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     padding-right: .5em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .h2-section.armor-shield {
-    width: calc(100% - 4px);
-    display: inline-block;
-    margin-top: 0;
-}
-
-.charsheet .h2-section.armor-shield {
+.charsheet .armor-shield {
     width: calc(70% - 4px);
-    display: inline-block;
-    margin-top: 0;
-}
-
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .h2-section.armor-penalties {
-    width: calc(100% - 4px);
     display: inline-block;
 }
 
 .charsheet .h2-section.armor-penalties {
-    width: calc(30% - 4px);
     display: inline-block;
+    width: calc(30% - 4px);
+}
+
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .armor-shield,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .armor-penalties {
+    width: calc(100% - 4px);
 }
 
 .charsheet input[value="2"].max-dex-indicator:checked ~ div .max-dex-indicator::before,
@@ -3823,23 +3976,23 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     z-index: 4;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.ability-buttons {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .ability-buttons {
     width: calc(50% - 6px);
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.section-mythic {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .section-mythic {
     width: calc(100% - 4px);
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section .col .h2-section.ability-buttons,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section .col .h2-section.section-mythic {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section .col .ability-buttons,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section .col .section-mythic {
     width: calc(50% - 6px);
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section .col .h2-section.section-mythic {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section .col .section-mythic {
     width: calc(100% - 4px);
     float: left;
 }
@@ -3852,8 +4005,8 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: auto;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.feats,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section .col .h2-section.feats {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .feats,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section .col .feats {
     width: calc(100% - 4px);
     display: inline-table;
 }
@@ -3869,7 +4022,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     vertical-align: top;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section:not(.section-npc) > .h2-section:not(.wide-readonly).notes {
+.charsheet .pf-wrapper.is-readonly .section:not(.section-npc) > .h2-section:not(.wide-readonly).notes {
     width: calc(100% - 4px);
 }
 
@@ -4060,8 +4213,13 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 }
 
 .charsheet .nontable-repeating .divider-db-lg {
-    vertical-align: middle;
     line-height: 1em;
+    margin-inline: auto;
+    vertical-align: middle;
+}
+
+.charsheet .nontable-repeating *:has(.super) + .divider-db-lg {
+    margin-left: 1.2rem;
 }
 
 .charsheet .entry-vlong {
@@ -4143,7 +4301,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 40%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-60p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-60p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-60p,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-60p-shrink {
     width: 80%;
@@ -4159,7 +4317,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 20%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-30p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-30p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-30p,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-30p-shrink {
     width: 40%;
@@ -4182,7 +4340,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 .charsheet .entry-20p,
 .charsheet .entry-20p-shrink,
-.charsheet .readonly-show:not(:checked) ~ .main .entry-20p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-20p-shrink,
 .charsheet .minimize-show:checked ~ .repeating-fields .entry-20p-shrink,
 .charsheet .counted:not(:checked) ~ .entry-20p-shrink {
     width: calc(23% - 6rem);
@@ -4204,7 +4362,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 10%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-15p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-15p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-15p,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-15p-shrink {
     width: auto;
@@ -4220,7 +4378,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 9%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-12p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-12p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-12p-shrink {
     width: auto;
 }
@@ -4234,7 +4392,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 8%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-10p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-10p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-10p-shrink {
     width: 12%;
 }
@@ -4249,7 +4407,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 6%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-8p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-8p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-8p-shrink {
     width: 10%;
 }
@@ -4264,7 +4422,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 4%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-5p-shrink,
+.charsheet .pf-wrapper.is-readonly .entry-5p-shrink,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-5p,
 .charsheet .split-column-show:checked ~ .repeating-fields .entry-5p-shrink {
     width: 8%;
@@ -4274,7 +4432,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
     width: 35%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .entry-rowname {
+.charsheet .pf-wrapper.is-readonly .entry-rowname {
     width: 65%;
 }
 
@@ -4419,7 +4577,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 .charsheet .monster-indicator {
     font-size: 1.2rem;
-    margin: 0 .5rem auto auto;
+    margin: 2px .5rem auto auto;
 }
 
 .charsheet .section-header {
@@ -4451,6 +4609,8 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 
 .charsheet .announcements .footer {
     margin: 0.5rem;
+    max-height: 480px;
+    overflow-y: auto;
     padding: 0.5rem;
     text-align: left;
 }
@@ -4624,6 +4784,7 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 .charsheet .subsect-show:not(:checked) ~ div .sect,
 .charsheet .subsect2-show:not(:checked) ~ div .sect2,
 .charsheet .subsect3-show:not(:checked) ~ div .sect3,
+.charsheet label:has(.sect2-show:not(:checked)) ~ .sect2,
 
 .charsheet .repeating-fields .nontable-repeating .toggle-casting-type:checked ~ .spontaneous,
 .charsheet .repeating-fields .nontable-repeating .toggle-casting-type:checked ~ label .spontaneous,
@@ -4631,10 +4792,11 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 .charsheet .repeating-fields .nontable-repeating .toggle-casting-type:not(:checked) ~ label .prepared,
 
 .charsheet .deletesect-show:not(:checked) + span + .deletesect,
-.charsheet .extra-show:not(:checked) ~ .extra-sect,
-.charsheet .extra-show:not(:checked) ~ div .extra-sect,
-.charsheet .extra-show:checked ~ .extra-sect-inverse,
-.charsheet .extra-show:checked ~ div .extra-sect-inverse,
+/* .charsheet .deletesect-show:not(:checked) + .deletesect, */
+.charsheet label:has(.extra-show:not(:checked)) ~ .extra-sect,
+.charsheet label:has(.extra-show:not(:checked)) ~ div .extra-sect,
+.charsheet label:has(.extra-show:checked) ~ .extra-sect-inverse,
+.charsheet label:has(.extra-show:checked) ~ div .extra-sect-inverse,
 /* buttons */
 .charsheet .progress-show:not(:checked) ~ .progress-icon,
 .charsheet label:has(.progress-show:not(:checked)) ~ .progress-icon,
@@ -4730,8 +4892,8 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 /* bg background tab turn off adventure skills */
 .charsheet .unchained-show:checked ~ .bg-show:checked ~ .tab2:checked ~ .skills .adventure:not(.bg),
 /* hide show more option*/
-.charsheet .readonly-show:not(:checked) ~ .main .selectedlabel-check:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .selectedlabel-check + b:not(.show-readonly) {
+.charsheet .pf-wrapper.is-readonly .main .selectedlabel-check:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .selectedlabel-check + b:not(.show-readonly) {
     display: none;
 }
 
@@ -4740,14 +4902,11 @@ span[data-i18n-title="display-settings-config"]:has(input.cssbutton:not(:checked
 }
 
 /* inventory subsections */
-.charsheet .equipment-onetime-show:not(:checked) ~ .repeating-fields .nontable-repeating .items-toggle {
+.charsheet label:has(.equipment-onetime-show:not(:checked)) ~ .repeating-fields .nontable-repeating .items-toggle {
     display: none;
 }
 
-/*
-equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinputtab10:not(:checked) ~ tabinputtab11:not(:checked) ~ equipment-onetime-show:not(:checked) ~ .repeating-fields .nontable-repeating items-toggle-except-on-all
-*/
-.charsheet .equipmentnav ~ .tab99:not(:checked) ~ .tab9:not(:checked) ~ .tab10:not(:checked) ~ .tab11:not(:checked) ~ .equipment-onetime-show:not(:checked) ~ .repeating-fields .nontable-repeating .items-toggle-except-on-all {
+.charsheet .equipmentnav ~ .tab99:not(:checked) ~ .tab9:not(:checked) ~ .tab10:not(:checked) ~ .tab11:not(:checked) ~ label:has(.equipment-onetime-show:not(:checked)) ~ .repeating-fields .nontable-repeating .items-toggle-except-on-all {
     display: none;
 }
 
@@ -5262,6 +5421,11 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .sheet-rolltemplate-pf_attack .sheet-crit-dmg-x {
     padding-left: 1em !important;
     line-height: 1.3em;
+}
+
+.sheet-rolltemplate-pf_attack .sheet-dmg + .sheet-roll-cell:has(.inlinerollresult),
+.sheet-rolltemplate-pf_attack .sheet-dmg-x + .sheet-roll-cell:has(.inlinerollresult) {
+    margin-bottom: 2px;
 }
 
 .sheet-rolltemplate-pf_attack .sheet-roll-groupi .sheet-roll-row .sheet-roll-cell.sheet-dmg,
@@ -5922,7 +6086,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .sheet-rolltemplate-pf_attack .sheet-roll-cell.sheet-atk:first-child .inlinerollresult,
 .sheet-rolltemplate-pf_attack > div.sheet-roll-accessible > label.sheet-atk span.sheet-atk:first-child > .inlinerollresult,
 .sheet-rolltemplate-pf_spell > div.sheet-roll-accessible > label > span.inlinerollresult {
-    color: black;
+    color: inherit;
     background-color: transparent;
     border: none;
     font-size: 1.2rem;
@@ -6043,26 +6207,26 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     padding-right: .5em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section:not(.section-npc) > .h2-section:not(.wide-readonly).extra-damage-section {
+.charsheet .pf-wrapper.is-readonly .section:not(.section-npc) > .h2-section:not(.wide-readonly).extra-damage-section {
     width: 100%;
 }
 
 /* 3way */
 /* readonly / edit mode button is reverse unchecked looks like checked */
 /* button */
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skill-options .config-table.options {
+.charsheet .pf-wrapper.is-readonly .skill-options .config-table.options {
     border: none;
 }
 
 /* draw border have to put + here just to override specificity of arrow toggles above. don't want to use important here or all display below will have to use important. */
-.charsheet .readonly-show:not(:checked) ~ .main .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section + .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section + .h2-section + .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h3-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section + .h3-section,
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section + .h3-section + .h3-section {
+.charsheet .pf-wrapper.is-readonly .main .h2-section,
+.charsheet .pf-wrapper.is-readonly .main .h2arrow:not(:checked) ~ .h2-section,
+.charsheet .pf-wrapper.is-readonly .main .h2arrow:not(:checked) ~ .h2-section + .h2-section,
+.charsheet .pf-wrapper.is-readonly .main .h2arrow:not(:checked) ~ .h2-section + .h2-section + .h2-section,
+.charsheet .pf-wrapper.is-readonly .main .h3-section,
+.charsheet .pf-wrapper.is-readonly .main .h3arrow:not(:checked) ~ .h3-section,
+.charsheet .pf-wrapper.is-readonly .main .h3arrow:not(:checked) ~ .h3-section + .h3-section,
+.charsheet .pf-wrapper.is-readonly .main .h3arrow:not(:checked) ~ .h3-section + .h3-section + .h3-section {
     max-width: calc(100% - .25em);
     display: block;
     margin: .125em;
@@ -6072,7 +6236,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     overflow: hidden;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section > .h2-section .h3-section:not(.wide-readonly).section-oldslas {
+.charsheet .pf-wrapper.is-readonly .main .section > .h2-section .h3-section:not(.wide-readonly).section-oldslas {
     width: calc(100% - .25em);
     display: block;
     margin: .125em;
@@ -6081,58 +6245,52 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     height: auto;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .h2-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section:not(.noborder-readonly) + .h2-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h2arrow:not(:checked) ~ .h2-section:not(.noborder-readonly) + .h2-section:not(.noborder-readonly) + .h2-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h3-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section:not(.noborder-readonly) + .h3-section:not(.noborder-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .h3arrow:not(:checked) ~ .h3-section:not(.noborder-readonly) + .h3-section:not(.noborder-readonly) + .h3-section:not(.noborder-readonly) {
+.charsheet .pf-wrapper.is-readonly .main .h2-section:not(.noborder-readonly),
+.charsheet .pf-wrapper.is-readonly .main .h3-section:not(.noborder-readonly) {
     border: 0.1rem solid black;
     border-radius: 0.5rem;
 }
 
 /* default turn off .sections */
 
-.charsheet .readonly-show:not(:checked) ~ .main .notes {
+.charsheet .pf-wrapper.is-readonly .notes {
     min-height: 1.5em !important;
     height: auto;
 }
 
 /* readonly/compact mode toggles */
-.charsheet .readonly-show:checked ~ .main .show-readonly.inverse-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .hide-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .cheat:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .showarrow.h2arrow:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .showarrow.h3arrow:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .clickheader.showsect:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .table-name:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .nontable-name:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .secondary-table-name:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .divider:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .divider-lg:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .desc:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .desc-show:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .desc-showlabel:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .macro-text-show:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .macro-text-showlabel:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .id-show:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .id-showlabel:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .macro-text:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .repeating-id:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .armor-attributes:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .armor-attributes-showlabel:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .weapon-attributes:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .repeating-fields .weapon-attributes-showlabel:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .hide-readonly ~ .npc-header.showsect::before,
-.charsheet .readonly-show:not(:checked) ~ .main .hide-readonly ~ .npc-header.showsect::after {
+.charsheet .pf-wrapper.is-editmode .main .show-readonly.inverse-readonly,
+.charsheet .pf-wrapper.is-readonly .main .hide-readonly,
+.charsheet .pf-wrapper.is-readonly .main .cheat:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .showarrow.h2arrow:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .showarrow.h3arrow:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .clickheader.showsect:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .table-name:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .nontable-name:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .secondary-table-name:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .divider:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .divider-lg:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .desc:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .desc-show:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .desc-showlabel:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .macro-text-show:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .macro-text-showlabel:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .id-show:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .id-showlabel:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .macro-text:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .repeating-id:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .armor-attributes:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .armor-attributes-showlabel:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .weapon-attributes:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .repeating-fields .weapon-attributes-showlabel:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .main .hide-readonly ~ .npc-header.showsect::before,
+.charsheet .pf-wrapper.is-readonly .main .hide-readonly ~ .npc-header.showsect::after {
     display: none !important;
 }
 
 .charsheet .hide-unused-section-readonly:checked + .showarrow.h2arrow + .showsect + .h2-section,
 .charsheet .hide-unused-section-readonly:checked + .showarrow.h3arrow + .showsect + .h3-section,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section h1 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section h1 {
     display: none;
 }
 
@@ -6174,113 +6332,113 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     top: 7.25em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1 + span {
     top: 4.5em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2 + span {
     top: 6.75em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2 + span {
     top: 9em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3 + span {
     top: 9em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:checked ~ .expand3,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:checked ~ .expand3 + span,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:not(:checked) ~ .expand3,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:not(:checked) ~ .expand3 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2:checked ~ .expand3,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:not(:checked) ~ .expand2:checked ~ .expand3 + span,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2:not(:checked) ~ .expand3,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2:not(:checked) ~ .expand3 + span {
     top: 11.25em;
 }
 
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:checked ~ .expand3,
-.charsheet .readonly-show:checked ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:checked ~ .expand3 + span {
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2:checked ~ .expand3,
+.charsheet .pf-wrapper.is-editmode .attack-grid .expand1:checked ~ .expand2:checked ~ .expand3 + span {
     top: 13.5em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1 + span {
     top: 1.25em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2 + span {
     top: 3.5em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2 + span {
     top: 5.75em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2:not(:checked) ~ .expand3 + span {
     top: 5.75em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:checked ~ .expand3,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:not(:checked) ~ .expand2:checked ~ .expand3 + span,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:not(:checked) ~ .expand3,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:not(:checked) ~ .expand3 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2:checked ~ .expand3,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:not(:checked) ~ .expand2:checked ~ .expand3 + span,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2:not(:checked) ~ .expand3,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2:not(:checked) ~ .expand3 + span {
     top: 8em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:checked ~ .expand3,
-.charsheet .readonly-show:not(:checked) ~ .main .attack-grid.hasexpandrows .expand1:checked ~ .expand2:checked ~ .expand3 + span {
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2:checked ~ .expand3,
+.charsheet .pf-wrapper.is-readonly .attack-grid .expand1:checked ~ .expand2:checked ~ .expand3 + span {
     top: 10.25em;
 }
 
 /* repeating .sections take up half on "all" view
 also if multiple repeating sects inside h2 they are 100% wide and only h2 is narrow.
 */
-.charsheet .readonly-show:not(:checked) ~ .main .section .half-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .section .tab99:checked ~ .section > .col,
-.charsheet .readonly-show:not(:checked) ~ .main .section:not(.section-npc) > .h2-section:not(.wide-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .section > .h2-section .h3-section:not(.wide-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section:not(.section-npc) > .h2-section.repeating-sect:not(.wide-readonly) {
+.charsheet .pf-wrapper.is-readonly .section .half-readonly,
+.charsheet .pf-wrapper.is-readonly .section .tab99:checked ~ .section > .col,
+.charsheet .pf-wrapper.is-readonly .section:not(.section-npc) > .h2-section:not(.wide-readonly),
+.charsheet .pf-wrapper.is-readonly .section > .h2-section .h3-section:not(.wide-readonly),
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section:not(.section-npc) > .h2-section.repeating-sect:not(.wide-readonly) {
     margin: 0.2rem;
     width: calc(50% - 6px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-npc > .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-npc > .h2-section .repeating-sect,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section > .h2-section.wide-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section > .h2-section.repeating-sect,
-.charsheet .readonly-show:not(:checked) ~ .main .section .col .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section > .h2-section.wide-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .h3-section.wide-readonly {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-npc > .h2-section,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-npc > .h2-section .repeating-sect,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section > .h2-section.wide-readonly,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section > .h2-section.repeating-sect,
+.charsheet .pf-wrapper.is-readonly .section .col .h2-section,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .h2-section,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section > .h2-section.wide-readonly,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .h3-section.wide-readonly {
     margin: 0.2rem;
     width: calc(100% - 4px);
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .col {
+.charsheet .pf-wrapper.is-readonly .col {
     display: block;
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .col.equipment {
+.charsheet .pf-wrapper.is-readonly .col.equipment {
     display: flex;
     float: none;
     width: 100% !important;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .flex-row {
+.charsheet .pf-wrapper.is-readonly .flex-row {
     display: flex !important;
     flex-flow: row nowrap;
     align-items: stretch !important;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .flex-col {
+.charsheet .pf-wrapper.is-readonly .flex-col {
     display: flex !important;
     flex-flow: column nowrap;
     align-items: stretch !important;
@@ -6294,33 +6452,33 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     margin: 0.4rem 0.2rem 0.2rem 0.2rem;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section .col .h2-section.ability-scores,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.ability-scores {
+.charsheet .pf-wrapper.is-readonly .section .col .h2-section.ability-scores,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .h2-section.ability-scores {
     margin: 0.2rem;
     width: calc(50% - 6px);
     float: left;
     min-height: 16.7em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section .col .h2-section.half-readonly,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.half-readonly {
+.charsheet .pf-wrapper.is-readonly .section .col .h2-section.half-readonly,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .h2-section.half-readonly {
     margin: 0.2rem;
     width: calc(50% - 6px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section .col .h2-section.class-grid,
-.charsheet .readonly-show:not(:checked) ~ .main .section .col .h2-section.experience,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.class-grid,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .col .h2-section.experience {
+.charsheet .pf-wrapper.is-readonly .section .col .h2-section.class-grid,
+.charsheet .pf-wrapper.is-readonly .section .col .h2-section.experience,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .h2-section.class-grid,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .col .h2-section.experience {
     margin: 0.2rem;
     width: calc(50% - 6px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .h2-section.ability-scores {
+.charsheet .pf-wrapper.is-readonly .h2-section.ability-scores {
     min-width: 15em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .h2-section.class-grid {
+.charsheet .pf-wrapper.is-readonly .h2-section.class-grid {
     min-width: 15em;
 }
 
@@ -6328,42 +6486,43 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     height: 4.2em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .creature-race-header {
+.charsheet .pf-wrapper.is-readonly .section-core .class-grid .creature-race-header {
     height: 1.25em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .h2-section.experience {
+.charsheet .pf-wrapper.is-readonly .section-core .h2-section.experience {
     min-width: 19em;
     margin: 0.2rem;
     display: inline-block;
     min-height: 6.45em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .h2-section.speeds {
+.charsheet .pf-wrapper.is-readonly .section-core .h2-section.speeds {
     min-width: 25em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-core .row.row2 {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-core .row.row2 {
     width: 100%;
     display: block;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-core .row.row2 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-core .row.row2 {
     width: 70%;
     display: block;
     float: left;
     margin-right: .125em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main ~ .section-core .h2-section.hit-points,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-core .h2-section.hit-points {
+.charsheet .pf-wrapper.is-readonly ~ .section-core .h2-section.hit-points,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-core .h2-section.hit-points {
     max-width: calc(50% - 6px);
     width: auto;
     flex-grow: 2;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .wounds-show:not(:checked) ~ .h2-section.hit-points {
+.charsheet .pf-wrapper.is-readonly .section-core .wounds-show:not(:checked) ~ .h2-section.hit-points {
     margin: 0.2rem;
+    min-height: auto;
 }
 
 .charsheet .wound-threshold .table-row {
@@ -6378,14 +6537,9 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     display: inline-flex;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-core .h2-section.wound-threshold {
-    width: auto;
-    flex-grow: 1;
-}
-
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .h2-section.initiative,
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .wounds-show:checked ~ .h2-section.initiative,
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .wounds-show:not(:checked) ~ .h2-section.initiative {
+.charsheet .pf-wrapper.is-readonly .section-core .h2-section.initiative,
+.charsheet .pf-wrapper.is-readonly .section-core .wounds-show:checked ~ .h2-section.initiative,
+.charsheet .pf-wrapper.is-readonly .section-core .wounds-show:not(:checked) ~ .h2-section.initiative {
     max-width: calc(50% - 6px);
     margin: 0.2rem;
     width: auto;
@@ -6394,7 +6548,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 }
 
 /*added this because the contents were pushing out of the parent element in non-edit view */
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .initiative .table span.table-cell {
+.charsheet .pf-wrapper.is-readonly .section-core .initiative .table span.table-cell {
     display: inline-block;
     vertical-align: bottom;
     padding: 0.4rem;
@@ -6405,7 +6559,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     min-width: 30em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .h2-section.speeds {
+.charsheet .pf-wrapper.is-readonly .section-core .h2-section.speeds {
     margin: 0.2rem;
     width: calc(100% - 4px);
     display: block;
@@ -6415,15 +6569,15 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: auto;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .speeds .narrow-numbers-readonly input[type="number"] {
+.charsheet .pf-wrapper.is-readonly .speeds .narrow-numbers-readonly input[type="number"] {
     width: auto;
 }
 
 /* defense page */
 
-.charsheet .readonly-show:not(:checked) ~ .main .section > .h2-section.saves,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .h2-section.saves,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-defenses .h2-section.saves {
+.charsheet .pf-wrapper.is-readonly .section > .h2-section.saves,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .h2-section.saves,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-defenses .h2-section.saves {
     min-width: 18em;
     display: block;
     margin: 0.2rem 0.2rem 0 0;
@@ -6432,61 +6586,66 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     min-height: 14em;
 }
 
-.charsheet .readonly-show:checked ~ .main .saves-notes-table .table-cell:first-child {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-defenses .h2arrow:not(:checked) ~ .h2-section.special-defenses {
+    min-height: 6.125em;
+    clear: both;
+}
+
+.charsheet .pf-wrapper.is-editmode .saves-notes-table .table-cell:first-child {
     width: 25%;
     text-align: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .saves-notes-table .table-cell {
+.charsheet .pf-wrapper.is-readonly .saves-notes-table .table-cell {
     display: block;
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section .saves-notes-table .table-cell textarea {
+.charsheet .pf-wrapper.is-readonly .section .saves-notes-table .table-cell textarea {
     min-height: 4em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .h2-section.defense-grid {
+.charsheet .pf-wrapper.is-readonly .section-defenses .h2-section.defense-grid {
     min-width: 30em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .h2-section.defense-grid {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .h2-section.defense-grid {
     width: 69%;
     min-height: 14em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-defenses .h2-section.defense-grid {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-defenses .h2-section.defense-grid {
     margin: 0.2rem;
     width: calc(50% - 6px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .h2-section.attack-grid {
+.charsheet .pf-wrapper.is-readonly .section-attacks .h2-section.attack-grid {
     min-width: 24em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .linked-tablecell-short {
+.charsheet .pf-wrapper.is-readonly .section-attacks .attack-grid .linked-tablecell-short {
     width: 4em;
     max-width: 4em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .linked-tablecell-short select.linked-cellfield {
+.charsheet .pf-wrapper.is-readonly .section-attacks .attack-grid .linked-tablecell-short select.linked-cellfield {
     width: 100%;
     max-width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section > .h2-section.spellcasting-classes.wide-readonly {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section > .h2-section.spellcasting-classes.wide-readonly {
     margin: 0.2rem 0 0.2rem 0.4rem;
     width: 100%;
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section .h3-section.domains.wide-readonly {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section .h3-section.domains.wide-readonly {
     padding-bottom: 0.5em;
     margin: 0;
     min-width: calc(100% - 1px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .h2-section.advanced-macros {
+.charsheet .pf-wrapper.is-readonly .section-attacks .h2-section.advanced-macros {
     border: none;
 }
 
@@ -6496,23 +6655,23 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .col.col1 .table {
+.charsheet .pf-wrapper.is-readonly .section-equipment .col.col1 .table {
     margin-right: 0;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-equipment .h2-section.current-loads {
+.charsheet .pf-wrapper.is-editmode .current-loads {
     flex-flow: row nowrap;
     justify-content: space-between;
 }
 
 /* block not .table because of wrap */
-.charsheet .readonly-show:checked ~ .main .section-equipment .h2-section.current-loads .table,
-.charsheet .readonly-show:checked ~ .main .section-equipment .h2-section.loads-and-lift .table,
-.charsheet .readonly-show:checked ~ .main .section-equipment .h2-section.currency .table {
+.charsheet .pf-wrapper.is-editmode .current-loads .table,
+.charsheet .pf-wrapper.is-editmode .loads-and-lift .table,
+.charsheet .pf-wrapper.is-editmode .currency .table {
     display: inline-block;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-equipment .h2-section.current-loads .load .table-cell {
+.charsheet .pf-wrapper.is-editmode .current-loads .load .table-cell {
     line-height: 3em;
 }
 
@@ -6534,111 +6693,106 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: 33.3%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .h2-section.other-items {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .h2-section.other-items {
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .h2-section.other-items {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .h2-section.other-items {
     width: 100%;
 }
 
 /* inventory page switch from rows to columns */
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .h2-section.currency,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .h2-section.current-loads,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .h2-section.loads-and-lift {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .h2-section.currency,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .h2-section.current-loads,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .h2-section.loads-and-lift {
     display: flex;
     flex-flow: column;
 }
 
 /* inventory page only */
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .col.col1 .h2-section.currency,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .col.col1 .h2-section.current-loads {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .col.col1 .h2-section.currency,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .col.col1 .h2-section.current-loads {
     width: calc(50% - 6px);
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .loads-and-lift {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .loads-and-lift {
     width: calc(50% - 6px);
     float: right;
 }
 
 /* inventory all page  */
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col1 .h2-section.currency,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col1 .h2-section.current-loads,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col1 .h2-section.loads-and-lift {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col1 .h2-section.currency,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col1 .h2-section.current-loads,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col1 .h2-section.loads-and-lift {
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .worn-items {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .worn-items {
     flex-flow: column;
     align-items: stretch;
 }
 
-.charsheet .worn-items .table {
-    display: inline-block;
-    width: 49%;
-    flex-basis: 50%;
-}
-
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-equipment .col.col2 {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-equipment .col.col2 {
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col1 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col1 {
     margin: 0.2rem 0.2rem 0.2rem -0.2rem;
     width: 40%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col2 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col2 {
     margin: 0.2rem 0 0.2rem 0;
     width: calc(60% - 8px);
     float: right;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col2 .worn-items .table {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col2 .worn-items .table {
     width: 100%;
     display: table;
     flex-basis: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col2.worn-items {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col2.worn-items {
     display: block;
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .col.col2.worn-items .table {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-equipment .col.col2.worn-items .table {
     display: inline-block;
+    vertical-align: top;
     width: calc(50% - 2px);
 }
 
-.charsheet .h2-section.core-details,
-.charsheet .h2-section.worn-items,
-.charsheet .h2-section.extra-damage-section,
-.charsheet .h2-section.dual-wield-sect {
+.charsheet .core-details,
+.charsheet .worn-items,
+.charsheet .extra-damage-section,
+.charsheet .dual-wield-sect {
     min-height: 2em;
     resize: vertical;
 }
 
-/* in case flex not supported: */
-.charsheet .h2-section.worn-items .table:first-child {
-    margin-right: .125em;
+.charsheet .worn-items .table-header.right,
+.charsheet .worn-items .table-cell.right,
+.charsheet .worn-items .table-cell.left {
+    padding-inline: 1rem;
 }
 
-.charsheet .h2-section.worn-items .table:last-child {
-    float: right;
+.charsheet .worn-items .table-cell.left input {
+    text-align: center;
+}
+
+.charsheet .worn-items .table {
+    display: inline-table;
+    max-width: 49.5%;
 }
 
 /* read only any page */
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .h2-section.current-loads .table,
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .h2-section.loads-and-lift .table,
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .h2-section.currency .table {
+.charsheet .pf-wrapper.is-readonly .current-loads .table,
+.charsheet .pf-wrapper.is-readonly .loads-and-lift .table,
+.charsheet .pf-wrapper.is-readonly .currency .table {
     width: 100%;
-}
-
-/* display xp at bottom of page in all pages mode */
-
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-equipment .experience {
-    display: none;
 }
 
 /******** spells ********/
@@ -6655,169 +6809,169 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: 33%;
 }
 
-.charsheet .h3-section.spellclass-level,
-.charsheet .h3-section.spellclass-concentration {
+.charsheet .spellclass-level,
+.charsheet .spellclass-concentration {
     width: 69.5%;
     float: left;
 }
 
-.charsheet .h3-section.spellclass-ranges {
+.charsheet .spellclass-ranges {
     display: inline-table;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-spells .h3-section.spellclass-ranges {
+.charsheet .pf-wrapper.is-editmode .spellclass-ranges {
     max-width: 29.75%;
     vertical-align: top;
     float: right;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-spells .h3-section.spellclass-roll-adj {
+.charsheet .pf-wrapper.is-editmode .spellclass-roll-adj {
     max-width: 29.75%;
     float: right;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-spells .spellclass-ranges .table-header {
+.charsheet .pf-wrapper.is-editmode .spellclass-ranges .table-header {
     height: 3.05rem;
     /* exactly matches 2 rows from sheet-spellclass-level table.*/
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 .table .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 .table .divider-lg {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 .table .divider,
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 .table .divider-lg {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-header:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-cell:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .divider:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-header:nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-cell:nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .divider:nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-header:nth-child(10),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .table-cell:nth-child(10),
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .spells-per-day .table-row .divider:nth-child(10) {
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-header:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-cell:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .divider:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-header:nth-child(9),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-cell:nth-child(9),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .divider:nth-child(9),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-header:nth-child(10),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .table-cell:nth-child(10),
+.charsheet .pf-wrapper.is-readonly .spells-per-day .table-row .divider:nth-child(10) {
     display: none;
 }
 
-.charsheet .readonly-show:checked ~ .main .section-spells .col.col1,
-.charsheet .readonly-show:checked ~ .main .section-spells .col.col2 {
+.charsheet .pf-wrapper.is-editmode .section-spells .col.col1,
+.charsheet .pf-wrapper.is-editmode .section-spells .col.col2 {
     width: 100%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 {
     margin: 0.2rem 0.2rem 0.2rem -0.2rem;
     width: 50%;
     float: left;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1:last-child {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1:last-child {
     margin: 0;
     width: calc(50% - .4rem);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col2 {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col2 {
     margin: 0.2rem;
     width: calc(50% - 6px);
     float: right;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col2 .h2-section,
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 .h3-section,
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col2 .h3-section {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 .h2-section,
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col2 .h2-section,
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 .h3-section,
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col2 .h3-section {
     width: 100%;
     display: block;
     overflow-x: auto;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spells .col.col1 .h3-section button {
+.charsheet .pf-wrapper.is-readonly .section-spells .col.col1 .h3-section button {
     font-size: 80%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-skills skilllist {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-skills skilllist {
     width: 100%;
 }
 
 /**************** tabs .expand */
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-skills .skillsnav ~ .tab {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-skills .skillsnav ~ .tab {
     width: 28%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-skills .skillsnav ~ .tabinput {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-skills .skillsnav ~ .tabinput {
     width: 28%;
     margin-right: -28%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .h2-section.skill-totals,
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .h2-section.skill-notes,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-skills .h2-section.skill-totals,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-skills .h2-section.skill-notes {
+.charsheet .pf-wrapper.is-readonly .main .section-skills .h2-section.skill-totals,
+.charsheet .pf-wrapper.is-readonly .main .section-skills .h2-section.skill-notes,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-skills .h2-section.skill-totals,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-skills .h2-section.skill-notes {
     float: left;
     width: calc(40% - 4px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .h2-section.skill-options,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-skills .h2-section.skill-options {
+.charsheet .pf-wrapper.is-readonly .main .section-skills .h2-section.skill-options,
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-skills .h2-section.skill-options {
     float: right;
     width: calc(60% - 8px);
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-spells .spellclassnav ~ .tab:not(.tab99) {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-spells .spellclassnav ~ .tab:not(.tab99) {
     width: 25%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ .section-spells .spellclassnav ~ .tabinput:not(.tab99) {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ .section-spells .spellclassnav ~ .tabinput:not(.tab99) {
     width: 25%;
     margin-right: -25%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ div .tab.tab99 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ div .tab.tab99 {
     width: 10%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:checked ~ div .tabinput.tab99 {
+.charsheet .pf-wrapper.is-readonly .tab99:checked ~ div .tabinput.tab99 {
     width: 10%;
     margin-right: -10%;
 }
 
 /* hide .table columns */
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-header:nth-child(4),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-cell:nth-child(4),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-header:nth-child(5),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-cell:nth-child(5),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-header:nth-child(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-cell:nth-child(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-header:nth-child(7),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-cell:nth-child(7),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-header:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .table-cell:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .ability-scores .divider-lg {
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-header:nth-child(4),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-cell:nth-child(4),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-header:nth-child(5),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-cell:nth-child(5),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-header:nth-child(6),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-cell:nth-child(6),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-header:nth-child(7),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-cell:nth-child(7),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-header:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .ability-scores .table-cell:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .ability-scores .divider,
+.charsheet .pf-wrapper.is-readonly .ability-scores .divider-lg {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-header:nth-child(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-cell:nth-child(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-header:nth-child(11),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-cell:nth-child(11),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-header:nth-child(12),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-cell:nth-child(12),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-header:nth-child(13),
-.charsheet .readonly-show:not(:checked) ~ .main .section-core .class-grid .table-cell:nth-child(13) {
+.charsheet .pf-wrapper.is-readonly .class-grid .table-header:nth-child(6),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-cell:nth-child(6),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-header:nth-child(11),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-cell:nth-child(11),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-header:nth-child(12),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-cell:nth-child(12),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-header:nth-child(13),
+.charsheet .pf-wrapper.is-readonly .class-grid .table-cell:nth-child(13) {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-header:nth-child(3),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-cell:nth-of-type(3),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-header:nth-child(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-cell:nth-of-type(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-header:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-cell:nth-of-type(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-header:nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-cell:nth-of-type(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-header:nth-child(n+13),
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-grid .defense-table .table-cell:nth-of-type(n+13) {
+.charsheet .pf-wrapper.is-readonly .defense-table .table-header:nth-child(3),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-cell:nth-of-type(3),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-header:nth-child(6),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-cell:nth-of-type(6),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-header:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-cell:nth-of-type(8),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-header:nth-child(9),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-cell:nth-of-type(9),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-header:nth-child(n+13),
+.charsheet .pf-wrapper.is-readonly .defense-table .table-cell:nth-of-type(n+13) {
     display: none;
 }
 
@@ -6832,76 +6986,76 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-group-head :nth-child(4),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-group-head :nth-child(7),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-group-head :nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-group-head :nth-child(n+12),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-row :nth-child(4),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-row :nth-child(7),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-row :nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .table-row :nth-child(n+12) {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-group-head :nth-child(4),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-group-head :nth-child(7),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-group-head :nth-child(9),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-group-head :nth-child(n+12),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-row :nth-child(4),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-row :nth-child(7),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-row :nth-child(9),
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .section-defenses .saves-table .table-row :nth-child(n+12) {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .tab99:not(:checked) ~ .section-defenses .saves .saves-table .divider-lg {
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .saves-table .divider,
+.charsheet .pf-wrapper.is-readonly .tab99:not(:checked) ~ .saves-table .divider-lg {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-defenses .defense-notes .notes {
+.charsheet .pf-wrapper.is-readonly .defense-notes .notes {
     height: 5em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-child(n+3),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-child(n+3),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .linked-tablecell-short input {
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .divider,
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-child(n+3),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-child(n+3),
+.charsheet .pf-wrapper.is-readonly .attack-grid .linked-tablecell-short input {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-of-type(4),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-of-type(4),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-of-type(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-of-type(6),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-of-type(11),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-of-type(11),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-of-type(16),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-of-type(16),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-group-head .table-header:nth-of-type(17),
-.charsheet .readonly-show:not(:checked) ~ .main .section-attacks .attack-grid .table-row .table-cell:nth-of-type(17) {
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-of-type(4),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-of-type(4),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-of-type(6),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-of-type(6),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-of-type(11),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-of-type(11),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-of-type(16),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-of-type(16),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-group-head .table-header:nth-of-type(17),
+.charsheet .pf-wrapper.is-readonly .attack-grid .table-row .table-cell:nth-of-type(17) {
     display: table-cell;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(10),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(12),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(13),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-header:nth-child(n+15),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(8),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(9),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(10),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(12),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(13),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skilllist .skills .table-row .table-cell:nth-of-type(n+15),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skills-key {
+.charsheet .pf-wrapper.is-readonly .skills .table-row .divider,
+/* .charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(8),
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(9),
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(10), */
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(12),
+/* .charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(13), */
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-child(n+15),
+/* .charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(8),
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(9),
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(10), */
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(12),
+/* .charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(13), */
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(n+15),
+.charsheet .pf-wrapper.is-readonly .skills-key {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skill-totals .table-header:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skill-totals .table-cell:not(.show-readonly),
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skill-totals .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-skills .skill-totals .divider-lg {
+.charsheet .pf-wrapper.is-readonly .skill-totals .table-header:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .skill-totals .table-cell:not(.show-readonly),
+.charsheet .pf-wrapper.is-readonly .skill-totals .divider,
+.charsheet .pf-wrapper.is-readonly .skill-totals .divider-lg {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .carried-totals .divider,
-.charsheet .readonly-show:not(:checked) ~ .main .section-equipment .carried-totals .divider-lg {
+.charsheet .pf-wrapper.is-readonly .carried-totals .divider,
+.charsheet .pf-wrapper.is-readonly .carried-totals .divider-lg {
     display: none;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section > .nontable-nameshow-readonly {
+.charsheet .pf-wrapper.is-readonly .section > .nontable-nameshow-readonly {
     width: 49%;
     float: left;
     display: block;
@@ -6918,15 +7072,17 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     max-width: 90%;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .nowrap-readonly {
+.charsheet .pf-wrapper.is-readonly .nowrap-readonly {
     white-space: nowrap !important;
 }
 
 .charsheet .small-label2.autoexpand {
-    padding-top: 2em;
-    width: auto;
-    min-width: 3.5em;
+    margin-bottom: 2px;
     max-width: 99%;
+    min-width: 3.5em;
+    padding-top: 2em;
+    vertical-align: bottom;
+    width: auto;
 }
 
 .charsheet .small-label2.autoexpand input {
@@ -7024,8 +7180,8 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: 2em;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .skills .table-row .table-header:nth-of-type(7),
-.charsheet .readonly-show:not(:checked) ~ .main .skills .table-row .table-cell:nth-of-type(7) {
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-header:nth-of-type(7),
+.charsheet .pf-wrapper.is-readonly .skills .table-row .table-cell:nth-of-type(7) {
     width: .5em;
     max-width: .5em;
 }
@@ -7070,10 +7226,10 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 .charsheet .horror-show:not(:checked) ~ .horror-sect,
 .charsheet .dual-wield-show:not(:checked) ~ .dual-wield-sect,
 .charsheet .spellpoints-show:not(:checked) ~ .section-spellclass .spellpoints-sect,
-.charsheet .advanced-spell-option-show:not(:checked) ~ .spellcasting-classes .section-spellclass .manual-column-show:not(:checked) ~ div .spell-userdef-column,
-.charsheet .advanced-spell-option-show:not(:checked) ~ .spellcasting-classes .section-spellclass .advanced-spell-option,
-.charsheet .advanced-spell-option-show:not(:checked) ~ .spells .advanced-spell-option,
-.charsheet .advanced-spell-option-show:not(:checked) ~ .npc-spells .advanced-spell-option,
+.charsheet label:has(.advanced-spell-option-show:not(:checked)) ~ .spellcasting-classes .section-spellclass .manual-column-show:not(:checked) ~ div .spell-userdef-column,
+.charsheet label:has(.advanced-spell-option-show:not(:checked)) ~ .spellcasting-classes .section-spellclass .advanced-spell-option,
+.charsheet label:has(.advanced-spell-option-show:not(:checked)) ~ .spells .advanced-spell-option,
+.charsheet label:has(.advanced-spell-option-show:not(:checked)) ~ .npc-spells .advanced-spell-option,
 .charsheet .spell-multiclassed-show:not(:checked) ~ .spellcasting-classes .spell-multiclassed,
 .charsheet .spell-multiclassed-show:not(:checked) ~ .repeating-sect .spell-multiclassed,
 .charsheet .all-macro-text-show:not(:checked) ~ div .macro-text,
@@ -7116,7 +7272,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     display: none !important;
 }
 
-.charsheet .readonly-show:not(:checked) ~ .main .section-spellclass .col button[type="roll"] {
+.charsheet .pf-wrapper.is-readonly .section-spellclass .col button[type="roll"] {
     font-size: .95em;
 }
 

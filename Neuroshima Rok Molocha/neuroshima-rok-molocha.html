@@ -207,7 +207,7 @@
             <div class="label-container">
                 <label class="default-player-label">
                     PD
-                    <input type="text" class="default-player-input" style="max-width: 75px;" name="attr_exp" placeholder="Punkty Doświadczenia">
+                    <input type="text" class="default-player-input" style="max-width: 75px;" name="attr_exp" >
                 </label>
             </div>
         </div>
@@ -232,6 +232,10 @@
             <div>
                 <h1 class="disease-title">Stan Ostry</h1>
                 <textarea class="disease-description" name="attr_acute_phase"></textarea>
+            </div>
+            <div>
+                <h1 class="disease-title">Stan Krytyczny</h1>
+                <textarea class="disease-description" name="attr_critical_phase"></textarea>
             </div>
             <div>
                 <h1 class="disease-title">Stan Terminalny</h1>
@@ -808,7 +812,7 @@
                 <button type="action" name="act_test_biologia" class="roll-button"></button>
                 <input type="radio" name="attr_skill-select" value="biologia">
                 <input class="skill-name-input" value="Biologia" readonly>
-                <input type="number" value="0" name="attr_fizyka">
+                <input type="number" value="0" name="attr_biologia">
             </div>
             <div class="skill-container">
                 <button type="action" name="act_test_chirurgia" class="roll-button"></button>
@@ -1069,12 +1073,12 @@
             <div class="range-data-container">
                 <label class="range-facilities">Ułatwienia
                     <input class="input-range-default input-range-facilities" type="text"
-                        name="attr_range-facilities-valu" placeholder="0">
+                        name="attr_range-facilities-value" placeholder="0">
                     %
                 </label>
                 <label class="range-impediments">Utrudnienia
                     <input class="input-range-default input-range-impediments" type="text"
-                        name="attr_range-impediments-valu" placeholder="0">
+                        name="attr_range-impediments-value" placeholder="0">
                     %
                 </label>
             </div>
@@ -1464,7 +1468,7 @@ function set_difficulty_level(
   // let difficulty_level = current_difficulty;
   let difficulty_level = findMaxIndex(current_difficulty, max_difficulty_level);
 
-  if (skill_value < 1 && skill_value !== null) {
+  if (skill_value < 1 && skill_value !== null && !is_battle) {
     difficulty_level++;
   } else if (!is_battle && skill_value !== null) {
     difficulty_level -= Math.floor(skill_value / 4);
@@ -1474,9 +1478,10 @@ function set_difficulty_level(
     0,
     Math.min(difficulty_level, max_difficulty_level)
   );
-
-  difficulty_level += count_number(rolls, 20);
-  difficulty_level -= count_number(rolls, 1);
+  if (!is_battle) {
+    difficulty_level += count_number(rolls, 20);
+    difficulty_level -= count_number(rolls, 1);
+  }
   difficulty_level = Math.max(
     0,
     Math.min(difficulty_level, max_difficulty_level)

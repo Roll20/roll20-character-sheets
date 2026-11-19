@@ -1,0 +1,299 @@
+# Past Announcements/Updates Log
+
+- Fixed Spell tab bug that only allowed spells to be seen using the "All" tab. Introduced with last weeks update.(TY @Kazdan)
+- Fixed a bug with the Thief "sync to class" option where the level was failing to 0. Introduced with last weeks update.
+- Added a "Sync Caster Class" option to the spells section. Linking to a class will automatically adjust the caster name and level values whenever the linked class changes from the top of the sheet.
+- Added datalist options for various fields. Datalist fields are similar to dropdown selectors, but also allow custom input as well. Added lists to; class, race, alignment, secondary skills, and non-weapon proficiencies(these also show the slot, ability, and modifier).
+- Added a print option to the sheet. Adjusting sub-sections, resizing text boxes, etc. as needed will help produce a better end-result. I have hidden elements that would only apply to the VTT as well as other adjustments to help the sheet be "print-friendly". Click the printer icon at the top left corner of the character journal to preview. Ensure to toggle "background graphics" from the advanced print settings to see how it effects the preview.
+- Updated how the to-Hit and weapon vs armor type table data is posted with attacks.
+- Added an "Ask" option to the sheet whisper settings. Rolls will include a query to whisper the roll or not when choosing the "Ask" option. DM sees all...
+- Manually changing "Current Encumbrance" in the Carrying Capacity section will also adjust movement "Speed" accordingly. Further adjusting any item weight or reloading the sheet will recalc and undo any temp encumbrance and speed changes. Similarly, you may also override adjusted speed temporarily.
+- Sync is now enabled by default for HP max and AC. These options can still be changed per-sheet an/or per-game by the game's creator using the game's default sheet settings. This update only effects new sheets going forward.
+- Updated Total HP(ie HP max) calcs for multi-class characters. "HP Total" will show HP as a decimal if multi-classing, and will round up for any partial/fractional HP that is >= 0.5 The "Partial HP" field has now been hidden but will still include any fractional HP. ie @{hitpoints_remainder_total}
+- Small adjustments on the NPC/Monster page to prevent overflowing elements at small window sizes.
+- Refactoring done for the majority of sheetworkers. Converted the callback-based Roll20 functions to async/await versions.
+- Some refactoring done in the sheetworker that keeps Armor Details and repeating_equipment Armor in sync. Includes a one-time update to check and set 'repeating_equipment_$X_equipment_sync_armor_flag' attribute.
+- Added a "lock" icon next to the armor type dropdown selector in the equipment armor sub-section. This is just a visual indicator if the item is currently synced with an Armor Details row.
+- Hiding Multi-Class fields has been set as the default for new sheets. These options can still be changed per-sheet or per-game by the game creator using the game's default sheet settings. This update only effects new sheets going forward.
+- Updated the Pick Pockets roll to not require a selected token.
+- Fixed a glitch introduced in the last update with the Equipment sorting buttons displaying askew when viewed in FF.
+- Added title text to Armor Details item name that gives some explanation on how Armor Details and Equipment|Armor interact.
+- Fixed armor row columns display/alignment if armor is marked as "magical" and Equipment tab was filtered to show "Magic" items only.
+- Adding a new equipment item will check the current Equipment tab and set the equipment type to match.
+- Added a couple sorting options to Equipment. Sort AZ and Sort by Location, then Item AZ. Includes an "Undo" option that will restore the previous natural order.
+- Added a couple sorting options to Spells. Sort AZ and Sort by Level, then Spell AZ. Includes an "Undo" option that will restore the previous natural order.
+- Update to Spells; adding new spells will automatically set a Spell's caster class and level based on the current Caster and Spell Level tabs selected. example; If the current Spell Tab is set to show "3rd" level spells and a new spell is added "+", entering a spell name will trigger the sheet to set the Spell's level to "3". If the tab is set to "All" or if the Spell's level has already been set, the Spell's level will not be changed. If the spell is added using an API mod, the Spell's level will not be changed. Caster Class selected acts similarly.
+- "Spell Lvl" is now shown with the Spell Name and #Memorized/Prepared. Hidden when the Spell details is expanded.
+- Made a correction with the Spell Level Tab behavior when editing a Spell's Level while showing "All" levels. Tab would incorrectly change the Spell Level Tab to match the new Spell Level. Expected behavior is to stay on "All".
+- Updated the Thief Skills Dex and Race auto-fill option. Expanded the Dex Thief skill adjustments up to DEX 25.
+- Updated dependencies used to bundle the sheet. Impacts dev environment only.
+- Updated title text on max fields from '..._max' to '...|max'. Macros and token bars need to use '...|max'
+- Added "Roll Template Color" selector to the sheet's default settings options.
+- Updated the 'Equipment|Weapon|+Add' button to set all default weapon values for the attack row instead of just those synced from the Equipment's row. Fixes default hit-table info not being posted to chat (unless the selector was manually set) if the attack was created using the Equipment button.
+- Added a very subtle linear-gradient background(top transparent to bottom light gray) to a few sections to help introduce a little contrast between sections.
+- Fixed Equipment tabs for Carried|Not Carried|Mount|All not filtering.
+- Updated sheetworker logic used when creating new repeating rows. Allows API mods to detect the default values.
+- Updated the NWP title-text, inverting the +/- appropriately so it makes sense. Added an additional option in the NWP row dropdown to include a "vs Base" (which will give a roll-time query to enter a base/target value) to accommodate anyone that is using OA's version of NWP.
+- Open Doors changed from percentage roll to d6 (or larger die for demi-god level STR values).
+- Added additional logic to auto-fill bonus languages as per PHB. Previously the sheet only auto-filled Humans. This update will only effect new characters going forward. @{bonuslanguages} will remain unchanged for existing characters unless Race or INT are changed.
+- Added setting the NWP default values using sheetworkers upon row creation to help with API attribute recognition. ie ScriptCards. Also added a "Val." column to show the current value of the Ability selected.
+- Added a "Magical" column and checkbox to equipment. Check this box if an item has magical properties. Items that are checked will also be displayed when the "Magic" tab is selected regardless of their type category.
+- Added options to autofill Thief Skills racial and Dex modifiers.
+- Added an option to the Thief Skills to sync to a class. Base value will continue to auto-adjust whenever the class level changes.
+- Added an option to the Attack Matrix/THAC0 section to sync to-Hit values to a class. Table data will continue to auto-adjust whenever the class level changes. Multi/Dual-class characters should choose the most favorable class. Class names entered on the sheet need to match one of the core 1e classes in order for this option to work.
+- Added an option to use a 5% progression based to-Hit table for Fighters. (DMG p74) Use 5% checkbox added to Settings|Misc. Options and inside the Attack/THAC0 Matrix window.
+- Attack/THACO Matrix section has been updated so that it's opened/closed state will remain persistent. It will be open by default on new sheets.
+- Removed the character_name validation warning for the use of commas within a character's name.
+- Removed alternating row background-color from the &{template:attacks} roll template.
+- AC calculation updated: check added to remove low Dex penalties beyond AC 10. "Armor class below 10 is not possible except through cursed items." DMG p73
+- Added formatting for chat menu and api button links in the roll template. Including a backtick just inside the first parenthesis of the button macro removes the default sheet formatting & roll20's default pink text. ie [Click Me](`~some_ability)
+- Improved the roll template's allprops schema to better handle custom key=value pairs.{{sans equal sign text is centered}}, {{=%NEWLINE% empty on the left, text aligns to the right}} {{empty on the right, text aligns to the left=%NEWLINE%}} Use %NEWLINE% or carriage returns inside of the roll template to create new rows within the same key.
+- Added inline roll results border color for success(green) and fail(red). Applies to the &{template:general} roll template. The success/fail border is based on the {{roll_high}}, {{roll_low}} and {{roll_target}} keys which are used for all check-based sheet rolls. ie Ability Checks, Saving Throws, Thief Skills, etc.
+- Fixed a z-index bug where the sheet's portrait could overlap other header areas preventing input/access. This only happens if the use URL option is chosen in the sheet settings but no URL is provided.
+- Small adjustment to the roll template header and subheader padding.
+- Changed the attack template font style to be the same as the general template.
+- <code>{{bigtext1}}</code> keys expanded to 12 rows to allow 6 grey(odd) and 6 white(odd) rows for custom macros.
+- Updated the portrait image option: Added "none" as an option. Updated the image url parsing to detect png, jpg, and gif. While you can post a sheet's image to chat by simply clicking on the portrait image, you can now access the sheet's image URL as well for macro usage. Call the attribute's value directly using; @{selected|sheet_image_url} macro example; <code>[x](@{selected|sheet_image_url})</code>
+- Added <code>{{bigname}}</code> to both templates. This key can be used to display text in the header that is 1.75x's larger than the normal header ie <code>{{name}}</code>. These additional keys are provided for those that desire to customize and/or their own macros. They do not impact the sheet's default rolls and macros. Feel free to experiment.
+- Added some missing css for the bigtext if used in the attacks roll template.
+- Added the same <code>{{bigtext1}}</code> thru <code>{{bigtext4}}</code> keys to the &{template:attacks} roll template.
+- Added 4 new keys to the &{template:general} roll template. ie <code>{{bigtext1}}</code> thru <code>{{bigtext4}}</code>. Should be helpful for anyone wanting to inject some big text and/or rolls into their customized macros.
+- Added local auto-fill checkbox for THAC0
+- Roll templates now have an increased max-height for embedded images based on the viewport width. Should help to display larger images.
+  '''FYI:''' images can be included with sheet rolls by using roll20's normal chat image format. ie '''[x](URL that ends in a common image format such as .jpg, .png, .gif)''' So if you want to display an image with a given roll, simply include a properly formatted image code macro within any text-based field. ie Name, Notes, Description. Macro-text can also be modified to include an image. ie '''{{subtag=[x](URL)}}'''
+- Fix for crit damage rolls; I've added parenthesis around the crit damage dice so that the entire roll is multiplied x2. This is a non-issue unless you want bonuses included with the crit multiplier. While it's common for crit damage to only double the dice roll and then add bonuses, you can include bonuses with the damage dice if desired. Note that the damage modifier field will also be included after any multiplier. Use it however you like.
+- Rollback of last weeks single column not spanning full width 'fix' and a proper redo that doesn't cause collateral issues with the spell header layout.
+- Small fix for single column spells and special abilities not spanning the full width.
+- Added an option in the Sheet settings to auto-roll weapon damage regardless of the attack roll.
+- Updated some of the sheet's font settings.
+- Small adjustment to hide the +/- flippers on number fields.
+- Autofill base value for saves has been added to the Monster page.
+- Height and Weight fields have been added to the Monster page.
+- Updated the Pick Pockets roll to include a query for the hit dice of the target and check for detection if the attempt has failed. The HD query will adjust the target score and check for detection according to the PHB.
+- Included a check when changing the character_name that tests for illegal characters. Specifically ')', ']', '}', or '|'. These may break sheet rolls/macros if included in a character's name. Underscores, dashes, and apostrophes should be fine.
+- Updated the background-image url for parchment.
+- Fixed Thief/Monk/Assassin Save vs Spell @levels 5-8. Corrected the threshold from "12" to "13".
+- Added Friend/Foe indicator at the top of the sheet. This is purely a visual indicator and does not impact the sheet.
+- Copied the Magic Resistance field to PC Saving Throws.
+- Added "Light Goldenrod" background.
+- Added a close "X" option from within the Announcements window.
+- Removed the whisper option when clicking on the portrait image to send to chat and added a query to prevent an accidental display of the portrait.
+- Updated History/Bio textarea to auto-expand to match it's content.
+- Updated PC Notes so that the first non-repeating textarea box will auto-expand to match it's content.
+- Fixed NWP not being hidden by default.
+- Fixed Climb Walls calculation.
+- Reminder: nearly all the per-sheet options can also be set from the Games Settings page so that all new sheets will start with your default options. These settings will apply only to new characters moving forward. If you would also like to apply these settings to all existing characters in the game follow the wiki instructions:[Roll20 Wiki Link](https://wiki.roll20.net/Game_Settings_Page#Applying_Setting_Defaults_to_Existing_Content_In-Game)">
+  Applying Setting Defaults to Existing Content
+- Option added to auto-fill the Save Base chance based on class and level selected.
+- Option added to auto-fill the Thief Skills Base chance based on thief level selected.
+- Sheet Settings: "Exceptional" will now display the exceptional attribute fields for all abilities regardless of the Ability score. Previously these fields would only show if the score was 18+. Exceptional Strength will always be shown as well.
+- Adjusted the "In-Use" checkbox to allow multiple attack rows to be selected at the same time. If multiple "In-Use" attack rows are selected simultaneously, the global values for the "Weapon In-Use" will use the weapon with the fastest weapon speed for the name, speed and misc. attributes.
+- Small adjustment to the roll templates that allows text after a "forced line-break" within a macro, to be center-aligned. Works in the header, subheader, and allprops keys. ie {{name}}, {{subtag}} {{}}
+- Adjusted inline roll appearance when the roll is in the header or sub-header.
+- Alignment adjustment for the weapon vs armor type table.
+- Fixed a bug in the Attack Matrix class drop-down selector where the "Cleric, Druid, and Monk" selection incorrectly used the Fighter table data. This was related to last week's change to the class dropdown. Big apologies.
+- Attacks that have the "In-Use" box enabled will auto-fill the global attributes @{weapon_in_use} (shows the weapon's name), @{weapon_in_use_speed} and @{weapon_in_use_misc}. You can see these in the Misc. Attack Info section found just above the repeating attacks. I believe these attributes could be used for those of you that wish to modify/customize their initiative rolls and/or other macros.
+- Added a "Misc." attribute to repeating attacks. @{repeating_weapon_$X_weapon_misc} this attribute will also be used to auto-fill @{weapon_in_use_misc} when the weapon is marked "In-Use".
+- Adjusted roll template to limit the image size to max-height of 100px if placed within the {{subtag}} key. Images posted included within other keys will still have a max-height of 300px.
+- Fixed THAC0 table output alignment issue.
+- Fixed the Class/Monster dropdown selector in the Attack Matrix to be less confusing.
+- The Revised sheet is now live! While roll20 would not permit both versions of the 1e sheet to coexist, they have agreed to deprecate the old sheet. It will remain as-is for anyone that is currently using that sheet in their existing games and could possibly get future updates/changes. It will not show up as an available sheet for new games however. Only the Revised 1e sheet will be listed for new games going forward. Game creators using the old sheet can convert to the Revised sheet if/when they desire by changing the game settings character template to the "Advanced Dungeons & Dragons 1e sheet".
+- Sheet.json has been updated to allow setting default values for most of the options found on the sheet's settings page. These Game/Campaign options are only available to game creators when using a live sheet template and will affect all future characters/NPC's created in-game.
+- Bug Fix; the Initiative roll subtitle was incorrectly referencing the surprise_die selector. Roll was correct, but the title was not.
+- Psionics option added. Uncheck Sheet Settings|Hide Areas|Psionics to reveal additional psionic-related fields under Special Abilities. Attack/Defensive Modes and Disciplines can be added as Special Abilities. I may add a Point Cost field to Special Abilities as well.
+- Added an alternative Turn Undead roll that groups undead by "adjusted" HD. Expands the turn undead table beyond the MM. See Dragonsfoot.com [http://www.dragonsfoot.org/php4/archive.php?sectioninit=FT&fileid=175&watchfile=0 www.dragonsfoot.org/Footprints #7] e-zine for details.
+- Bug fix; missing Damage buttons with attacks when creating a new attack from the Equipment|Weapon|+Add option.
+- Made a small adjustment for the attack table output to work regardless of the Sidebar|Text Chat Options 'Enable Chat Timestamps' setting.
+- Refined the Turn/Command Undead roll to check a given type of Undead vs all possible Undead. While the Turn Undead roll can be found in Sheet Settings|Misc. you can use the '+Add' to create a unique, non-synced, Special Ability that includes a chat menu button to roll the Turn Undead check from chat.
+- Added a Turn Undead roll. Located in Sheet Settings|Misc. Reminder: nearly all the buttons on the sheet can be dragged to the macrobar and/or used in other macros to execute a sheet roll without having to open the sheet.
+- Added dice icon to ability row rolls.
+- Added Surprise Others roll.
+- Added an auto-fill option for the Attack matrix tables. By default, the to-hit tables will auto-fill the table based on the class and level selected.
+- Added "Light Greyhawk" and "Greyhawk" to background colors.
+- Added "In Use" checkbox to attacks to better distinguish weapons that are armed, and on-the-ready.
+- Added a warning indicator if the attack matrix values have not been filled out. to-Hit table values default to all "20's" otherwise.
+- Fixed single column checkbox bug that required toggling the box to sync.
+- Changed fractional HP field to prevent 'out of range' browser warnings.
+- Changed most buttons to plain text.
+- Updated repeating_equipment armor to hide meaningless fields in order to match their Armor Details counterpart.
+- Added a Language roll button to post known languages to chat.
+- Added option to 'Use Lbs' instead of gold pieces when determining encumbrance. Carrying capacities and carried coin weight will be divided by 10. Per-item weights need to be entered as lbs in order for the sheet to properly calculate encumbrance. Leave STR allowance in gp as per Strength table. Strength allowance will be converted to lbs on the encumbrance table.
+- Updated Thief Skill migration to better handle existing attributes and normal skill calcs.
+- Climb Walls updated to allow decimals. in-turn, checks made when Climb Walls is 99.1 or greater will receive an additional d10/10 added to the roll as a fraction.
+- Small darkmode adjustments.
+- Added the pc/npc whisper options to image and info buttons. This also applies to clicking the sheet's image directly.
+- Fix made to Saving Throw calc logic that would prevent entering "20" as the base value.
+- Armor Details rows Other(2-6), AC and AR selectors have been changed from a base value(10 through 0) to a bonus(+0 through +10) to AC and AR.
+- Unarmored fix to enable AC and AR calcs to work without requiring a name value for the unarmored row.
+- Removed "Roll" from the repeating roll buttons.
+- Updated the Special Ability macro to include "0 +" for the inline rolls to prevent a chat error if a non-number is used in the ability_die and/or ability_current_max fields. Roll template checks these inline rolls for numbers in order to show or hide info.
+- Added rolls for Racial Notes and Special Senses.
+- Small adjustments to text and layout.
+- Added the ability to create an attack from Equipment|Weapons(sub-section). Using the "+ADD" button will create a unique(ie not linked to equipment) attack.
+- Updated repeating_equipment sheetworker; split tab changes that set the hide/show attributes for all rows from the type and carry changes that only happen within a given row.
+- Version check to correct equipment type:gear that could have erroneously been set to an out of range value instead of Gear.
+- Small adjustment to repeating row edit:move handling.
+- Fixed a bug in the Bulk load calculation incorrectly using "Heavy" as the baseline instead of "Normal".
+- The Encumbered condition will remove any DEX bonus from AC calculations. There will also be a visual indicator (dashed-border w/small warning icon) added to the "Dex Adj." field when Encumbered as a helpful reminder.
+- Added Weapon Proficiency total field. @{weapon_proficiency_total}
+- Sheet portrait can now be clicked on to post the image to chat.
+- Increased the Monster portrait image area. Avatar or URL images will fill the available space up to a 350px<sup>2</sup>.
+- Updated Initiative and Surprise rolls to show Encumbrance penalties.
+- Disabled repeating_equipment|armor| "armor details" attributes until an armor type has been selected. This helps ensure the proper fields are shown for armor type.
+- Adjustment to exceptional abilities so that they will only be displayed if the Show Exceptional is unchecked in Sheet Settings and the ability is at least 18. Exceptional Strength is always shown regardless of the hide option.
+- Fixed incorrect table data for STR and CON. Updated Open Doors macro to use % vs d6.
+- Armor Bulk and Encumbrance are now used to auto-adjust the movement load indicator and speeds. Dex penalty and roll template bulk/encumbrance text are on the to-do list.
+- Armor Details: the unArmored Base row has been included with repeating_equipment|armor sync. This row is designed to represent any non-armor "Base AC". ie monsters natural skin/hide or a PC's clothing.
+- Fixed a bug with newly added equipment and the equipment_carried_select attr. While the select showed "carried", the weight calc was incorrectly using "0" (ie not carried), which is the default value for equipment_carried.
+- Added an Auto-Calc Movement option. The movement load can be temporarily selected even if the auto-calc option is enabled but any changes to encumbrance, base movement, or opening the sheet will cause a re-calc. If Auto-Calc Movement is disabled, any manual changes to the movement load will be persistent.
+- Fixed NPC image link roll.
+- Fixed triggering event for total weight. Was not recalculating until sheet open.
+- Fixed portrait image resize to be consistent between using the default avatar image or custom image url.
+- Armor details on repeating_equipment has been moved into the expanded sub-section.
+- Fixed equipment|armor|shield AC and AR dropdown selectors to match Armor Details.
+- Added back the display of armor and weapon weight sub-totals to the bottom of the equipment section.
+- Sheet Settings; expanded the "Reset" macros button to include buttons for each repeating section. Resetting simply clears the existing macro-text in order to use the most current default macros used for sheet rolls.
+- Weapon weight and cost migration; one-time update checks existing repeating_weapon that have either weight or cost being tracked (ie non-zero value) and creates a copy of them to equipment|weapons if the weapon isn't already in equipment. Names must match exactly to be considered a match. "Matched" items are updated with the weapon weight and cost values. If a weapon is not having it's weight/cost tracked, it will be ignored. This was necessary in order to prevent adding multiple versions of the same weapon. ie variations of an attack. Add weapons to equipment|weapons manually to track weight/cost. Weight and Cost calcs are now included with equipment.
+- Fixed a bug in the equipment default value update that set all equipment to carried.
+- Fixed equipment type dropdown from teleporting to the matching tab view when the "All" tab is selected.
+- Sync spell tab level view to match a spell level change.
+- Fixed missing armor weight and cost for armor 1 when migrating older sheets.
+- Added Caster Class 1 and Caster Class 2. Each class will have it's own spell/day grid. Repeating spells now include the caster class and the caster level. Caster Class 2 related sections are hidden by default but can be toggled visible in the sheet options. Spells can be sorted by Caster class.
+- Added Save Type field to spells.
+- Armor Details rows are now synced with repeating_equipment under Armor. Changes made to either should be reflected in both locations. There are now 6 "Other" rows that can be used for anything else that might effect AC. ie magical items and spells. Weight and Cost calcs are now included with equipment.
+- Added two more custom rows to Armor Details section.
+- Fixed a bug that caused a gap between repeating rows of spells.
+- Added a url "Link" attribute and button to Spells, Equipment, Special Abilities, NWP, and Monster. Button sends a clickable "LINK" to chat. Link has also been added to the roll template.
+- Toggling the sheet's role from PC to NPC will also change the main tab text to help indicate that the NPC sheet role can use both the 'Monster' tab and PC tab which gets renamed 'NPC' with this update. Toggle back to PC and the main tab displays 'PC' and hides the Monster tab.
+- Added @{hitdice_total} to Class Details to Track total/effective Hit Dice for Spell effects and XP.
+- Added a Custom Attributes section located on the settings page. Use custom attributes to track misc. adjustments for macros and mods. ie Ring of Protection +1 Saves, +1 AC.
+- Expanded the Special Abilities to include additional fields/attributes to better handle SLA's and misc. Powers. New Abilities will automatically get the updated roll template for these new fields. Manually reset the macro-text(ie delete the current macro-text) to force the new default macro. To-do: Auto-update roll template for old/existing special abilities.
+- New fields/attributes;
+<ul><b>- PC/NPC:</b> @{pc_image_link}, @{surprise_others_mod}, @{senses}, @{pc_image_link}, @{npc_image_link}, @{npc_link}</ul>
+<ul><b>- Spells:</b> @{priest_caster_level}, @{mage_caster_level}, @{spell_link}, @{spell_notes}</ul>
+<ul><b>- Special Abilities:</b> @{ability_effect_type}, @{ability_level}, @{ability_ct}, @{ability_range}, @{ability_duration}, @{ability_save}, @{ability_aoe}, @{ability_save_type}, @{ability_link}, @{ability_notes}</ul>
+
+- Added URL fields and a button to post images and hyperlinks to chat.
+- Fixed accidentally open/closing the collapsible areas by clicking the whitespace between repeating fields.
+- Small adjustment to header spacing when an avatar has not been selected.
+- Bug Fix: Typo prevented some of the Saving Throws (Spells, and Custom 1-3) from including the Misc and Temp values in the total.
+- Sheet Settings: Fixed the hide Thief Skills option. Missing "checked" state in a hidden checkbox used to trigger hide/show areas of the sheet.
+- Small changes to improve weapon Range field validation. Normal input will accept S/M/L ranges as numbers seperated by '/'. ie 1/2/3. You may also include single or double quotes as distance indicators. ie 1"/2"/3" or 10'/20'/30'. Entering a single value will result in all ranges using that value.
+- NPC/Monster: added @{monsterHD} to help differentiate player class hit dice vs monster hit dice.
+- Armor Details: Dex Adj. can be toggled to adjust AC for certain conditions.
+- Added a PC/NPC radio selector. Located directly under the sheet "Announcements". @{is_npc} Added to the Default Settings page as well.
+- Comeliness: added @{comeliness_base} which should represent the Comeliness rolled.ie un-adjusted.
+- Sheet Rolls: macro-text for rolls have been updated to allow bonuses(in fields and/or the modifier prompts) to include the '+' symbol. ie '+2'. Prior to this update, including the plus symbol ie '+2' would result in a '++2' which would break the macro.
+- Abilities: bonuses and penalties are now displayed with the appropriate +/- symbols as per the Ability table. The sheet used to show the mathematically correct value, but now shows the table value instead.
+- Armor Details: changed Magic and Misc. Adj fields from dropdown selectors to regular input fields. Bonuses lower AC. Penalties raise AC. ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2. The AC calculations row has also been updated to display the inverted Defensive Adjustment for Dex as well as Armor Adj. and Shield Adj.
+- Armor Details: Magic Adj. and Misc. Adj dropdowns have been expanded to allow -6(penalty) thru +6(bonus).
+- Added Default Settings options(only available once the sheet goes live) that allow the game's creator to set sheet defaults. These will be applied to all new sheets automatically (ie npc, whispers, hide/show various areas, auto-calc ac, hp, crit damage, etc.), but can also be applied to ALL existing sheets through an additional in-game step from the 'My Settings' page, 'Apply Default Settings'.
+- Repeating Weapons/Attacks: added weapon_ammo/weapon_ammo_max to help track arrows, bolts, etc. Ammo will be shown with ranged and ranged touch attacks. Also added weapon_num_attacks to indicate multiple/iterative attacks. Shown with Melee and Touch attacks. #Attacks is only serves as a visual indicator at this time. May be used in a future update to roll multiple attacks.
+- Critical Damage: "Use Crit Damage" has been added to the sheet options. If enabled, natural 20 rolls will use Crit Damage in lieu of normal damage. Defaults to normal weapon damage x2 and can be modified per attack.
+- Added Ability Checks(click an ability to make a roll). Defaults to 1d20 vs the Ability score, but the check can be customized from Sheet Settings|Ability Check die.
+- Bug Fix: Range and Backstab fields were not toggling based on weapon_type.(melee, range, touch, ranged touch).
+- Moved sheet Settings(gear icon) to the top tab bar.
+- Comeliness: Charisma adjustment (same race) is auto-calculated.
+- Sync HP option added to Class Details and Advanced Settings. Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} )
+- Sync AC option added to Armor Details and Advanced Settings. Enabling "Sync AC" will lock AC Total from Armor Details with AC ie @{armorclass} at the top of the sheet.
+- Bug Fix: backstab adj. that were enabled for attacks were still active even when Thief Skills were hidden. Hiding Thief Skills also hides and disables Backstab adjustments.
+- Dual-Wield: dual-wield primary and secondary penalty has been added to the top of the Weapons section. Directly below Weapon Proficiencies. ( @{dual_pen_primary} and @{dual_pen_secondary} ) Dual-wield penalties are calculated based on Dexterity. You can override these penalties locally, per attack, if desired.
+- Armor Rating: clicking "Ignore AR" sets armorclass_rating and unarmored_base to "-".
+- Choosing "Ranged Touch" will now accept a single range and or text in the Range field without displaying an input error. The Range field label also changes from "S/M/L" to "Range" which might avoid any confusion that you must enter three range values.
+- Armor Rating has also been added to the top of the sheet. Matches AR found in the Armor Details section.
+- Fixed Total Ac CALC. Bug was introduced after last the last changes for shields.
+- Changed Size2 to "Temp Size" for both PC and NPC for consistency.
+- Armor Details - Shield: the AC Rating and AC dropdown selectors have been changed to "+1 through +10". The bottom column totals, "In Use/Best" have also been updated to reflect a shield's impact on AC Rating and AC accordingly.
+- Bug Fix: Shield AC was being included in the AC Base.
+- Added Comeliness to non-weapon proficiencies dropdown selector for nwp checks/rolls. Also added two new fields to the Comeliness row to track CHA and Racial adjustments.
+- Weapons: Range now includes three hidden attributes, weapon_range_short, weapon_range_medium, and weapon_range_long. While the weapon_range field excepts any text value, the preferred format should be three numbers separated by a forward slash. Dash, space, or comma should also work. ie '1/2/3', '10-20-30', '1 2 3', '1,2,3'. The sheet will attempt to extract the three range values but will show a red/gold border with red text if it cannot extract all three ranges.
+- Weapons: added a new Attack Type selector to indicate "Melee, Ranged, Touch, or Ranged Touch". Mostly a visual indicator, but can also help differentiate attack types for API. Range and Fire Rate are hidden for Melee attacks. Backstab is hidden for Ranged attacks. Changed the older Dual-wield "Attack Type" attributes ie weapon_attack_type_pen to weapon_dual_pen and have also updated the macro-text accordingly.
+- Morale check button added. Basic roll: d100 vs @{morale_base} + mod
+- Backstab: the Backstab Multiplier,@{backstab} and Backstab Bonus,@{backstab_bonus} are now included with attack rolls. The multiplier defaults to "1", and the bonus defaults to "0" so they will not affect normal attacks. Enabling the "Backstab" checkbox on the attack adds the To-Hit bonus (defaults to "+4") to the attack roll and multiply weapon damage rolled. Any damage, magic, misc. bonuses are applied after the damage multiplier. The backstab checkbox is hidden if Sheet Settings|Hide Areas|Thief Skills is checked.
+- Roll Templates: brought back alternating row shading.
+- Added a one-time version check/update that auto-calcs ability rows, saves, and thief skills.
+- Added a one-time version check/update that updates the macro-text for repeating weapons, abilities, nwp, and spells. Only unedited, default macro-text will be updated to the latest default roll automatically. Customized macro-text will be skipped. FYI: to force a field to update to the latest default, simply delete the text. Using the "Reset Now" button from within the Sheet Settings tab forces updates of multiple sheet-wide macro-text fields. Use with caution.
+- Auto-updating ability stats. Completed: Strength, Intelligence(bonuslanguages only auto-fills for humans), Wisdom, Dexterity, Constitution(checks for fighter, paladin, or ranger, to expand bonuses past +2), Charisma.
+- Attack Type: updated 'Normal' so that the roll template does not show '(Normal Attack)'. Only '(Primary Attack)' and '(Secondary Attack)' will be included with an attack roll.
+- AC Details: added the option 'Auto-Calc AC'. Enabled by default so that any changes to the armor detail rows will auto-calculate the AC totals at the bottom of the section. The best AC at the top of the sheet is still manual so you may enter whatever you want regardless of any auto-calculated 'suggestions'. Also, the 'Calc AC' button can be used to force a re-calc regardless of the 'Auto-Calc AC' checkbox.
+- Adjustments to help the roll templates better handle inserted images.
+- Armor Details: added a column to list Bulk. Info tracking only. Not used in any calculations.
+- Re-positioned the Rear and Shieldless AC boxes to a vertical position nearer AC. Made fields editable to match Armor Details.
+- Armor Details: reworked this section as per forum discussions. Bottom row numbers can be manually changed and they will only gets auto-calculated, (based on the table above) if you use the "Calc AC" button.
+- Added Secondary Skill field. Added Weapon Proficiency fields to the top of the Weapons section.
+- NPC: attacks and special abilities will be shared between pc/npc. Same attributes.
+- Settings: added "pink" and "darkpink" to the roll template options.(Khruc) and "colorized" the roll template selector to help visualize your selection. Also made a few small teaks to the header text contrast to help with a few of the color choices.
+- NPC: added Save rolls. These are shared with the PC tab and use the Base number to keep things simple.
+- Thief Functions: each row is now auto-calculated. While you can temporarily override the total, any changes made to the row will trigger a recalc. Special handling for pre-existing characters; older thief values will be copied to the Base column. This allows for the "new" total to still match the old value, but will auto-calc once the row is manually adjusted. New sheets default to level 1 Thief base values.
+- Settings: Toggle Multi-Class fields. Toggle is also included inside the Class Details section.
+- Settings: Toggles all macro-text fields. Only show when you want to edit rolls.
+- Equipment: moved Wealth below the repeating equipment rows.
+- Armor Details: Added No Armor/Natural field.
+- NPC: added an Wears Armor checkbox. Used to indicate that the AC includes unnatural armor. Weapons vs Armor Type should apply. Unchecked by default. Uses a new attribute: @{armor_rating_flag}
+- NPC: added Type. Uses the existing attribute: @{race}.
+- PC/NPC: added Size and Temp Size. Size can be used for the Natural/Unaltered size, where as Temp Size can be used to track the current size. Uses new attributes: @{size} and @{size2}
+- NPC: added a Secondary/Other movement field. Only the primary movement is used for sheet speed calcs. Uses a new attribute: @{movement2}
+- NPC: No Appearing will now expand to match text entered.
+- Darkmode: More adjustments.
+- Settings: Option to hide comeliness row.
+- Darkmode: Fixed HP and AC weirdness.
+- Special Abilities: added die and modifier. A roll will be included with the Special Ability roll only if the die field is more than 1d0 or if the modifier is greater than 0.
+- Settings: added an Advanced Option to reset all sheet macros. **WARNING:*- This option will clear all repeating macro-text which forces the macro fields to re-populate to the latest sheet defaults. Any customization/editing that was done to any existing macro-text fields will be lost if the reset option is utilized. I will include an automatic check and reset of non-edited macro-text once the sheet is ready to to go live. For testing purposes, using the Reset option is the easiest method to ensure the sheet is using the latest macros.
+- Settings: added options to whisper PC and NPC rolls.
+- Attacks: added Attack Type for dual wielding attacks. normal, primary, and secondary option. Penalties are auto-calculated and adjusted for Dex.
+- Attacks: added Damage Type. Also displayed with damage rolls.
+- Initiative and Surprise: exposed macro text in settings to allow for more customization.
+- Fixed logo from being resized by roll20 image server which was causing the image to look blurry. Changed the logo to a background-image instead of an img element.
+- Saves: each save row is now auto-calculated. While you can temporarily override the save total, any changes made to the row will trigger a recalc. Special handling for per-existing characters; older save values will be copied to the Base/Class column. This allows for the "new" save total to still match the old value, but will auto-calc once the row is manually adjusted. New sheets default to 20.
+- Hit Adj. vs AC type: Added additional fields beyond AC 2. ie 1 and 0.
+- Attack row: alignment adjustments.
+- Included a check that adds a single repeating row if no rows have been added. Serves as a placeholder entry.
+- Updated navigational indicators (hide/show triangles have been changed to chevrons).
+- Updated logo with a cleaner more scalable image. (Thanks David)
+- Saves: removed Class Adj. column and added Temp. Adj.
+- Added hide/show toggle for custom saves and custom thief functions.
+- Minor adjustments to navigational section headings and button rolls.
+- Adjustments made to help better control portrait image.
+- Added some adjustments for dark mode.
+- Bug Fix: Equip weight- newly added items were not calculating weight properly.
+- Spells: changed Spell Type/School field to a datalist. Type to sort and choose, or enter any text.
+- Made the sheet a "little" more friendly to resizing the journal window. YMMV...
+- Attack Matrix: auto-fill to hit table automatically by selecting class/monster and level/HD.
+- NPC/Monster(WIP): added a toggle at the top of the sheet to switch sheet from PC to NPC/Monster.
+- Equipment: added carried options(yes,no,mount) with additional filtering(carried, not carried, mount). items that are not carried or on mount are not included in the character's weight calcs.
+- Bug Fix: Spells - toggling memorized spells(wasn't actually filtering correctly...) and also prevented seeing a newly added spell. Oops.
+- Spells: memorized spells will be slightly emphasized over non-prepared using a subtle opacity difference.
+- Settings: additional toggles added to hide Thief Skills, Spells, and Non-Weapon Proficiencies.
+- Notes: added repeating notes with the ability to output the note to chat with a roll.
+- Created an additional roll template for the attack table that places the matrix/thac0 output directly below the attack roll in chat. Should take up less room in chat make it a little easier if/when the Hit Armor Type table is also used.
+- Settings: added an option to either use a sheet's avatar or a custom url for the sheet's image/portrait.
+- Font updates to the sheet and templates. Also added a linear gradient to the template header color.
+- Attack Matrix and THAC0 table have been moved into the top of the Weapons section.
+- Settings: toggle Attack Matrix or THAC0 table.
+- Spells: toggle added to display memorized spells only.
+- Updated Saving Throws to show Success/Failure.
+- Repeating sections have been "condensed" and now include an option to expand the row for descriptions and macro-text.
+- Equipment: added tabs to help organize items. Includes a expanding section with description, macro-text and a sheet roll. Currently I'm hiding weight and cost for armor and weapons since you can enter that info outside of equipment. I'm toward removing the weight and cost field from the other sections entirely and simply track those in one location, Equipment...
+- Settings: added toggles to hide Costs and Exceptional Ability column.
+- Carrying Capacities and Movement Rates beyond 'Normal' are now calculated by the sheet.
+- Armor Details now has a carried option to handle armor weight.
+- Armor Details; now includes a auto-calculations based off of the armor "matrix". Best selected/worn base will be used for AC. All selected/worn armor adjustment and magical adjustments are applied. Calcs, Rear, Shieldless, and Total AC.
+- Still wrestling with how best to track multi-class hp. See the "Class Details" sub-section. Currently, the Total HP calc is all class hp+con/# of classes. Result can be a fraction for a multi-class character. Use this the Total HP result to determine what to enter in the HitPoint|max field. There is a spot to track any fractional HP if desired.
+- Sheet has now been converted over to be CSE(character sheet enhancement) mode and will break if the sheet is loaded in as a Custom game as Legacy.
+- added additional custom rows for saves and thief functions.
+- Added a Weapon Proficiency adj. checkbox toggle. Non-proficiency(unchecked) reveals a "penalty" field. Sheet auto-calcs weapon_prof_pen based on checkbox state and weapon_prof value. @{weapon_prof_pen} has been added to the default attack macro-text.
+- Added to hit vs armor type adj. Includes a checkbox to toggle the table with the attack roll. Sheet auto-calcs whether to use "{{ToHitACadj2to10}}" or "{{ToHitACadj2to10=<complete hit adj. by armor type table values>}}" and saves this value to @{weapon_ToHitACadj} which has been added to the default attack macro-text.
+- Small updates to the roll template to better accommodate the To Hit table.
+- All the older table data has been replaced. Moving to a grid/flex-based layout should help to make future changes easier.
+- Settings; Init and Surprise have a "die" option in the settings(located in the footer). d6 is the default. Hide/Show Costs has not been enabled yet.
+- Still planning to auto-hide the extra class and levels fields at the top of the sheet if not a multi-class.
+- Continuing to convert sheet layout from tables (only the roll templates are left to convert...)
+- Added a character portrait that pulls the sheet's avatar. Todo: add a default image(generic silhouette) in cases where there is not an image to pull or if it's not desired.
+- Working out a better class sub-section to better handle tracking xp and hp calcs for multi-class. Currently all manual entry, but auto-calculation "possibly" planned for hitpoints|max.
+- Added additional types of AC. ie Shieldless, Surprised, and Rear.
+- Updated some of the ability-based rolls to show target/threshold number as well as any adjustments included with the roll.
+- Updated Mental Save macro. 1d20+wis adj + query adj
+- Saving throw "matrix" added to handle multiple adjustments for saving throws. ie ability, racial, class, and misc. Currently all manual entry, but auto-calculation planned for the total of each type of saving throw. Also added an additional custom save row.
+- Updated saving throw rolls to show target/threshold and any adjustments included with the roll. Removed the success/fail border indicator for now... since it did not actually work correctly when applying modifiers. Border color was only based on the raw roll(system limitation). This will be addressed once the roll templates are updated.
+- Added notes for armor/defenses, racial, history/bio, and saving throws.
+- Thief skills now uses a matrix layout similar to saves. Add additional attributes to track adj. Also added an additional custom save row.-

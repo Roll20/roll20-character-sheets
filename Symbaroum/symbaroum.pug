@@ -9,6 +9,7 @@ input.tab(name="attr_page-number" type="hidden" value="1")
 
 // PC SHEET
 // =============================
+
 .pc.grid
 	.grid.character-info
 		label(data-i18n-title="name" title="name")
@@ -42,11 +43,41 @@ input.tab(name="attr_page-number" type="hidden" value="1")
 	.grid.attributes
 		each val in attributeObject
 			- const attrName = val.toLowerCase();
-			input(name='attr_' + attrName  max="15" min="5" type="number" value="10")
-			button(data-i18n=attrName name='roll_' + val + 'Check' type='roll' value='&{template:attrib}{{name=^{' + attrName + '}}} {{character=@{character-name}}} {{attribute=[[@{' + attrName + '}+(?{Modifier +/-|0})]]}} {{roll=[[1d20]]}}')
+			input(name='attr_' + attrName  max="30" min="5" type="number" value="10")
+			button(data-i18n=attrName name='roll_' + val + 'Check' type='roll' value='&{template:check}{{title=^{' + attrName + '}}} {{name=@{character-name}}} {{Target=[[@{' + attrName + '}+(?{Modifier +/-|0})]]}} {{Roll=[[1d20]]}}')
 				span=val
 		input(type="number" class="sheet-number-circle" disabled="true" value="(@{accurate}+@{cunning}+@{discreet}+@{persuasive}+@{quick}+@{resolute}+@{strong}+@{vigilant})" name="attr_attribute-total")
 		span(data-i18n="total") Total
+	.grid.toughness.tough-corr-row
+		h1.center(data-i18n="toughness") Toughness
+		label.center(data-i18n-title="current toughness input" title="current toughness input")
+			input.center(name="attr_toughness" title="@{toughness}" type="number" value="@{strong}")
+		span.center(data-i18n="current") Current
+		label.center(data-i18n-title="toughness maximum input" title="toughness maximum input")
+			input.center(min="10" name="attr_toughness_max" title="@{toughness_max}" type="number" value="10")
+		span.center(data-i18n="maximum-abbrv") Max
+		label.center(data-i18n-title="pain threshold display" title="pain threshold display")
+			input.center(name="attr_pain_threshold" title="@{pain_threshold}" type="number" value="ceil(@{strong}/2)" disabled="true")
+		span.center(data-i18n="pain-threshold-abbrv") Pain thresh.
+		button(data-i18n="death-c" name='act_DeathCheck' type='action' class='toughness' style='width: 60px; height: 32px; color: DarkRed; opacity: 1.0; padding: 4px; border: 3px solid #004242; border-radius: 6px;' data-i18n-title='deathCheck(pleaseSelectCharacterIconOnMap)-c' value='&{template:check} {{death=@{character-name}}} {{title=Dices with Death}}  {{Roll=[[1d20]]}}')
+		div.input-group
+			input(name="attr_death1"  data-i18n-title="deathCheck1-c" title="@{death1}" type="checkbox" style="margin-left: 8%" value="1")
+			input(name="attr_death2"  data-i18n-title="deathCheck2-c" title="@{death2}" type="checkbox" style="margin-left: 8%" value="1")
+			input(name="attr_death3"  data-i18n-title="deathCheck3-c" title="@{death3}" type="checkbox" style="margin-left: 8%" value="1")
+	.grid.corruption.tough-corr-row
+		h1.center(data-i18n="corruption") Corruption
+		button(data-i18n-title='title-choose-dice-and-roll' name='roll_corruption' title='Pick a dice value (to the right) and hit this button to roll' type='roll' value='&{template:check} {{name=@{character-name}}} {{title=for Corruption}}  {{Roll=[[@{corruption-d}]]}}')
+		select(name="attr_corruption-d")
+			+diceSelect("d4")
+		label.center(data-i18n-title="corruption input" title="corruption input")
+			input.center(name="attr_corruption" min="0" title="@{corruption}" type="number" value="0")
+		span.center(data-i18n="temporary-abbrv") Temp.
+		label.center(data-i18n-title="permanent corruption input" title="permanent corruption input")
+			input.center(name="attr_corruption_permanent" min="0" title="@{corruption_permanent}" type="number"  value="0")
+		span.center(data-i18n="permanent-abbrv") Perm.
+		label.center(data-i18n-title="corruption threshold" title="corruption threshold")
+			input.center(name="attr_corruption_threshold" title="@{corruption_threshold}" type="number"  value="ceil(@{resolute}/2)")
+		span.center(data-i18n="threshold") Threshold
 	.grid.tabs
 		// CHARACTER TAB
 		input.tab(data-i18n-title="title-character-sheet" name="attr_page-number" title="Character Sheet" type="radio" value="1" checked)
@@ -60,31 +91,6 @@ input.tab(name="attr_page-number" type="hidden" value="1")
 		// EQUIPMENT & BIO TAB
 		input.tab(data-i18n-title="title-equipment-group-and-friends" name="attr_page-number" title="Equipment, Group, and Friends" type="radio" value="4")
 		span.tab(data-i18n="equipment-and-biography") Equipment | Bio
-	.grid.toughness.tough-corr-row.section-pc1
-		h1.center(data-i18n="toughness") Toughness
-		label.center(data-i18n-title="current toughness input" title="current toughness input")
-			input.center(name="attr_toughness" title="@{toughness}" type="number" value="@{strong}")
-		span.center(data-i18n="current") Current
-		label.center(data-i18n-title="toughness maximum input" title="toughness maximum input")
-			input.center(min="10" name="attr_toughness_max" title="@{toughness_max}" type="number" value="10")
-		span.center(data-i18n="maximum-abbrv") Max
-		label.center(data-i18n-title="pain threshold display" title="pain threshold display")
-			input.center(name="attr_pain_threshold" title="@{pain_threshold}" type="number" value="ceil(@{strong}/2)" disabled="true")
-		span.center(data-i18n="pain-threshold-abbrv") Pain thresh.
-	.grid.corruption.tough-corr-row.section-pc1
-		h1.center(data-i18n="corruption") Corruption
-		button(data-i18n-title="title-choose-dice-and-roll" name="roll_corruption" title="Pick a dice value (to the right) and hit this button to roll" type="roll" value="/roll @{corruption-d} for Corruption...")
-		select(name="attr_corruption-d")
-			+diceSelect("d4")
-		label.center(data-i18n-title="corruption input" title="corruption input")
-			input.center(name="attr_corruption" min="0" title="@{corruption}" type="number" value="0")
-		span.center(data-i18n="temporary-abbrv") Temp.
-		label.center(data-i18n-title="permanent corruption input" title="permanent corruption input")
-			input.center(name="attr_corruption_permanent" min="0" title="@{corruption_permanent}" type="number"  value="0")
-		span.center(data-i18n="permanent-abbrv") Perm.
-		label.center(data-i18n-title="corruption threshold" title="corruption threshold")
-			input.center(name="attr_corruption_threshold" title="@{corruption_threshold}" type="number"  value="ceil(@{resolute}/2)" disabled="true")
-		span.center(data-i18n="threshold") Threshold
 	.grid.attacks.section-pc1
 		.grid.section-header
 			h1(data-i18n="attacks") Attacks
@@ -130,7 +136,7 @@ input.tab(name="attr_page-number" type="hidden" value="1")
 				fieldset.repeating_trait
 					.grid.section-body
 						+traitAbil("trait")
-			.grid.boon
+			.grid.boons
 				.grid.section-header
 					h1(data-i18n="boons") boons
 				.grid.section-body

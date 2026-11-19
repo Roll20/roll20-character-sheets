@@ -1,4 +1,4 @@
-/* ranged combat other begin */
+/* ranged_combat_other start */
 on(
 	"change:safe-sheet-open " +
 	"change:FKBasis " +
@@ -65,4 +65,4 @@ on(
 		safeSetAttrs(attrsToChange);
 	});
 });
-/* ranged combat other end */
+/* ranged_combat_other end */

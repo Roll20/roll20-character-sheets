@@ -1,8 +1,6 @@
-# Dependencies
+# Sheet Checks
 
-* You will need to install the correct asdf node js listed in the root of this repo's .tools-version file
-* Then you will need to run `npm i -g @vercel/ncc`
-* Then run `npm run build`
+This folder holds the built Sheet Checks action. It is generated from Roll20's private repository and
+updated by pull request; changes made here directly will be overwritten.
 
-NOTE: You will need to run `npm run build` and commit that change every time you make file changes 
-in `index.ts`
+To report a problem with the checks, open an issue in this repository.
