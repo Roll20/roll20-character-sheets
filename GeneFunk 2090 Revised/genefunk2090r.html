@@ -6712,7 +6712,47 @@ function openClassReset(){
 }
 on("clicked:class-reset", openClassReset);
 const CLS_ROW_SECS = ["trait","globalmod","feat","upgrade","hack","hack2","hack3","hack4","hack5"];
+let resetManeuverNote = "";
+function clearManeuvers(cb){
+  getAttrs(["mma_known","stalker_known"], rv => {
+    const had = {mma:(rv.mma_known||"").trim() !== "", stalker:(rv.stalker_known||"").trim() !== ""};
+    getSectionIDs("repeating_action", aids => {
+      getSectionIDs("repeating_globalmod", gids => {
+        const f = [];
+        aids.forEach(id => f.push(`repeating_action_${id}_name`, `repeating_action_${id}_properties`));
+        gids.forEach(id => f.push(`repeating_globalmod_${id}_name`));
+        getAttrs(f, v => {
+          const aDel = aids.filter(id => {
+            const nm = (v[`repeating_action_${id}_name`]||"").trim();
+            const pr = v[`repeating_action_${id}_properties`]||"";
+            return (MMA_FX[nm.toLowerCase()] && pr.indexOf("Mixed Martial Arts - ") === 0)
+                || (nm === "Elite Stalker: Snare" && pr.indexOf("Elite Stalker maneuver") >= 0);
+          });
+          const gDel = !had.stalker ? [] : gids.filter(id => {
+            const nm = (v[`repeating_globalmod_${id}_name`]||"").trim().toLowerCase();
+            return nm.indexOf("ambush (+") === 0 || nm.indexOf("reap (+") === 0;
+          });
+          const out = {};
+          if(had.mma) out.mma_known = "";
+          if(had.stalker) out.stalker_known = "";
+          const rows = () => {
+            aDel.forEach(id => removeRepeatingRow("repeating_action_" + id));
+            gDel.forEach(id => removeRepeatingRow("repeating_globalmod_" + id));
+            const n = aDel.length + gDel.length;
+            resetManeuverNote = (had.mma || had.stalker || n)
+              ? "cleared chosen maneuvers (" + n + " row" + (n === 1 ? "" : "s") + ")" : "";
+            cb();
+          };
+          if(Object.keys(out).length) setAttrs(out, {silent:false}, rows); else rows();
+        });
+      });
+    });
+  });
+}
 function doClassReset(done){
+  clearManeuvers(() => doClassResetCore(done));
+}
+function doClassResetCore(done){
   getAttrs(["class_select","class_select_2","class_select_3",
             "archetype_select","archetype_select_2","archetype_select_3",
             "asi_ledger","bg_ledger","startequip_class","startequip_ledger"], cv => {
@@ -6793,7 +6833,9 @@ function doClassReset(done){
             + killed.upgrade + " granted ware, " + killed.hack + " free hacks"
             + (rev.length ? ", and reversed " + rev.length + " class ability score increase" + (rev.length === 1 ? "" : "s") : "")
             + (skGone.length ? " | cleared " + skGone.length + " skill proficienc" + (skGone.length === 1 ? "y" : "ies") : "")
-            + (trGone.length ? " | training cleared: " + trGone.join(", ") : "");
+            + (trGone.length ? " | training cleared: " + trGone.join(", ") : "")
+            + (resetManeuverNote ? " | " + resetManeuverNote : "");
+          resetManeuverNote = "";
           setAttrs(out, {silent:false}, () => {
             syncAllHexes();
             const bled = bgLedgerOf(cv.bg_ledger);
@@ -7400,6 +7442,24 @@ on(["genometrait","upgrade","feat","trait"].map(s => "remove:repeating_" + s).jo
     });
   });
 });
+const WORN_ASI = {"artificial muscles": {strength:2}};
+function recalcWornAsi(){
+  getSectionIDs("repeating_equip", ids => {
+    const f = [];
+    ids.forEach(id => ["name","equipped"].forEach(k => f.push(`repeating_equip_${id}_${k}`)));
+    getAttrs(f, v => {
+      const worn = {};
+      ids.forEach(id => {
+        const k = String(v[`repeating_equip_${id}_name`] || "").trim().toLowerCase();
+        if(WORN_ASI[k] && int(v[`repeating_equip_${id}_equipped`])) worn[k] = true;
+      });
+      applyAsiBatch(Object.keys(WORN_ASI).map(k => ({key:"worn:" + k, deltas:worn[k] ? WORN_ASI[k] : null, replace:true, label:k})), applied => {
+        applied.filter(x => x.moved).forEach(x => ccLog("ASI", x.label + " " + x.txt + " (equip toggle)"));
+      });
+    });
+  });
+}
+on("change:repeating_equip remove:repeating_equip", recalcWornAsi);
 const TRAITFX = {
   "leathery scales":    {ac_min:18, dr_min:4, nodex:true},
   "sclerotized plates": {ac_min:16, dr_min:2, amp:{ac_min:2, dr_min:2, nodex:true}},
@@ -12451,7 +12511,7 @@ function recalcDaemonAv(){
     });
   });
 }
-on("sheet:opened change:repeating_upgrade remove:repeating_upgrade", recalcDaemonAv);
+on("sheet:opened change:repeating_upgrade remove:repeating_upgrade change:repeating_genometrait:name remove:repeating_genometrait", recalcDaemonAv);
 function daemonRoll(rollName, bonus){
   getAttrs(["daemon_name","advantage_state","whisper_state"], v => {
     const adv = (v.advantage_state || "1d20");
