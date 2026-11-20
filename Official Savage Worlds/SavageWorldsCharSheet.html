@@ -881,7 +881,7 @@ const setWildDie = function () {
   getAttrs(['is_npc'], function (lvalue) {
     //console.log("<==== Updating whether to Roll the Wild Die ====>");
     //console.log("is_npc value: " + lvalue.is_npc);
-    if (lvalue.is_npc === '0') {
+    if (String(lvalue.is_npc) === '0') {
       console.log('Is a Wild Card: Roll a Wild Die');
       setAttrs({ wdNum: 1 });
     } else {
@@ -896,6 +896,12 @@ const setWildDie = function () {
 on('change:is_npc', function () {
   //'use strict';
   setWildDie();
+});
+
+on('sheet:opened', function () {
+  getAttrs(['is_npc'], function (v) {
+    if (String(v.is_npc) === '0') setAttrs({ wdNum: 1 });
+  });
 });
 
 //Animal Intelligence
@@ -2205,7 +2211,9 @@ const PHEGSingular = {
     'shields':'shield',
     'armors':'armor',
     'vehicle':'vehicle',
-    'specialabilities':'specialability'
+    'specialabilities':'specialability',
+    'race':'character',
+    'iconic_framework':'character'
 };
 //Lookup proxy handlers. These functions are used int he proxies to return an appropriate value from the lookup objects above, even when a given key does not exist in those objects.
 const genericLookupHandler = {
@@ -2267,17 +2275,17 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
-        lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
+    lookupBurndown(queue, productArray, searchArray, callback, origBlock,IDPathways);
 };
 
 //Actually queries the compendium to get details on the items in each category using the searchArray assembled in compendiumLookup
 //ARGUMENTS
-//statblock (object): the original object dropped from the compendium
+//statblocks (array): the objects whose attachments are looked up, starting with the object dropped from the compendium
 //productArray (array): The array of expansion IDs that this product may rely on
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
-const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock,IDPathways) {
+const lookupBurndown = function(statblocks, productArray, searchArray, callback, origBlock,IDPathways) {
     getCompendiumQuery(searchArray, (dataArr) => {
         debug({dataArr});
         if(!Array.isArray(dataArr)){
@@ -2295,7 +2303,7 @@ const lookupBurndown = function(statblock, productArray, searchArray, callback, 
                 });
             }
         });
-        let queue = additionalLookups(statblock,origBlock);
+        let queue = statblocks.flatMap((statblock) => additionalLookups(statblock,origBlock));
         if(queue.length){
             compendiumDataLookup({queue,callback,origBlock,IDPathways});
         }else{
@@ -2324,7 +2332,7 @@ const additionalLookups = function(statblock,origBlock){
                                 origBlock[nProp] = origBlock[nProp] ? 
                                     [...origBlock[nProp],...jArr] : 
                                     [...jArr];
-                                m.data[nProp] = jArr;
+                                m.data[nProp] = [...(m.data[nProp] || []), ...jArr];
                                 m.nested = true;
                             }
                         }catch(err){
@@ -2726,6 +2734,7 @@ const determineWeaponOptions = function (
 const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes = {}}){
   debug('Applying effects fields');
   const effectPrefix = PHEGSingular[sectionName];
+  const traitDice = [...attributeNames, ...static.map(attr => attr.replace(/^static/, '').toLowerCase())];
   if (jsonObj[`${effectPrefix}effect`]) {
     //get all the different pieces
     jsonObj[`${effectPrefix}effect`]
@@ -2734,7 +2743,7 @@ const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes =
         effectString.replace(
           /(.+?)\s*:\s*(.+)/,
           (match,field,value)=>{
-            const findKey = obj => Object.keys(obj).find(key => key.toLowerCase() === field.toLowerCase());
+            const findKey = (obj, name = field) => Object.keys(obj).find(key => key.toLowerCase() === name.toLowerCase());
             const targetField = findKey(targetObj) || field;
             const currentValue = targetObj.hasOwnProperty(targetField) ?
               targetObj[targetField] :
@@ -2742,7 +2751,29 @@ const applyGeneralEffects = function({targetObj,sectionName,jsonObj,attributes =
             const numValue = +value;
             const numCurrentValue = +(currentValue || 0);
             if(!Number.isNaN(numValue) && !Number.isNaN(numCurrentValue)){
-              targetObj[targetField] = numCurrentValue + numValue;
+              if(traitDice.includes(field.toLowerCase())){
+                const modField = findKey(targetObj, `${field}mod`) || `${field}mod`;
+                const currentMod = +((targetObj.hasOwnProperty(modField) ?
+                  targetObj[modField] :
+                  attributes[findKey(attributes, modField)]) || 0);
+                let die = numCurrentValue;
+                let mod = currentMod;
+                for (let steps = Math.round(numValue / 2); steps > 0; steps--) {
+                  die === 12 ? mod++ : die += 2;
+                }
+                for (let steps = Math.round(numValue / 2); steps < 0 && die > 4; steps++) {
+                  die === 12 && mod > 0 ? mod-- : die -= 2;
+                }
+                targetObj[targetField] = die;
+                if (mod !== currentMod) {
+                  targetObj[modField] = mod;
+                }
+              }else{
+                targetObj[targetField] = numCurrentValue + numValue;
+              }
+            }else if(/^runningdie$/i.test(field) && !Number.isNaN(numValue)){
+              const sides = parseInt(`${currentValue || '1d6'}`.replace(/^1d/, '')) + numValue;
+              targetObj[targetField] = `1d${Math.min(12, Math.max(4, sides))}`;
             }else if(/(reason|modtype)$/i.test(field) && currentValue){
               targetObj[targetField] = `${currentValue}`.split(/\s*,\s*/).includes(value) ? `${currentValue}` : `${currentValue}, ${value}`;
             }else{
@@ -2889,6 +2920,7 @@ const dropArmorweapons = function({repSectionID,repSection,targetObj,jsonObj,att
 const dropCharacterType = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
   //Character types are not directly stored in repeating sections
   debug('dropping character type');
+  applyGeneralEffects({targetObj,sectionName:repSection,jsonObj,attributes});
   const retValue = [false,sheetAttributes];
   return retValue;
 };
@@ -3334,7 +3366,7 @@ const compendiumBestiary = function () {
             finalCharacterDetails.rolltemplate_theme = lookupObj['data-rolltemplate_theme'] || 'default';
             //switch character sheet view to mini-view
             //run dice handling
-            finalCharacterDetails = processAdditionalPHEGs(lookupObj,finalCharacterDetails,monster);
+            finalCharacterDetails = processAdditionalPHEGs(lookupObj,finalCharacterDetails,{...monster,...monsterStats});
             // set toughness armor to override any calculations
             finalCharacterDetails.toughnessArmor = lookupObj.toughnessArmor || 0;
             if (lookupObj.runningDie) {
@@ -3412,7 +3444,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         let dropType = getDropInfoCommand(type, source);
         let prefix = '';
         if(phegObj.data.subcategory){
-          prefix = /armor/i.test(phegObj.data.subcategory) ?
+          prefix = /^(power|robot) armor$/i.test(phegObj.data.subcategory) ?
             `${phegObj.data.subcategory[0].toLowerCase()}a_` :
             '';
         }
@@ -5292,7 +5324,7 @@ on("sheet:opened", function() {
 const descStatBlock = function() {
     let chardesc = "{{name=@{character_name}}}";
     getAttrs(["is_npc", "physdescription"], function(v) {
-        if (v.is_npc === "0") {
+        if (String(v.is_npc) === "0") {
             //is Wild Card
             chardesc += " {{wci=@{WCI}}}";
         }
@@ -5305,7 +5337,7 @@ const descStatBlock = function() {
     });
 };
 
-on("change:is_npc change:physdescription", function() {
+on("sheet:opened change:is_npc change:physdescription", function() {
     descStatBlock();
 });
 
@@ -5883,8 +5915,8 @@ on(
         importAttrs["tufnessMod"] = jsonObj.toughnessMod - jsonObj.size;
         importAttrs["money"] = jsonObj.wealth;
         jsonObj.wildcard ?
-            (importAttrs["is_npc"] = 0) :
-            (importAttrs["is_npc"] = 1);
+            (importAttrs["is_npc"] = "0") :
+            (importAttrs["is_npc"] = "1");
         importAttrs["wounds"] = jsonObj.wounds;
         importAttrs["wounds_max"] = jsonObj.woundsMax;
         //get the Attributes
