@@ -1,3 +1,3 @@
-# Medievo_-Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# LA MARCA DEL ESTE
+La marca del este Roll20-character-sheets.
+Hoja del jugador y del monstruo
