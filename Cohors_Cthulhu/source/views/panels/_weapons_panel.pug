@@ -1,0 +1,483 @@
+//- views/panels/_weapons_panel.pug
+//- Weapons & Attacks repeating section. Profiles from the game's melee and
+//- ranged weapon tables, declared here at compile time and embedded as the
+//- auto-fill table. The Name options below are written out individually
+//- (looping them through a k-scaffold mixin breaks the option text) and must
+//- match these keys. Axe and Javelin have melee and thrown profiles with a
+//- suffix each. Field keys match the row's attribute names.
+-
+  const ccMeleeWeapons = {
+    'Axe (Melee)': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Vicious', size: 'Minor', qualities: 'Special'},
+    'Club': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '2', size: 'Minor', qualities: ''},
+    'Cudgel': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Stun', size: 'Major', qualities: ''},
+    'Dagger': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '2, Piercing 1', size: 'Minor', qualities: 'Hidden, Subtle'},
+    'Dolabra': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '3, Piercing 1', size: 'Minor', qualities: ''},
+    'Javelin (Melee)': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Spear': {focus: 'Melee Weapons', reach_range: '3', damage_effects: '4, Piercing 1', size: 'Major', qualities: ''},
+    'Staff': {focus: 'Melee Weapons', reach_range: '3', damage_effects: '2', size: 'Major', qualities: 'Special'},
+    'Sword': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4', size: 'Major', qualities: 'Parrying'},
+    'Falx': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Vicious', size: 'Major', qualities: ''},
+    'Gladius': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Parrying'},
+    'Longsword': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '5', size: 'Major', qualities: 'Two-Handed'},
+    'Spatha': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '5, Piercing 1', size: 'Major', qualities: 'Two-Handed'},
+    'Unarmed': {focus: 'Unarmed', reach_range: '0', damage_effects: '2', size: '', qualities: 'Subtle'},
+    'War Axe': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Vicious', size: 'Major', qualities: 'Two-Handed'},
+    'Small Shield': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '2, Stun', size: 'Minor', qualities: 'Shield 2'},
+    'Large Shield': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '3, Stun', size: 'Major', qualities: 'Shield 3'},
+  };
+  const ccRangedWeapons = {
+    'Arcuballista': {focus: 'Archery', reach_range: 'Medium', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Accurate, Reload'},
+    'Axe (Thrown)': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '3, Vicious', size: 'Minor', qualities: 'Special'},
+    'Bow': {focus: 'Archery', reach_range: 'Medium', damage_effects: '3, Piercing 1', size: 'Major', qualities: 'Subtle'},
+    'Bow, Recurve': {focus: 'Archery', reach_range: 'Long', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Subtle'},
+    'Javelin (Thrown)': {focus: 'Thrown Weapons', reach_range: 'Medium', damage_effects: '3, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Pilum': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '4, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Plumbata': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '2, Piercing 1', size: 'Minor', qualities: ''},
+    'Sling': {focus: 'Thrown Weapons', reach_range: 'Long', damage_effects: '3, Stun', size: 'Minor', qualities: 'Inaccurate, Subtle, Special'},
+  };
+  const ccWeaponProfiles = Object.assign({}, ccMeleeWeapons, ccRangedWeapons);
+
+.cc-panel.cc-weapons
+  .cc-banner Weapons &amp; Attacks
+  .cc-rep-table.cc-rep-weapons
+    .cc-rep-header
+      span
+      span.cc-npc-col
+      span Name
+      span.cc-npc-col Type
+      span Focus
+      span Reach or Range
+      span Damage &amp; Effects
+      span Size
+      span Qualities
+    +fieldset({name: 'weapon'})
+      //- Attack and damage in one message (initiateWeaponRoll).
+      +roller({
+        name: 'weapon roll',
+        class: 'cc-weapon-roll',
+        trigger: {triggeredFuncs: ['initiateWeaponRoll']}
+      })
+      //- NPC Name: free text with a <datalist>, since NPCs carry claws, horns
+      //- and the like. Same combobox and apply button as the Talents Name;
+      //- the datalist is declared once below.
+      +action({
+        name: 'weapon apply',
+        class: 'cc-weapon-apply cc-npc-col',
+        trigger: {triggeredFuncs: ['ccApplyWeaponPreset', 'ccRefreshActionCalls']}
+      })
+      //- Name is rendered twice on one attribute; CSS shows one per Character
+      //- Type. NPCs get the combobox; player characters get a dropdown of the
+      //- standard weapons, which fires on change and needs no apply button.
+      +text({
+        name: 'name',
+        list: 'cc-weapon-options',
+        trigger: {triggeredFuncs: ['ccApplyWeaponPreset', 'ccRefreshActionCalls']}
+      }).cc-weapon-name-text
+      +select({
+        name: 'name',
+        trigger: {triggeredFuncs: ['ccApplyWeaponPreset', 'ccRefreshActionCalls']}
+      }).cc-weapon-name-select
+        +option({value: ''})
+          | Select Weapon
+        +option({value: "Axe (Melee)"})
+          | Axe (Melee)
+        +option({value: "Club"})
+          | Club
+        +option({value: "Cudgel"})
+          | Cudgel
+        +option({value: "Dagger"})
+          | Dagger
+        +option({value: "Dolabra"})
+          | Dolabra
+        +option({value: "Javelin (Melee)"})
+          | Javelin (Melee)
+        +option({value: "Spear"})
+          | Spear
+        +option({value: "Staff"})
+          | Staff
+        +option({value: "Sword"})
+          | Sword
+        +option({value: "Falx"})
+          | Falx
+        +option({value: "Gladius"})
+          | Gladius
+        +option({value: "Longsword"})
+          | Longsword
+        +option({value: "Spatha"})
+          | Spatha
+        +option({value: "Unarmed"})
+          | Unarmed
+        +option({value: "War Axe"})
+          | War Axe
+        +option({value: "Small Shield"})
+          | Small Shield
+        +option({value: "Large Shield"})
+          | Large Shield
+        +option({value: "Arcuballista"})
+          | Arcuballista
+        +option({value: "Axe (Thrown)"})
+          | Axe (Thrown)
+        +option({value: "Bow"})
+          | Bow
+        +option({value: "Bow, Recurve"})
+          | Bow, Recurve
+        +option({value: "Javelin (Thrown)"})
+          | Javelin (Thrown)
+        +option({value: "Pilum"})
+          | Pilum
+        +option({value: "Plumbata"})
+          | Plumbata
+        +option({value: "Sling"})
+          | Sling
+      //- Blank infers Melee or Ranged from Focus. Mental: the NPC mental
+      //- attack, Will + Persuasion or Survival, difficulty 1, resisted by
+      //- Courage + Morale.
+      +select({name: 'attack type'}).cc-npc-col
+        +option({value: ''})
+          | Auto
+        +option({value: 'melee'})
+          | Melee
+        +option({value: 'ranged'})
+          | Ranged
+        +option({value: 'mental'})
+          | Mental
+      +text({name: 'focus'})
+      +text({name: 'reach range'})
+      +text({name: 'damage effects'})
+      +text({name: 'size'})
+      +text({name: 'qualities'})
+  datalist#cc-weapon-options
+    option(value='Axe (Melee)')
+    option(value='Club')
+    option(value='Cudgel')
+    option(value='Dagger')
+    option(value='Dolabra')
+    option(value='Javelin (Melee)')
+    option(value='Spear')
+    option(value='Staff')
+    option(value='Sword')
+    option(value='Falx')
+    option(value='Gladius')
+    option(value='Longsword')
+    option(value='Spatha')
+    option(value='Unarmed')
+    option(value='War Axe')
+    option(value='Small Shield')
+    option(value='Large Shield')
+    option(value='Arcuballista')
+    option(value='Axe (Thrown)')
+    option(value='Bow')
+    option(value='Bow, Recurve')
+    option(value='Javelin (Thrown)')
+    option(value='Pilum')
+    option(value='Plumbata')
+    option(value='Sling')
+
++scss.
+  .cc-character {
+    .cc-rep-weapons {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1.3fr 1fr 0.9fr 1.7fr 0.6fr 1.2fr;
+        align-items: center;
+      }
+
+      // Player characters: dropdown, no apply button, no Type column.
+      .cc-npc-col,
+      .cc-weapon-name-text {
+        display: none;
+      }
+
+      // Same icon button as .cc-talent-apply.
+      .cc-weapon-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      // Same stone block as .cc-focus-roll, as a small square chip with the
+      // square fleck pattern.
+      .cc-weapon-roll {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        background-image:
+          radial-gradient(circle at 61% 17%, rgba(74, 53, 30, 0.6) 0%, transparent 6%),
+          radial-gradient(circle at 27% 68%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 83% 19%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 11% 29%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 7% 25%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 54% 27%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 78% 9%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 68% 37%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        border: 1px solid var(--cc-stone-bezel);
+        border-radius: 4px;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.45),
+          0 1px 1px rgba(0, 0, 0, 0.2);
+        color: var(--cc-ink);
+        font-size: 1.1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '0';
+          opacity: 1;
+        }
+
+        // Flat maroon fill instead of the stone texture.
+        &:hover {
+          background-image: none;
+          background-color: var(--cc-banner);
+          border-color: var(--cc-banner);
+          color: var(--cc-banner-text);
+        }
+      }
+    }
+  }
+
++scss.
+  // NPC tiers keep the free-text Name, apply button and Type column.
+  .cc-character {
+    #cc-character-type-trooper:checked,
+    #cc-character-type-toughened:checked,
+    #cc-character-type-nemesis:checked {
+      ~ .cc-weapons .cc-rep-weapons {
+        .cc-rep-header,
+        fieldset,
+        .repcontainer .repitem {
+          grid-template-columns: 1.6rem 1.6rem 1fr 0.8fr 1fr 0.9fr 1.7fr 0.6fr 1.2fr;
+        }
+
+        .cc-npc-col {
+          display: block;
+        }
+
+        .cc-weapon-apply.cc-npc-col {
+          display: inline-block;
+        }
+
+        .cc-weapon-name-text {
+          display: block;
+        }
+
+        .cc-weapon-name-select {
+          display: none;
+        }
+      }
+    }
+  }
+
++module.
+  // Embedded from ccWeaponProfiles at compile time.
+  const ccWeaponProfiles = !{JSON.stringify(ccWeaponProfiles)};
+
+  // Picking a known weapon fills its Focus, Reach/Range, Damage & Effects,
+  // Size and Qualities. All stay editable; "Custom / Other" leaves the row as
+  // is.
+  const ccApplyWeaponPreset = ({trigger, attributes}) => {
+    const profile = ccWeaponProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyWeaponPreset});
+
+  // "4, Piercing 1": base Damage in Challenge Dice, then the Damage Effects.
+  const ccParseDamageEffects = (text) => {
+    const parts = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    return {
+      baseRating: Number(parts[0]) || 0,
+      effects: parts.slice(1),
+    };
+  };
+
+  // Weapon roll: attack and damage in one message. Damage is always rolled
+  // and shown only on a pass.
+  //
+  // Melee: Agility + Fighting (Brawn for an NPC with Brutal X); ranged:
+  // Coordination + Fighting; mental: Will + Persuasion or Survival (a query).
+  // All difficulty 1. A blank Type infers melee or ranged from Focus.
+  //
+  // Damage: a PC's row holds the base rating, so the attribute's bonus damage
+  // is added. An NPC's row holds the stat block total, so nothing is added.
+  //
+  // Crit range opens to Fighting's ranks when Focus is a known Fighting
+  // focus (a natural 1 always crits, even with 0 ranks); mental attacks crit
+  // on a natural 1.
+  //
+  // Extra damage dice: each Momentum (Threat for an adversary) adds 1
+  // Challenge Die on a hit, up to 3. They're asked for up front and always
+  // rolled, but only counted and paid for on a hit.
+  const initiateWeaponRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const weaponName = attributes[`${prefix}name`] || 'Weapon';
+    const focus = attributes[`${prefix}focus`] || '';
+    const damageEffects = attributes[`${prefix}damage_effects`] || '';
+    const isNpc = ccIsNpc(attributes);
+
+    const focusLower = focus.toLowerCase();
+    const inferredType = (focusLower === 'archery' || focusLower === 'thrown weapons') ? 'ranged' : 'melee';
+    // Player characters have no Type column; their attack type comes from
+    // Focus.
+    const attackType = (isNpc && attributes[`${prefix}attack_type`]) || inferredType;
+    const isMental = attackType === 'mental';
+    const isRanged = attackType === 'ranged';
+
+    let attrName = isRanged ? 'coordination' : 'agility';
+    if (isMental) { attrName = 'will'; }
+    if (attackType === 'melee' && isNpc && ccHasSpecialRule(attributes, /^\s*brutal\b/i)) { attrName = 'brawn'; }
+    const attributeRating = Number(attributes[`${attrName}_rating`]) || 0;
+    const autoSuccesses = ccExtraordinary(attributes, attrName);
+
+    const fightingRanks = Number(attributes.fighting_ranks) || 0;
+    const focusSlug = focusLower.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const knownFocus = Boolean(!isMental && focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
+    const critMax = knownFocus ? Math.max(1, fightingRanks) : 1;
+
+    // Mental attacks: the option value is the chosen skill's ranks.
+    const persuasionRanks = Number(attributes.persuasion_ranks) || 0;
+    const survivalRanks = Number(attributes.survival_ranks) || 0;
+    const skillQuery = `?{Mental attack skill|Persuasion,${persuasionRanks}|Survival,${survivalRanks}}`;
+
+    let bonusDamageAttr = isRanged ? 'insight' : 'brawn';
+    if (isMental) { bonusDamageAttr = 'will'; }
+    const bonusDamage = isNpc ? 0 : (Number(attributes[`${bonusDamageAttr}_bonus_damage`]) || 0);
+
+    const {baseRating, effects} = ccParseDamageEffects(damageEffects);
+    const diceCount = Math.max(1, baseRating + bonusDamage);
+
+    console.log('[CC] Weapon roll:', {
+      weaponName, focus, attackType, attrName, attributeRating, fightingRanks, knownFocus, critMax, diceCount, autoSuccesses,
+    });
+
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
+    // Used in two fields; Roll20 asks once.
+    const extraDamageQuery = `?{Extra damage dice bought with ${ccPoolName(attributes)} if the attack succeeds (0-3)|0}`;
+    let focusLabel = focus;
+    if (isMental) { focusLabel = 'Mental Attack'; }
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${weaponName}}} ` +
+      (focusLabel ? `{{focus=${focusLabel}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      (isMental ? `{{skill_choice=[[0+${skillQuery}]]}} {{mental=1}} ` : '') +
+      `{{difficulty=1}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}} ` +
+      `{{has_damage=1}} ` +
+      `{{extra_damage=[[0+${extraDamageQuery}]]}} ` +
+      `{{damage_dice=[[(${diceCount}+${extraDamageQuery})d6]]}} ` +
+      `{{total_damage=[[0]]}} ` +
+      `{{effect_count=[[0]]}} ` +
+      `{{damage_dice_text=[[0]]}} ` +
+      `{{effects_summary=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const skillRanks = isMental ? (Number(roll.results.skill_choice.result) || 0) : fightingRanks;
+
+      const dice = ccTestDice(roll.results.roll1);
+
+      console.log(`[CC] ${weaponName} attack roll - d20s:`, dice);
+
+      const targetNumber = attributeRating + skillRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= critMax).length + autoSuccesses;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= 1;
+
+      // Extra damage dice count and cost only on a hit, at most 3.
+      const extraDamageDice = passed ?
+        Math.min(3, Math.max(0, Number(roll.results.extra_damage.result) || 0)) : 0;
+      const converted = ccRollDice(roll.results.damage_dice)
+        .slice(0, diceCount + extraDamageDice)
+        .map(ccChallengeDieFromD6);
+
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalDamage = converted.reduce((sum, c) => sum + c.pips, 0) +
+        effectCount * ccViciousBonus(effects);
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${effects.length ? ` - ${effects.join(', ')}` : ''}` :
+        'No Effects triggered';
+
+      console.log(`[CC] ${weaponName} result:`, {
+        targetNumber, successCount, complicationCount, passed, totalDamage, effectCount,
+      });
+
+      const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
+      const weaponBonusDiceCount = Math.max(0, dice.length - 2);
+      const weaponPoolSpent = await ccSettleRoll({
+        attributes,
+        generated: weaponBonusMomentum,
+        bonusDiceCount: weaponBonusDiceCount,
+        extraSpent: extraDamageDice,
+        complications: complicationCount,
+      });
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: weaponBonusMomentum,
+        complications: complicationCount,
+        momentum_spent: weaponPoolSpent,
+        auto_successes: autoSuccesses,
+        extra_damage: extraDamageDice,
+        total_damage: totalDamage,
+        effect_count: effectCount,
+        damage_dice_text: converted.map((c) => c.symbol).join(' '),
+        effects_summary: effectsSummary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        total_damage: '?',
+        effect_count: '?',
+        damage_dice_text: `error: ${err.message}`,
+        effects_summary: '',
+      });
+    }
+  };
+  k.registerFuncs({initiateWeaponRoll});

@@ -1,0 +1,197 @@
+//- views/panels/_special_rules_panel.pug
+//- NPC-only Special Rules. Name is a free-text combobox of the common NPC
+//- rules; X fills in from a trailing number ("Fearsome 2"). The rule's text
+//- is typed in Description.
+//-
+//- Only effects not already in a stat block's totals are automated:
+//-  - Extraordinary [Attribute] X: +X automatic successes on tests with that
+//-    attribute (ccExtraordinary).
+//-  - Brutal X: melee attacks use Brawn instead of Agility
+//-    (initiateWeaponRoll).
+//- Other rules are reference text; each row's button posts the rule to chat.
+-
+  const ccSpecialRuleNames = [
+    'Brutal',
+    'Extraordinary Agility',
+    'Extraordinary Brawn',
+    'Extraordinary Coordination',
+    'Extraordinary Gravitas',
+    'Extraordinary Insight',
+    'Extraordinary Reason',
+    'Extraordinary Will',
+    'Fast Recovery',
+    'Fearsome',
+    'Feeds Upon Fear',
+    'Flight',
+    'Grasping',
+    'Immune to',
+    'Incorporeal',
+    'Invulnerable',
+    'Keen Senses',
+    'Menacing',
+    'Mindless',
+    'Natural Armor',
+    'Natural Courage',
+    'Night Vision',
+    'Scale',
+    'Spellcaster',
+    'Threatening',
+    'Tough',
+  ];
+
+.cc-panel.cc-npc-panel.cc-special-rules
+  .cc-banner Special Rules
+  .cc-rep-table.cc-rep-special-rules
+    .cc-rep-header
+      span
+      span
+      span Name
+      span X
+      span Description
+    +fieldset({name: 'specialrule'})
+      +action({
+        name: 'special rule post',
+        class: 'cc-special-rule-post',
+        trigger: {triggeredFuncs: ['ccPostSpecialRule']}
+      })
+      +action({
+        name: 'special rule apply',
+        class: 'cc-special-rule-apply',
+        trigger: {triggeredFuncs: ['ccApplySpecialRulePreset']}
+      })
+      +text({
+        name: 'name',
+        list: 'cc-special-rule-options',
+        trigger: {triggeredFuncs: ['ccApplySpecialRulePreset']}
+      })
+      +number({name: 'x'})
+      +textarea({name: 'description'})
+  //- Options written out individually, as for the Weapons dropdown.
+  datalist#cc-special-rule-options
+    option(value='Brutal')
+    option(value='Extraordinary Agility')
+    option(value='Extraordinary Brawn')
+    option(value='Extraordinary Coordination')
+    option(value='Extraordinary Gravitas')
+    option(value='Extraordinary Insight')
+    option(value='Extraordinary Reason')
+    option(value='Extraordinary Will')
+    option(value='Fast Recovery')
+    option(value='Fearsome')
+    option(value='Feeds Upon Fear')
+    option(value='Flight')
+    option(value='Grasping')
+    option(value='Immune to')
+    option(value='Incorporeal')
+    option(value='Invulnerable')
+    option(value='Keen Senses')
+    option(value='Menacing')
+    option(value='Mindless')
+    option(value='Natural Armor')
+    option(value='Natural Courage')
+    option(value='Night Vision')
+    option(value='Scale')
+    option(value='Spellcaster')
+    option(value='Threatening')
+    option(value='Tough')
+
++scss.
+  .cc-character {
+    .cc-rep-special-rules {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1.6rem 1.2fr 2.5rem 3fr;
+        align-items: center;
+      }
+
+      textarea {
+        min-height: 1.8rem;
+        width: 100%;
+      }
+
+      // Same plain-icon-button look as .cc-weapon-apply.
+      .cc-special-rule-apply,
+      .cc-special-rule-post {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      .cc-special-rule-apply:before {
+        content: '\21BB';
+      }
+
+      // Speech-balloon-ish arrow: "post this rule to chat".
+      .cc-special-rule-post:before {
+        content: '\27A4';
+      }
+    }
+  }
+
++module.
+  const ccSpecialRuleNames = !{JSON.stringify(ccSpecialRuleNames)};
+
+  // "Fearsome 2", "Immune to Cold, Suffocation" or "Spellcaster (Will) 3"
+  // all resolve to their common rule: the longest profile name the typed
+  // name starts with.
+  const ccFindSpecialRule = (name) => {
+    const lower = String(name || '').trim().toLowerCase();
+    return ccSpecialRuleNames
+      .filter((key) => lower.startsWith(key.toLowerCase()))
+      .sort((a, b) => b.length - a.length)[0];
+  };
+
+  // Fills in X from a trailing number in a known rule's name, without
+  // overwriting a value already typed.
+  const ccApplySpecialRulePreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const name = attributes[`${prefix}name`];
+    const key = ccFindSpecialRule(name);
+    if (!key) { return; }
+    const trailing = String(name || '').match(/(\d+)\s*$/);
+    if (trailing && !attributes[`${prefix}x`]) {
+      attributes[`${prefix}x`] = Number(trailing[1]);
+    }
+  };
+  k.registerFuncs({ccApplySpecialRulePreset});
+
+  // Roll-template fields can't contain "}}" or "|" safely.
+  const ccTemplateSafe = (text) => String(text || '').replace(/[{}|]/g, '').replace(/\n+/g, ' ');
+
+  // Posts the rule to chat. A Fearsome rule also spells out the first-sight
+  // test and which mental attack it inflicts (the first Mental row in
+  // Weapons & Attacks).
+  const ccPostSpecialRule = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const name = attributes[`${prefix}name`] || 'Special Rule';
+    const x = Number(attributes[`${prefix}x`]) || 0;
+    let extra = '';
+    if (ccFindSpecialRule(name) === 'Fearsome') {
+      const mental = (attributes.repeating_weapon || []).find((row) => row.attack_type === 'mental');
+      const attack = mental ? `${mental.name} (${mental.damage_effects})` : 'its basic mental attack';
+      extra = `{{First sight=Will + Resilience test, difficulty ${x || 1}, or suffer ${ccTemplateSafe(attack)}}} `;
+    }
+    try {
+      const roll = await startRoll(`&{template:default} {{name=@{character_name}: ${ccTemplateSafe(name)}}} ` +
+        `{{Rule=${ccTemplateSafe(attributes[`${prefix}description`])}}} ${extra}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Special rule post failed:', err.message);
+    }
+  };
+  k.registerFuncs({ccPostSpecialRule});

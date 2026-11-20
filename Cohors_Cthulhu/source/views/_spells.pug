@@ -1,0 +1,909 @@
+//- views/_spells.pug
+//- Spells tab: spellcasting header and a repeating spell list.
+- const ccSpellbooks = require('./source/data/spells.json');
++tab({name: 'spells', container: 'article', button: {content: 'Spells'}})
+  .cc-page.cc-spells
+
+    //- Hidden PC/NPC marker for this page's CSS, calculated from
+    //- character_type (calcSpellsTypeMarker). It can't be more character_type
+    //- radios: radios with the same name form one group across the sheet.
+    +radio({name: 'spells type marker', value: 'pc', checked: '', trigger: {calculation: 'calcSpellsTypeMarker'}}).cc-spells-type.cc-spells-type-pc
+    +radio({name: 'spells type marker', value: 'npc', trigger: {calculation: 'calcSpellsTypeMarker'}}).cc-spells-type.cc-spells-type-npc
+
+    .cc-panel.cc-spellcasting-header
+      .cc-banner Spellcasting
+      .cc-field-group
+        //- Player and NPC versions of the same attribute; CSS shows one,
+        //- driven by spells_type_marker. The NPC versions add "Spellcaster
+        //- (Attribute) X" and the Mythos tomes.
+        .cc-field
+          span Spellcasting Type
+          +select({
+            name: 'spellcasting type',
+            trigger: {affects: ['spellcasting_attribute', 'base_power', 'power_rating']}
+          }).cc-pc-only
+            +option({value: ''})
+              | Select One
+            +option({value: 'traditional'})
+              | Traditional
+            +option({value: 'research'})
+              | Research
+            +option({value: 'dabbling'})
+              | Dabbling
+          +select({
+            name: 'spellcasting type',
+            trigger: {affects: ['spellcasting_attribute', 'base_power', 'power_rating']}
+          }).cc-npc-only
+            +option({value: ''})
+              | Select One
+            +option({value: 'traditional'})
+              | Traditional
+            +option({value: 'research'})
+              | Research
+            +option({value: 'dabbling'})
+              | Dabbling
+            +option({value: 'npc_insight'})
+              | NPC Spellcaster (Insight)
+            +option({value: 'npc_reason'})
+              | NPC Spellcaster (Reason)
+            +option({value: 'npc_will'})
+              | NPC Spellcaster (Will)
+        .cc-field
+          span Magical Tradition
+          //- Filters the Spell Name dropdown. Spells already learned from
+          //- another tradition stay, marked with a note.
+          +select({
+            name: 'magical tradition',
+            trigger: {affects: ['tradition_marker'], triggeredFuncs: ['ccUpdateSpellTraditions']}
+          }).cc-pc-only
+            +option({value: ''})
+              | Select One
+            +option({value: 'runic'})
+              | Runic
+            +option({value: 'oracular'})
+              | Oracular
+            +option({value: 'celtic'})
+              | Celtic
+          +select({
+            name: 'magical tradition',
+            trigger: {affects: ['tradition_marker'], triggeredFuncs: ['ccUpdateSpellTraditions']}
+          }).cc-npc-only
+            +option({value: ''})
+              | Select One
+            +option({value: 'runic'})
+              | Runic
+            +option({value: 'oracular'})
+              | Oracular
+            +option({value: 'celtic'})
+              | Celtic
+            +option({value: 'cthulhu'})
+              | Tome of Cthulhu
+            +option({value: 'mormo'})
+              | Compendium of Mormo
+            +option({value: 'nyarlathotep'})
+              | Grimoire of Nyarlathotep
+            +option({value: 'yog_sothoth'})
+              | Spellbook of Yog-Sothoth
+        .cc-field
+          //- Derived from Spellcasting Type: Traditional uses Insight,
+          //- Research Reason, Dabbling Will.
+          span Spellcasting Attribute
+          +text({
+            name: 'spellcasting attribute',
+            readonly: true,
+            trigger: {calculation: 'calcSpellcastingAttribute', affects: ['power_rating']}
+          })
+        .cc-field
+          span Power Rating
+          +number({name: 'power rating', readonly: true, trigger: {calculation: 'calcPowerRating'}})
+        .cc-field
+          span Base Power
+          +number({name: 'base power', readonly: true, trigger: {calculation: 'calcBasePower', affects: ['power_rating']}})
+
+    //- Hidden radios mirroring Magical Tradition, so CSS can match on
+    //- :checked. They must be direct siblings of .cc-spell-list for the ~
+    //- selector.
+    +radio({
+      name: 'tradition marker',
+      value: 'runic',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-runic
+    +radio({
+      name: 'tradition marker',
+      value: 'oracular',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-oracular
+    +radio({
+      name: 'tradition marker',
+      value: 'celtic',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-celtic
+    +radio({
+      name: 'tradition marker',
+      value: 'cthulhu',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-cthulhu
+    +radio({
+      name: 'tradition marker',
+      value: 'mormo',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-mormo
+    +radio({
+      name: 'tradition marker',
+      value: 'nyarlathotep',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-nyarlathotep
+    +radio({
+      name: 'tradition marker',
+      value: 'yog_sothoth',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-yog_sothoth
+
+    .cc-panel.cc-spell-list
+      .cc-banner Spells
+      +fieldset({name: 'spell'})
+        .cc-spell-block
+          .cc-field-group
+            //- Hidden: set when the spell is an attack spell (see
+            //- ccUpdateSpellAttack), which shows the Damage & Effects field.
+            +checkbox({name: 'spell attack', value: 1}).cc-spell-attack-marker
+            .cc-field
+              span Name
+              //- One Spell Name dropdown with every tradition's spells; CSS
+              //- shows only the options of the chosen Magical Tradition, so
+              //- a spell from another tradition stays selected and shown
+              //- but can't be picked anew. Options are written out rather
+              //- than looped, as for the Weapons and Armor dropdowns.
+              .cc-spell-name-row
+                +roller({
+                  name: 'spell cast',
+                  class: 'cc-spell-cast',
+                  trigger: {triggeredFuncs: ['initiateSpellRoll']}
+                })
+                +select({
+                  name: 'name',
+                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
+                }).cc-spell-name
+                  +option({value: ''})
+                    | Select Spell
+                  +option({value: 'Blessing of Fylgjur', class: 'cc-spell-opt-runic'})
+                    | Blessing of Fylgjur
+                  +option({value: 'Bounty of Baldr', class: 'cc-spell-opt-runic'})
+                    | Bounty of Baldr
+                  +option({value: 'Curse of Loki', class: 'cc-spell-opt-runic'})
+                    | Curse of Loki
+                  +option({value: 'Hammer of Thunraz', class: 'cc-spell-opt-runic'})
+                    | Hammer of Thunraz
+                  +option({value: 'Ravens of Wodan', class: 'cc-spell-opt-runic'})
+                    | Ravens of Wodan
+                  +option({value: 'Swiftness of Sleipnir', class: 'cc-spell-opt-runic'})
+                    | Swiftness of Sleipnir
+                  +option({value: 'Wisdom of Frigg', class: 'cc-spell-opt-runic'})
+                    | Wisdom of Frigg
+                  +option({value: 'Augury', class: 'cc-spell-opt-oracular'})
+                    | Augury
+                  +option({value: 'Guiding Hand', class: 'cc-spell-opt-oracular'})
+                    | Guiding Hand
+                  +option({value: 'Invoke the Parcae', class: 'cc-spell-opt-oracular'})
+                    | Invoke the Parcae
+                  +option({value: 'Prescience', class: 'cc-spell-opt-oracular'})
+                    | Prescience
+                  +option({value: 'Scrying', class: 'cc-spell-opt-oracular'})
+                    | Scrying
+                  +option({value: 'Second Sight', class: 'cc-spell-opt-oracular'})
+                    | Second Sight
+                  +option({value: 'Bounties of the Dagda', class: 'cc-spell-opt-celtic'})
+                    | Bounties of the Dagda
+                  +option({value: 'Cyclone of Cernunnos', class: 'cc-spell-opt-celtic'})
+                    | Cyclone of Cernunnos
+                  +option({value: 'Gaze of Balor', class: 'cc-spell-opt-celtic'})
+                    | Gaze of Balor
+                  +option({value: 'Gift of Arduinna', class: 'cc-spell-opt-celtic'})
+                    | Gift of Arduinna
+                  +option({value: 'Horn of Néit', class: 'cc-spell-opt-celtic'})
+                    | Horn of Néit
+                  +option({value: 'Roots of the Earth', class: 'cc-spell-opt-celtic'})
+                    | Roots of the Earth
+                  +option({value: 'Spear of Lug', class: 'cc-spell-opt-celtic'})
+                    | Spear of Lug
+                  +option({value: 'The Ogham Sign', class: 'cc-spell-opt-celtic'})
+                    | The Ogham Sign
+                  +option({value: 'Call of the Deep', class: 'cc-spell-opt-cthulhu'})
+                    | Call of the Deep
+                  +option({value: 'Curse of Cthulhu', class: 'cc-spell-opt-cthulhu'})
+                    | Curse of Cthulhu
+                  +option({value: 'Echo of the Ocean', class: 'cc-spell-opt-cthulhu'})
+                    | Echo of the Ocean
+                  +option({value: 'Gift of Cthulhu', class: 'cc-spell-opt-cthulhu'})
+                    | Gift of Cthulhu
+                  +option({value: 'Pool of Limpid Bliss', class: 'cc-spell-opt-cthulhu'})
+                    | Pool of Limpid Bliss
+                  +option({value: 'Swimmer in the Elder Current', class: 'cc-spell-opt-cthulhu'})
+                    | Swimmer in the Elder Current
+                  +option({value: 'Wave Storm', class: 'cc-spell-opt-cthulhu'})
+                    | Wave Storm
+                  +option({value: 'Acidic Transformation', class: 'cc-spell-opt-mormo'})
+                    | Acidic Transformation
+                  +option({value: 'Black Goat\'s Blessing', class: 'cc-spell-opt-mormo'})
+                    | Black Goat's Blessing
+                  +option({value: 'Call the Corpse Eaters', class: 'cc-spell-opt-mormo'})
+                    | Call the Corpse Eaters
+                  +option({value: 'Foul Birthing', class: 'cc-spell-opt-mormo'})
+                    | Foul Birthing
+                  +option({value: 'Necrophagus', class: 'cc-spell-opt-mormo'})
+                    | Necrophagus
+                  +option({value: 'Sacrificial Rebirth', class: 'cc-spell-opt-mormo'})
+                    | Sacrificial Rebirth
+                  +option({value: 'Whisper of the Woods', class: 'cc-spell-opt-mormo'})
+                    | Whisper of the Woods
+                  +option({value: 'Delirium of the Dark Pharaoh', class: 'cc-spell-opt-nyarlathotep'})
+                    | Delirium of the Dark Pharaoh
+                  +option({value: 'Lesser Black Rain', class: 'cc-spell-opt-nyarlathotep'})
+                    | Lesser Black Rain
+                  +option({value: 'Mask of the Faceless Sphinx', class: 'cc-spell-opt-nyarlathotep'})
+                    | Mask of the Faceless Sphinx
+                  +option({value: 'Rays of the Black Sun', class: 'cc-spell-opt-nyarlathotep'})
+                    | Rays of the Black Sun
+                  +option({value: 'The Nameless Mists', class: 'cc-spell-opt-nyarlathotep'})
+                    | The Nameless Mists
+                  +option({value: 'The Shape of Hate', class: 'cc-spell-opt-nyarlathotep'})
+                    | The Shape of Hate
+                  +option({value: 'Touch of the Black Sun', class: 'cc-spell-opt-nyarlathotep'})
+                    | Touch of the Black Sun
+                  +option({value: 'Binding of Yog-Sothoth', class: 'cc-spell-opt-yog_sothoth'})
+                    | Binding of Yog-Sothoth
+                  +option({value: 'Foetid Touch of Aforgomon', class: 'cc-spell-opt-yog_sothoth'})
+                    | Foetid Touch of Aforgomon
+                  +option({value: 'Gaze of the Multiverse', class: 'cc-spell-opt-yog_sothoth'})
+                    | Gaze of the Multiverse
+                  +option({value: 'Loathsome Bond of \'Umr at-Tawil', class: 'cc-spell-opt-yog_sothoth'})
+                    | Loathsome Bond of 'Umr at-Tawil
+                  +option({value: 'Way of the Gatekeeper', class: 'cc-spell-opt-yog_sothoth'})
+                    | Way of the Gatekeeper
+                  +option({value: 'Spheres of Yog-Sothoth', class: 'cc-spell-opt-yog_sothoth'})
+                    | Spheres of Yog-Sothoth
+            .cc-field
+              span Skill
+              +text({name: 'skill'})
+            .cc-field
+              span Difficulty
+              //- Free text: some spells give an opposed test ("2, opposed by
+              //- target's Will + Resilience").
+              +text({name: 'difficulty'})
+            .cc-field
+              span Cost
+              +text({name: 'cost'})
+            .cc-field
+              span Duration
+              +text({name: 'duration'})
+            .cc-field
+              span Category
+              +text({name: 'category', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
+            //- Attack spells only. Same format as a weapon's Damage &
+            //- Effects: the base rating, then effects ("4, Piercing 1").
+            .cc-field.cc-spell-damage
+              span Damage &amp; Effects
+              +text({name: 'damage effects', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
+          //- Effect and Momentum fold behind the info button (the Pictos
+          //- "i"). Its click flips two hidden radio markers
+          //- (ccToggleSpellInfo), which CSS reads as siblings, so the button
+          //- and the text follow the state: open (default) = maroon button,
+          //- text shown; pressed = folded in, light button, text hidden. Per
+          //- row, so each spell folds on its own.
+          //- Set (ccSetSpellTraditionNote) when the spell belongs to another
+          //- tradition than the character's; shows the note beside the info
+          //- button, e.g. "Celtic spell".
+          +checkbox({name: 'other tradition', value: 1}).cc-spell-other-tradition-marker
+          +radio({name: 'effect open', value: 'open', checked: ''}).cc-spell-info-open
+          +radio({name: 'effect open', value: 'closed'}).cc-spell-info-closed
+          +action({
+            name: 'effect toggle',
+            class: 'cc-spell-info-toggle',
+            trigger: {triggeredFuncs: ['ccToggleSpellInfo']}
+          })(title='Show or hide the spell effect and momentum')
+          +span({name: 'tradition note'}).cc-spell-tradition-note
+          .cc-spell-collapse-content
+            .cc-field
+              span Spell Effect
+              +textarea({name: 'effect'}).cc-spell-textarea
+            .cc-field
+              span Momentum
+              +textarea({name: 'momentum'}).cc-spell-textarea
+
++scss.
+  .cc-spells {
+    .cc-spell-block {
+      border: 1px solid var(--cc-rule);
+      border-radius: 3px;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      textarea {
+        min-height: 3rem;
+        width: 100%;
+      }
+    }
+
+    // Damage & Effects shows for attack spells only.
+    .cc-spell-attack-marker,
+    .cc-spell-damage {
+      display: none;
+    }
+
+    .cc-spell-attack-marker:checked ~ .cc-spell-damage {
+      display: flex;
+    }
+
+    // Tradition markers only matter for their :checked state.
+    .cc-tradition-marker-runic,
+    .cc-tradition-marker-oracular,
+    .cc-tradition-marker-celtic,
+    .cc-tradition-marker-cthulhu,
+    .cc-tradition-marker-mormo,
+    .cc-tradition-marker-nyarlathotep,
+    .cc-tradition-marker-yog_sothoth {
+      display: none;
+    }
+
+    // PC or NPC variants of Spellcasting Type and Magical Tradition.
+    .cc-spells-type,
+    .cc-npc-only {
+      display: none;
+    }
+
+    .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-npc-only {
+      display: block;
+    }
+
+    .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-pc-only {
+      display: none;
+    }
+
+    // Spell Name options: only the chosen tradition's are offered. A
+    // selected option stays displayed even when hidden from the list.
+    .cc-spell-opt-runic,
+    .cc-spell-opt-oracular,
+    .cc-spell-opt-celtic,
+    .cc-spell-opt-cthulhu,
+    .cc-spell-opt-mormo,
+    .cc-spell-opt-nyarlathotep,
+    .cc-spell-opt-yog_sothoth {
+      display: none;
+    }
+
+    .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-opt-runic {
+      display: block;
+    }
+
+    .cc-tradition-marker-oracular:checked ~ .cc-spell-list .cc-spell-opt-oracular {
+      display: block;
+    }
+
+    .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-opt-celtic {
+      display: block;
+    }
+
+    .cc-tradition-marker-cthulhu:checked ~ .cc-spell-list .cc-spell-opt-cthulhu {
+      display: block;
+    }
+
+    .cc-tradition-marker-mormo:checked ~ .cc-spell-list .cc-spell-opt-mormo {
+      display: block;
+    }
+
+    .cc-tradition-marker-nyarlathotep:checked ~ .cc-spell-list .cc-spell-opt-nyarlathotep {
+      display: block;
+    }
+
+    .cc-tradition-marker-yog_sothoth:checked ~ .cc-spell-list .cc-spell-opt-yog_sothoth {
+      display: block;
+    }
+    .cc-spell-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      // Not in a .cc-field, so match its boxed look here.
+      select {
+        flex: 1 1 auto;
+        background-color: var(--cc-editable-fill);
+        border: 1px solid var(--cc-rule);
+        border-radius: 2px;
+        color: var(--cc-ink);
+        font-family: var(--cc-body-font);
+      }
+    }
+
+    // Same stone block as the Focus and Weapon roll buttons.
+    .cc-spell-cast {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.4rem;
+      height: 1.4rem;
+      background-image:
+        radial-gradient(circle at 61% 17%, rgba(74, 53, 30, 0.6) 0%, transparent 6%),
+        radial-gradient(circle at 27% 68%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+        radial-gradient(circle at 83% 19%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+        radial-gradient(circle at 11% 29%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+        radial-gradient(circle at 7% 25%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 54% 27%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 78% 9%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 68% 37%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+        linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      border: 1px solid var(--cc-stone-bezel);
+      border-radius: 4px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 1px 1px rgba(0, 0, 0, 0.2);
+      padding: 0;
+      color: var(--cc-ink);
+      font-size: 1.1rem;
+      cursor: pointer;
+
+      // '0' is the d20 glyph in Roll20's dicefontd20 font.
+      &:before {
+        content: '0';
+        opacity: 1;
+      }
+
+      // Flat maroon fill instead of the stone texture.
+      &:hover {
+        background-image: none;
+        background-color: var(--cc-banner);
+        border-color: var(--cc-banner);
+        color: var(--cc-banner-text);
+      }
+    }
+
+    // Info button: the Pictos "i" icon (a font Roll20 provides). Open
+    // (default) = maroon, Effect and Momentum shown; folded in = light, text
+    // hidden. The hidden radio markers carry the state.
+    .cc-spell-info-closed,
+    .cc-spell-info-open {
+      display: none;
+    }
+
+    .cc-spell-info-toggle {
+      display: inline-block;
+      margin: 0 0 0.2rem;
+      padding: 0;
+      background: none;
+      border: none;
+      color: var(--cc-banner);
+      cursor: pointer;
+      font-size: 1.3rem;
+      line-height: 1;
+
+      &:before {
+        content: 'i';
+        font-family: pictos;
+        font-style: normal;
+        font-weight: normal;
+      }
+
+      &:hover {
+        color: var(--cc-rule);
+      }
+    }
+
+    // "<Tradition> spell" beside the info button, for a spell from another
+    // tradition than the character's.
+    .cc-spell-other-tradition-marker {
+      display: none;
+    }
+
+    .cc-spell-tradition-note {
+      display: none;
+      margin-left: 0.3rem;
+      vertical-align: middle;
+      font-size: 0.65rem;
+      font-style: italic;
+      color: var(--cc-banner);
+    }
+
+    .cc-spell-other-tradition-marker:checked ~ .cc-spell-tradition-note {
+      display: inline;
+    }
+
+    .cc-spell-info-closed:checked ~ .cc-spell-info-toggle {
+      color: var(--cc-rule-soft);
+    }
+
+    .cc-spell-info-closed:checked ~ .cc-spell-collapse-content {
+      display: none;
+    }
+
+    .cc-spell-textarea {
+      font-size: 12px;
+    }
+  }
+
++module.
+  // Traditional uses Insight, Research Reason, Dabbling Will.
+  //
+  // NPCs use "Spellcaster (Attribute) X": base Power 2 plus that attribute's
+  // bonus.
+  const calcSpellcastingAttribute = ({attributes}) => {
+    const type = attributes.spellcasting_type || '';
+    if (type.startsWith('npc_')) { return ccCapitalize(type.slice(4)); }
+    if (type === 'traditional') { return 'Insight'; }
+    if (type === 'research') { return 'Reason'; }
+    if (type === 'dabbling') { return 'Will'; }
+    return '';
+  };
+  k.registerFuncs({calcSpellcastingAttribute});
+
+  // Base Power: 2 for Traditional/Research, 1 for Dabbling.
+  const calcBasePower = ({attributes}) => {
+    const type = attributes.spellcasting_type;
+    if (type === 'dabbling') { return 1; }
+    if (type === 'traditional' || type === 'research' || String(type).startsWith('npc_')) { return 2; }
+    return 0;
+  };
+  k.registerFuncs({calcBasePower});
+
+  // Power Rating = Base Power + the casting attribute's bonus. An NPC's stat
+  // block Power wins when filled in.
+  const calcPowerRating = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_power');
+    if (book !== null) { return book; }
+    const base = Number(attributes.base_power) || 0;
+    const attr = (attributes.spellcasting_attribute || '').toLowerCase();
+    const rating = attr ? attributes[`${attr}_rating`] : 0;
+    return base + ccAttributeBonus(rating);
+  };
+  k.registerFuncs({calcPowerRating});
+
+  // Sync the tradition marker radios with Magical Tradition.
+  const calcTraditionMarker = ({attributes}) => attributes.magical_tradition;
+  k.registerFuncs({calcTraditionMarker});
+
+  // Sync the PC/NPC marker with Character Type.
+  const calcSpellsTypeMarker = ({attributes}) => (ccIsNpc(attributes) ? 'npc' : 'pc');
+  k.registerFuncs({calcSpellsTypeMarker});
+
+  // Spell data keyed by tradition, then name (source/data/spells.json).
+  const ccSpellbooks = !{JSON.stringify(ccSpellbooks)};
+  // Every field a spell fills or the player types into its row.
+  const ccSpellFields = ['skill', 'difficulty', 'cost', 'duration', 'category', 'damage_effects', 'effect', 'momentum'];
+
+  // The tradition a spell belongs to (its spellbook key), or '' for a name in
+  // no spellbook. Names are unique across the spellbooks.
+  const ccSpellTradition = (name) => Object.keys(ccSpellbooks)
+    .find((tradition) => name && ccSpellbooks[tradition][name]) || '';
+  const ccTraditionNames = {
+    runic: 'Runic', oracular: 'Oracular', celtic: 'Celtic', cthulhu: 'Tome of Cthulhu',
+    mormo: 'Compendium of Mormo', nyarlathotep: 'Grimoire of Nyarlathotep', yog_sothoth: 'Spellbook of Yog-Sothoth',
+  };
+
+  // Characters can learn spells outside their Magical Tradition. Such a row
+  // keeps its spell and gets a note beside the info button ("Celtic
+  // spell"); a spell of the character's tradition, or one in no spellbook,
+  // gets none.
+  const ccSetSpellTraditionNote = (attributes, prefix) => {
+    const tradition = ccSpellTradition(attributes[`${prefix}name`]);
+    const other = tradition && tradition !== attributes.magical_tradition;
+    const note = other ? `${ccTraditionNames[tradition]} spell` : '';
+    if (Number(attributes[`${prefix}other_tradition`]) !== (other ? 1 : 0)) {
+      attributes[`${prefix}other_tradition`] = other ? 1 : 0;
+    }
+    if ((attributes[`${prefix}tradition_note`] || '') !== note) {
+      attributes[`${prefix}tradition_note`] = note;
+    }
+  };
+
+  // A new Magical Tradition: every row's note follows. No spell is cleared.
+  const ccUpdateSpellTraditions = ({attributes, sections}) => {
+    (sections.repeating_spell || []).forEach((rowId) => {
+      ccSetSpellTraditionNote(attributes, `repeating_spell_${rowId}_`);
+    });
+  };
+  k.registerFuncs({ccUpdateSpellTraditions});
+
+  // Choosing a different spell clears the row's other fields, so nothing is
+  // left over from the previous spell, then fills in the new spell's
+  // mechanics from its own spellbook. Each stays editable afterwards.
+  const ccApplySpellPreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const name = attributes[`${prefix}name`];
+    const tradition = ccSpellTradition(name);
+    const profile = tradition && ccSpellbooks[tradition][name];
+    ccSpellFields.forEach((field) => {
+      if (attributes[`${prefix}${field}`]) { attributes[`${prefix}${field}`] = ''; }
+    });
+    Object.keys(profile || {}).forEach((field) => {
+      attributes[`${prefix}${field}`] = profile[field];
+    });
+    ccSetSpellAttackMarker(attributes, prefix);
+    ccSetSpellTraditionNote(attributes, prefix);
+  };
+  k.registerFuncs({ccApplySpellPreset});
+
+  // An attack spell has "attack" in its Category, or a Damage & Effects
+  // entry; its hidden marker shows the Damage & Effects field.
+  const ccSetSpellAttackMarker = (attributes, prefix) => {
+    const isAttack = /attack/i.test(attributes[`${prefix}category`] || '') ||
+      String(attributes[`${prefix}damage_effects`] || '').trim() !== '';
+    const marker = isAttack ? 1 : 0;
+    if (Number(attributes[`${prefix}spell_attack`]) !== marker) {
+      attributes[`${prefix}spell_attack`] = marker;
+    }
+  };
+  const ccUpdateSpellAttack = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    ccSetSpellAttackMarker(attributes, `${section}_${rowID}_`);
+  };
+  k.registerFuncs({ccUpdateSpellAttack});
+
+  // The info button: folds the row's Effect and Momentum in or out (open by
+  // default).
+  const ccToggleSpellInfo = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const key = `${section}_${rowID}_effect_open`;
+    attributes[key] = attributes[key] === 'closed' ? 'open' : 'closed';
+  };
+  k.registerFuncs({ccToggleSpellInfo});
+
+  // The leading number of a free-text Difficulty.
+  const ccParseLeadingNumber = (text) => {
+    const match = String(text || '').match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  };
+
+  // Cost reads like "4 Drain" or "5 Drain, Piercing 1": a Challenge Dice
+  // count with its first effect, then more effects. Drain is a normal effect,
+  // applied only when an Effect is rolled.
+  const ccParseSpellCost = (text) => {
+    const segments = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    const [first, ...rest] = segments;
+    const match = (first || '').match(/^(\d+)\s*(.*)$/);
+    const diceCount = match ? Number(match[1]) : 0;
+    const firstEffect = match && match[2] ? match[2].trim() : '';
+    return {
+      diceCount,
+      effects: [firstEffect, ...rest].filter(Boolean),
+    };
+  };
+
+  // Spells whose Momentum options also add Cost dice: Scrying gains 1
+  // Challenge Die per Momentum spent. Other spells' Extra Momentum is tracked
+  // and shown but adds no Cost dice. Kept out of spells.json so
+  // ccApplySpellPreset doesn't copy it to a row attribute.
+  const ccSpellMomentumCostDice = {
+    'Scrying': 1,
+  };
+
+  // Spells whose Cost roll generates Threat: Curse of Loki, 1 Threat per
+  // damage effect rolled. Kept out of the cost string, which ccParseSpellCost
+  // would misread as an effect.
+  const ccSpellCostThreatPerEffect = {
+    'Curse of Loki': 1,
+    'Call of the Deep': 1,
+    'Delirium of the Dark Pharaoh': 1,
+    'The Nameless Mists': 1,
+    'Foetid Touch of Aforgomon': 1,
+    "Loathsome Bond of 'Umr at-Tawil": 1,
+    'Spheres of Yog-Sothoth': 1,
+  };
+
+  // Each skill's magic focus. A caster who has the focus for a spell's skill
+  // rolls it as a focus roll: every die at or under the skill's ranks is a
+  // critical success.
+  const ccMagicFocuses = {
+    academia: 'Religion',
+    fighting: 'War Magic',
+    medicine: 'Faith Healing',
+    observation: 'Instincts',
+    persuasion: 'Invocation',
+    resilience: 'Discipline',
+    survival: 'Mysticism',
+    tactics: 'Omen Reading',
+  };
+
+  // Casting roll: Spellcasting Attribute + the spell's Skill vs its
+  // Difficulty, with the Cost rolled in the same message. The cost is paid
+  // whether or not the spell succeeds.
+  //
+  // Attack spells (a Damage & Effects entry) also roll damage like a weapon:
+  // Power plus the listed rating in Challenge Dice, with the listed effects,
+  // and each Momentum (Threat for an adversary) spent on Spell Effects adds 1
+  // Challenge Die, up to 3. The dice are always rolled, but only shown,
+  // counted and paid on a pass. No attribute bonus damage is added (it is
+  // already in Power).
+  const initiateSpellRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const spellName = attributes[`${prefix}name`] || 'Spell';
+    const skillName = attributes[`${prefix}skill`] || '';
+    const skillSlug = skillName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const skillRanks = Number(attributes[`${skillSlug}_ranks`]) || 0;
+    // The focus checkbox's attribute, named as in components/_focus.pug. A
+    // ticked box holds "on" (no value attribute) or 1 (imported NPCs).
+    const focusName = ccMagicFocuses[skillSlug] || '';
+    const focusSlug = focusName.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    const hasFocus = Boolean(focusName && attributes[`${skillSlug}_focus_${focusSlug}_known`]);
+    // A natural 1 is always a critical success.
+    const critMax = hasFocus ? Math.max(1, skillRanks) : 1;
+
+    const castAttr = (attributes.spellcasting_attribute || '').toLowerCase();
+    const attributeRating = Number(attributes[`${castAttr}_rating`]) || 0;
+    const autoSuccesses = ccExtraordinary(attributes, castAttr);
+
+    const difficultyDefault = ccParseLeadingNumber(attributes[`${prefix}difficulty`]) || 1;
+    const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
+    const costDicePerMomentum = ccSpellMomentumCostDice[spellName] || 0;
+    const {baseRating: damageRating, effects: damageEffects} = ccParseDamageEffects(attributes[`${prefix}damage_effects`]);
+    const hasDamage = damageRating > 0;
+
+    // A Dabbler casts at Power 1 or 3 (plus their Will bonus). At 3, every
+    // Effect rolled on the spell's Challenge Dice (Cost, and Damage on a
+    // pass) generates 1 Threat, so it is settled after the roll.
+    const isDabbling = attributes.spellcasting_type === 'dabbling';
+    const spellPowerQuery = '?{Spell Power (3 costs 1 Threat per Effect rolled)|1|3}';
+    // Power, as in the Power Rating field. A Dabbler's chosen Power (1 or 3)
+    // replaces their Base Power of 1, so the damage roll reuses the query.
+    const powerRating = calcPowerRating({attributes});
+    const powerExpr = isDabbling ?
+      `(${powerRating - (Number(attributes.base_power) || 0)}+${spellPowerQuery})` :
+      `${powerRating}`;
+
+    const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
+    // The same query text in extra_momentum, cost_dice and damage_dice:
+    // Roll20 asks once and reuses the answer. An attack spell's Extra
+    // Momentum is what it spends on its Spell Effects (damage dice).
+    const extraMomentumQuery = hasDamage ?
+      `?{Extra ${ccPoolName(attributes)} spent on Spell Effects|0}` :
+      `?{Extra ${ccPoolName(attributes)} spent|0}`;
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${spellName}}} ` +
+      (skillName ? `{{focus=${skillName}${hasFocus ? `: ${focusName}` : ''}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
+      (isDabbling ? `{{spell_power=[[0+${spellPowerQuery}]]}} ` : '') +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{dabbling_power_threat=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}} ` +
+      `{{is_spell=1}} ` +
+      (hasDamage ?
+        `{{has_damage=1}} ` +
+        `{{extra_damage=[[0]]}} ` +
+        `{{spell_power_damage=[[0+${powerExpr}]]}} ` +
+        `{{damage_dice=[[(${damageRating}+${powerExpr}+(${extraMomentumQuery}))d6]]}} ` +
+        `{{total_damage=[[0]]}} ` +
+        `{{effect_count=[[0]]}} ` +
+        `{{damage_dice_text=[[0]]}} ` +
+        `{{effects_summary=[[0]]}} ` : '') +
+      `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
+      `{{cost_total=[[0]]}} ` +
+      `{{cost_effect_count=[[0]]}} ` +
+      `{{cost_dice_text=[[0]]}} ` +
+      `{{cost_effects_summary=[[0]]}} ` +
+      `{{cost_threat_generated=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
+
+      const dice = ccTestDice(roll.results.roll1);
+
+      // Crits on a die <= critMax (the skill's ranks with its magic focus,
+      // else 1).
+      const targetNumber = attributeRating + skillRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const critCount = dice.filter((d) => d <= critMax).length;
+      const successCount = dice.filter((d) => d <= targetNumber).length + critCount + autoSuccesses;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+
+      // Momentum is only spent on a pass, so a failure pays no Extra Momentum
+      // and doesn't count Scrying's extra Cost dice.
+      // An attack spell pays only for the damage dice it can add (3).
+      const extraDamageDice = hasDamage && passed ? Math.min(3, Math.max(0, extraMomentum)) : 0;
+      const momentumSpent = hasDamage ? extraDamageDice : (passed ? extraMomentum : 0);
+      const rawCostDice = ccRollDice(roll.results.cost_dice);
+      const countedCostDice = passed ? rawCostDice : rawCostDice.slice(0, Math.max(0, costDiceCount));
+
+      const converted = countedCostDice.map(ccChallengeDieFromD6);
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalCost = converted.reduce((sum, c) => sum + c.pips, 0) +
+        effectCount * ccViciousBonus(costEffects);
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
+        'No Effects triggered';
+      // Threat from the Cost's Effects is the GM's gain, so an adversary's
+      // spell generates none.
+      const powerDamage = hasDamage ? Math.max(0, Number(roll.results.spell_power_damage.result) || 0) : 0;
+      const damageDice = hasDamage ?
+        ccRollDice(roll.results.damage_dice).slice(0, powerDamage + damageRating + extraDamageDice).map(ccChallengeDieFromD6) : [];
+      const damageEffectCount = damageDice.filter((c) => c.effect).length;
+      const totalDamage = damageDice.reduce((sum, c) => sum + c.pips, 0) +
+        damageEffectCount * ccViciousBonus(damageEffects);
+      const damageEffectsSummary = damageEffectCount > 0 ?
+        `${damageEffectCount}x Effect${damageEffects.length ? ` - ${damageEffects.join(', ')}` : ''}` :
+        'No Effects triggered';
+      const costThreatGenerated = ccIsAdversary(attributes) ? 0 :
+        effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
+      // A Dabbler at Power 3: 1 Threat per Effect on the Cost dice and, on a
+      // pass, the Damage dice.
+      const spellPower = isDabbling ? (Number(roll.results.spell_power.result) || 1) : 0;
+      const dabblingPowerThreat = spellPower === 3 ? effectCount + (passed ? damageEffectCount : 0) : 0;
+
+      const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const spellBonusDiceCount = Math.max(0, dice.length - 2);
+      // ccSettleRoll is in views/_global_sheetworker.pug.
+      const spellPoolSpent = await ccSettleRoll({
+        attributes,
+        generated: spellBonusMomentum,
+        bonusDiceCount: spellBonusDiceCount,
+        extraSpent: momentumSpent,
+        complications: complicationCount,
+        extraThreat: dabblingPowerThreat + costThreatGenerated,
+      });
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: spellBonusMomentum,
+        complications: complicationCount,
+        extra_momentum: momentumSpent,
+        momentum_spent: spellPoolSpent,
+        auto_successes: autoSuccesses,
+        dabbling_power_threat: dabblingPowerThreat,
+        cost_total: totalCost,
+        cost_effect_count: effectCount,
+        cost_threat_generated: costThreatGenerated,
+        cost_dice_text: converted.map((c) => c.symbol).join(' '),
+        cost_effects_summary: effectsSummary,
+        ...(hasDamage ? {
+          extra_damage: extraDamageDice,
+          spell_power_damage: powerDamage,
+          total_damage: totalDamage,
+          effect_count: damageEffectCount,
+          damage_dice_text: damageDice.map((c) => c.symbol).join(' '),
+          effects_summary: damageEffectsSummary,
+        } : {}),
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        cost_total: '?',
+        cost_effect_count: '?',
+        cost_dice_text: `error: ${err.message}`,
+        cost_effects_summary: '',
+        ...(hasDamage ? {
+          total_damage: '?',
+          effect_count: '?',
+          damage_dice_text: `error: ${err.message}`,
+          effects_summary: '',
+        } : {}),
+      });
+    }
+  };
+  k.registerFuncs({initiateSpellRoll});

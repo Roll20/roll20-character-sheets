@@ -1,0 +1,139 @@
+//- views/panels/_attributes_panel.pug
+//- Attributes table: rating, bonus damage and a roll button per attribute.
+//- ccRatingAffects names attributes calculated in other panels; affects works
+//- by name.
+- const ccAttributes = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
+- const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
+-
+  const ccRatingAffects = {
+    brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'],
+    will: ['will_bonus_damage', 'courage', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'power_rating'],
+    insight: ['insight_bonus_damage', 'power_rating'],
+    reason: ['power_rating'],
+  }
+.cc-panel.cc-attributes
+  .cc-banner Attributes
+  table.cc-table.cc-attributes-table
+    thead
+      tr
+        th
+        each attr in ccAttributes
+          th
+            +roller({
+              name: `${attr} roll`,
+              class: 'cc-attribute-roll',
+              trigger: {triggeredFuncs: ['initiateAttributeRoll']}
+            })
+              = attr
+    tbody
+      tr
+        th Rating
+        each attr in ccAttributes
+          td
+            +number({
+              name: `${attr} rating`,
+              trigger: ccRatingAffects[attr] ? {affects: ccRatingAffects[attr]} : undefined
+            }).cc-attribute-rating
+      tr
+        th Bonus Damage
+        each attr in ccAttributes
+          td
+            if ccBonusDamageAttributes.includes(attr)
+              +number({
+                name: `${attr} bonus damage`,
+                readonly: true,
+                trigger: {calculation: 'calcAttributeBonusDamage'}
+              }).cc-attribute-bonus-damage
+            else
+              span.cc-attribute-bonus-damage.cc-disabled
+
++scss.
+  .cc-character {
+    .cc-attributes-table {
+      th,
+      td {
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      th:first-child {
+        text-align: left;
+      }
+
+      // Styled as a light chip on the header, inverting on hover, with an
+      // enlarged die icon.
+      .cc-attribute-roll {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--cc-banner-text);
+        border-radius: 4px;
+        padding: 0.15rem 0.5rem;
+        color: inherit;
+        font: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        cursor: pointer;
+
+        &:hover {
+          background: var(--cc-banner-text);
+          color: var(--cc-banner);
+        }
+
+        // '0' is the d20 glyph in Roll20's dicefontd20 font
+        // (https://wiki.roll20.net/CSS_Wizardry#Icon_Fonts); k-scaffold's
+        // roller defaults to 'T'.
+        &:before {
+          content: '0';
+          font-size: 1.5em;
+          opacity: 1;
+        }
+      }
+
+      .cc-attribute-rating,
+      .cc-attribute-bonus-damage {
+        width: 3rem;
+        text-align: center;
+        background: transparent;
+        border: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+        border-radius: 2px;
+      }
+
+      // Rating is player-entered; Bonus Damage is calculated.
+      .cc-attribute-rating {
+        background: var(--cc-editable-fill);
+      }
+
+      .cc-attribute-bonus-damage.cc-disabled {
+        display: inline-block;
+        width: 3rem;
+        height: 1.6rem;
+        border: 1px dashed var(--cc-parchment-dark);
+      }
+    }
+  }
+
++module.
+  const calcAttributeBonusDamage = ({trigger, attributes}) => {
+    const attrName = trigger.name.replace(/_bonus_damage$/, '');
+    return ccAttributeBonus(attributes[`${attrName}_rating`]);
+  };
+  k.registerFuncs({calcAttributeBonusDamage});
+
+  // Attribute-only roll: the TN is the rating, crit only on a natural 1.
+  const initiateAttributeRoll = async ({trigger, attributes}) => {
+    const attr = ccNormalizeName(trigger.name).replace(/_(roll|action)$/, '');
+    const rating = Number(attributes[`${attr}_rating`]) || 0;
+    // Packed like ccAttributeQuery: rating + 100 x Extraordinary bonus.
+    await runCcRoll({
+      attributes,
+      skillLabel: ccCapitalize(attr),
+      focusLabel: '',
+      attributeExpr: String(rating + 100 * ccExtraordinary(attributes, attr)),
+      skillRanks: 0,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateAttributeRoll});
