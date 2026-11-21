@@ -7904,15 +7904,16 @@ on(
 const toggleReadonlyClass = async (attr) => {
   const v = await getAttrsAsync([`${attr}`]);
   const isReadonly = int(v[`${attr}`]);
-  const attrBasedClass = attr.replaceAll('_', '-');
+  const classFromAttr = attr.replaceAll('_', '-');
+  console.log(`Change detected: classFromAttr:${classFromAttr}`);
   if (isReadonly) {
-    $20(`.${attrBasedClass}`).addClass('readonly-span');
+    $20(`.${classFromAttr}`).addClass('readonly-span');
   } else {
-    $20(`.${attrBasedClass}`).removeClass('readonly-span');
+    $20(`.${classFromAttr}`).removeClass('readonly-span');
   }
 };
 
-on('change:sync_hp_flag', async (eventInfo) => {
-  console.log(`Change detected: ${eventInfo.sourceAttribute}`);
-  await toggleReadonlyClass(eventInfo.sourceAttribute);
+on('sheet:opened change:sync_hp_flag', async (eventInfo) => {
+  const attr = 'sync_hp_flag';
+  await toggleReadonlyClass(attr);
 });
