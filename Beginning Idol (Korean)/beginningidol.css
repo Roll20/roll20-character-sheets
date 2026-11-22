@@ -39,8 +39,9 @@
 .sheet-rolltemplate-beginningidol .sheet-rt{display:flex;gap:6px;align-items:center;font-size:12px;line-height:1.5}
 .sheet-rolltemplate-beginningidol .sheet-rt .sheet-die{flex:none}
 .sheet-rolltemplate-beginningidol .sheet-rtx.sheet-fbx{font:400 12px/1.5 'Noto Sans KR',sans-serif;text-align:left}
-.sheet-rolltemplate-beginningidol .sheet-rtx{flex:1;min-width:0;font:900 14px/1.4 'Noto Sans KR',sans-serif}
+.sheet-rolltemplate-beginningidol .sheet-rtx{flex:1;min-width:0;font:900 14px/1.4 'Noto Sans KR',sans-serif;text-align:left}
 .sheet-rolltemplate-beginningidol .sheet-eff{background:var(--cell);padding:6px 7px;font-size:12px;line-height:1.5;white-space:pre-wrap}
+.sheet-rolltemplate-beginningidol .sheet-eff .inlinerollresult{display:inline;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;text-align:left}
 .sheet-rolltemplate-beginningidol .sheet-plain{white-space:pre-wrap}
 
 /* Sheet tokens. White paper, black bars as on the official sheet, one accent per route (tiara pink, crown royal blue). Dark mode follows Roll20. */
@@ -51,6 +52,11 @@
 .sheet-darkmode .t-route[value="crown"] ~ .bi{--accent:#7f9fe8;--soft:#222c42}
 .bi{position:relative;max-width:830px;background:var(--paper);color:var(--ink);font:13px/1.5 var(--sans);padding:10px;border:1px solid var(--line);text-align:left;display:flex;flex-direction:column;gap:8px}
 .bi *{box-sizing:border-box}
+/* sheet type and PC role (hidden mirrors before .bi): route unit = unit sheet, role side / center / support, mental cap 80 */
+.t-route[value="unit"] ~ .bi .pc-only,.t-route:not([value="unit"]) ~ .bi .unit-only{display:none}
+.t-role[value="center"] ~ .bi .no-center,.t-role:not([value="center"]) ~ .bi .center-only{display:none}
+.t-role[value="support"] ~ .bi .no-support,.t-role:not([value="support"]) ~ .bi .support-only{display:none}
+.t-m80:not([value="1"]) ~ .bi .ment label.mt.hi{display:none}
 
 /* Roll20 base css resets (bootstrap inputs, buttons, labels) */
 .bi input[type=text],.bi input[type=number],.bi textarea,.bi select{display:block;width:100%;height:auto;min-width:0;margin:0;padding:0 4px;background:transparent;color:var(--ink);border:0;border-radius:0;box-shadow:none;font:inherit;line-height:1.4;outline:0}
@@ -148,7 +154,7 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi input[type=checkbox].x:checked::before,.bi input[type=checkbox].x:checked::after{background:var(--accent);height:2.5px}
 
 /* roll strip: one row */
-.bi .strip{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:30px;padding:3px 2px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-size:11.5px}
+.bi .strip{display:flex;align-items:center;gap:3px;flex-wrap:wrap;min-height:30px;padding:3px 2px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-size:11.5px}
 .bi .seg{display:inline-flex;border:1px solid var(--ink)}
 .bi .seg label.sgk{display:block;width:auto;margin:0;padding:0;font-weight:400;cursor:pointer}
 .bi .seg label.sgk input{display:none}
@@ -168,7 +174,7 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi button[type=action].rs::before{content:"";position:absolute;top:2px;left:2px;right:2px;bottom:2px;border:1.5px solid currentColor;border-radius:50%;border-right-color:transparent}
 .bi button[type=action].rs::after{content:"";position:absolute;right:1px;top:0;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;border-right:4px solid currentColor;transform:rotate(-35deg)}
 .bi .adjv:not([value="0"]) ~ button[type=action].rs{color:var(--accent)}
-.bi button[type=action].rt{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--paper);padding:0 6px;font:500 11.5px/18px var(--sans)}
+.bi button[type=action].rt{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--paper);padding:0 5px;font:500 11.5px/18px var(--sans)}
 .bi button[type=action].rt:hover{border-color:var(--accent);color:var(--accent)}
 .bi button[type=action].rt .tdi{display:inline-block;flex:none;width:10px;height:10px;margin-right:3px;border:1px solid currentColor;border-radius:2px;color:#c8c8c8;
   background-image:radial-gradient(circle at 27% 27%,currentColor .8px,transparent 1.2px),radial-gradient(circle at 50% 50%,currentColor .8px,transparent 1.2px),radial-gradient(circle at 73% 73%,currentColor .8px,transparent 1.2px)}
@@ -199,7 +205,7 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi .ty label.tyk input:checked + span{border-color:var(--accent);color:var(--accent);font-weight:900}
 .bi .ty i{color:var(--sub)}
 
-/* row 4: reaction table | understanding | memories (1:1:1, rows stretch) and mental 0 to 50 */
+/* row 4: reaction table | understanding | memories (1:1:1, rows stretch) and mental 0 to 50 (to 80 with the cap 80 toggle) */
 .bi .r4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .bi .r4 > .pnl{display:flex;flex-direction:column}
 .bi .col{flex:1;display:flex;flex-direction:column}
@@ -213,7 +219,8 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi .un input[type=text]{height:24px;text-align:right}
 .bi .un span{font-size:11.5px;color:var(--sub)}
 .bi input[type=checkbox].box{-webkit-appearance:none;appearance:none;width:14px;height:14px;border:1.5px solid var(--ink);background:var(--paper)}
-.bi input[type=checkbox].box:checked{background:linear-gradient(45deg,transparent 44%,var(--accent) 45% 55%,transparent 56%),linear-gradient(-45deg,transparent 44%,var(--accent) 45% 55%,transparent 56%)}
+.bi input[type=checkbox].box:checked,.bi input[type=checkbox].ck:checked{background-image:linear-gradient(to top right,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to top left,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px));background-size:5px 5px,7px 10px;background-position:1px 4px,4px 0;background-repeat:no-repeat}
+.bi input[type=checkbox].ck{-webkit-appearance:none;appearance:none;flex:none;width:14px;height:14px;border:1.5px solid var(--ink);background-color:var(--paper)}
 .bi .mem{gap:4px;padding:5px}
 .bi .mi{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:4px;border-bottom:1px dotted var(--sub);padding-bottom:3px}
 .bi .mi:last-child{border-bottom:0}
@@ -229,6 +236,61 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi .ment label.mt input{display:none}
 .bi .ment label.mt span{display:block;text-align:center;font:700 10.5px/18px var(--sans);border-bottom:2px solid var(--accent);color:var(--sub)}
 .bi .ment label.mt input:checked + span{background:var(--accent);color:#ffffff}
+
+/* head bar controls: toggle with V (acting idol, mental cap 80), small text buttons (tables, memory, conditions), PC role switch */
+.bi .hb label.hck{display:inline-flex;align-items:center;gap:4px;width:auto;margin:0;padding:0;font:500 11px/1 var(--sans);color:#dddddd;cursor:pointer}
+.bi .hb label.hck input{display:none}
+.bi .hb label.hck span{display:inline-block;flex:none;width:12px;height:12px;border:1.3px solid #bbbbbb}
+.bi .hb label.hck input:checked + span{border-color:var(--accent);background-image:linear-gradient(to top right,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to top left,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px));background-size:4px 4px,6px 9px;background-position:0 4px,3px 0;background-repeat:no-repeat}
+.bi .hb label.hck:hover{color:#ffffff}
+.bi .hb button[type=action].hbt{display:inline-flex;align-items:center;border:1px solid #777777;color:#dddddd;padding:0 5px;margin-right:12px;font:500 10.5px/16px var(--sans);white-space:nowrap}
+.bi .hb button[type=action].hbt + button[type=action].hbt{margin-left:-9px}
+.bi .hb button[type=action].hbt:hover{border-color:var(--accent);color:#ffffff}
+.bi .hb button[type=action].hbt .tdi{display:inline-block;flex:none;width:9px;height:9px;margin-right:3px;border:1px solid currentColor;border-radius:2px;
+  background-image:radial-gradient(circle at 27% 27%,currentColor .7px,transparent 1.1px),radial-gradient(circle at 50% 50%,currentColor .7px,transparent 1.1px),radial-gradient(circle at 73% 73%,currentColor .7px,transparent 1.1px)}
+.bi .hb .seg{border-color:#777777;margin-right:12px}
+.bi .hb .seg label.sgk span{color:#dddddd;font:500 10.5px/16px var(--sans)}
+.bi .hb .seg label.sgk + label.sgk span{border-left-color:#777777}
+.bi .hb .seg label.sgk input:checked + span{color:#ffffff}
+.bi .hb > .center-only,.bi .hb > .no-center{display:inline}
+
+/* row 5: my plan (side PC) / produce card (center PC) / supporter goal | costume coordinate, 1:1 */
+.bi .r5{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bi .r5 > .pnl{display:flex;flex-direction:column}
+.bi .pl{flex:1;display:flex;flex-direction:column;padding:0 6px 4px;overflow:hidden}
+.bi .pq{display:grid;grid-template-columns:96px minmax(0,1fr);align-items:center;gap:4px;min-height:30px;border-top:1px dotted var(--sub);margin-top:-1px}
+.bi .pq button[type=action].rt{justify-self:start;display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--paper);padding:0 6px;font:500 11.5px/20px var(--sans)}
+.bi .pq button[type=action].rt:hover{border-color:var(--accent);color:var(--accent)}
+.bi .pq.tall{flex:1;align-items:stretch;padding:3px 0}
+.bi .pq.tall .chip{padding-top:4px}
+.bi .pq textarea{font-size:12px;line-height:1.45;min-height:44px;height:100%;padding:3px 4px;background:var(--cell)}
+.bi .pq .pv{display:grid;grid-template-columns:minmax(0,1fr) 14px;align-items:center;gap:0 6px}
+.bi .pq .pv input[type=text],.bi .pq .pv input[type=number]{height:24px;border-bottom:1px solid var(--line)}
+.bi .pq .pv input[type=number]{width:64px;font:900 15px var(--sans);text-align:center}
+.bi .pq .pv input.iv{color:var(--accent);border-bottom:2px solid var(--accent)}
+.bi .pq .pv p{grid-column:1/-1;font-size:9.5px;line-height:1.3;color:var(--sub)}
+.bi .cos .sh,.bi .cos .cr{display:grid;grid-template-columns:22px 130px minmax(0,1fr) 26px;align-items:stretch}
+.bi .cos .cr{flex:1;min-height:30px;border-bottom:1px dotted var(--sub)}
+.bi .cos .cr:last-child{border-bottom:0}
+.bi .cos .cr > *{display:flex;align-items:center;border-left:1px solid var(--line)}
+.bi .cos .cr > b{border-left:0;justify-content:center;background:var(--bar);color:#ffffff;font:700 11px var(--sans);border-bottom:1px solid #444444}
+.bi .cos .cr > :last-child{justify-content:center}
+.bi .cos .cr .nm input{height:26px;font-weight:700}
+.bi .cos .cr textarea{font-size:11.5px;line-height:1.45;min-height:22px;height:24px;padding:2px 4px}
+
+/* unit sheet: members, world setting, theme, name | unit powers | conditions (check = the unit has it) */
+.bi .r1 > .uinfo{grid-column:2/4;display:flex;flex-direction:column}
+.bi .uinfo .pr{flex:none}
+.bi .uinfo .um{flex:1;display:flex;flex-direction:column;gap:2px;padding:5px 0 2px}
+.bi .uinfo .um .chip{padding-left:2px}
+.bi .uinfo .um textarea{flex:1;min-height:110px;font-size:13px;line-height:1.6;padding:4px 6px;background:var(--cell)}
+.bi .upw .sh,.bi .upw .srow{grid-template-columns:26px 170px 76px minmax(0,1fr)}
+.bi .cds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.bi .cd{display:grid;grid-template-columns:16px 116px minmax(0,1fr);align-items:center;gap:6px;padding:5px 7px;min-height:38px;border-bottom:1px dotted var(--sub)}
+.bi .cd:nth-child(odd){border-right:1px dotted var(--sub)}
+.bi .cd:nth-last-child(-n+2){border-bottom:0}
+.bi .cd b{font:400 14px/1.2 var(--head)}
+.bi .cd p{font-size:10.5px;line-height:1.4;color:var(--sub)}
 
 /* icon buttons drawn with CSS (no emoji, no image). Color follows the button text color */
 .bi button[type=action].dic{display:inline-block;flex:none;width:16px;height:16px;padding:0;border:1.5px solid currentColor;border-radius:3px;background-color:transparent;color:var(--sub);
@@ -266,6 +328,9 @@ body.sheet-darkmode .bi .logo select{color:#ffffff}
 .bi span.mir{display:block;width:100%;min-width:0;margin:0;padding:0 4px;background:transparent;color:var(--ink);border:0;border-radius:0;box-shadow:none;font:inherit;line-height:1.4;outline:0}
 body.sheet-darkmode .bi span.mir{background-color:transparent;color:var(--ink)}
 .bi .srow span.mir{font-size:11.5px;line-height:1.45;min-height:22px;min-height:24px;padding:2px 4px}
+.bi .pq span.mir{font-size:12px;line-height:1.45;min-height:44px;padding:3px 4px;background:var(--cell)}
+.bi .cos .cr span.mir{font-size:11.5px;line-height:1.45;min-height:22px;min-height:24px;padding:2px 4px}
+.bi .uinfo .um span.mir{min-height:110px;font-size:13px;line-height:1.6;padding:4px 6px;background:var(--cell)}
 .bi div.auto > span.mir{display:block;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;pointer-events:none}
 .bi div.auto > span.mir::after{content:"."}
 .bi div.auto > textarea.at{position:absolute;top:0;left:0;width:100%;height:100%;min-height:0;margin:0;overflow:hidden;resize:none}
