@@ -1985,18 +1985,6 @@ on('change:abilities_info_show change:toggle_exceptional change:strength', async
   await setAttrsAsync(output, {silent: true});
 });
 
-// PC or NPC sheet role
-on('change:is_npc', async (eventInfo) => {
-  const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
-  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  const output = {};
-  const isNPC = int(v.is_npc);
-  let toggleNPC = int(v.toggle_npc);
-  toggleNPC = isNPC === 0 ? 0 : 1;
-  output.toggle_npc = toggleNPC;
-  await setAttrsAsync(output, {silent: true});
-});
-
 const sumEquipmentCost = async () => {
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
@@ -7905,7 +7893,6 @@ const toggleReadonlyClass = async (attr) => {
   const v = await getAttrsAsync([`${attr}`]);
   const isReadonly = int(v[`${attr}`]);
   const classFromAttr = attr.replaceAll('_', '-');
-  console.log(`Change detected: classFromAttr:${classFromAttr}`);
   if (isReadonly) {
     $20(`.${classFromAttr}`).addClass('readonly-span');
   } else {
@@ -7916,4 +7903,37 @@ const toggleReadonlyClass = async (attr) => {
 on('sheet:opened change:sync_hp_flag', async (eventInfo) => {
   const attr = 'sync_hp_flag';
   await toggleReadonlyClass(attr);
+});
+
+// Handles sheet mode (PC/Monster)
+// Sets class (.show-pc, .show-monster, or .show-settings)
+on('sheet:opened change:toggle_npc change:is_npc', async (eventInfo) => {
+  const v = await getAttrsAsync(['toggle_npc', 'is_npc']);
+  const isMonster = int(v.is_npc) === 1;
+  let primaryTab = int(v.toggle_npc);
+  // sync active/current tab
+  if (eventInfo?.sourceAttribute === 'is_npc') {
+    primaryTab = isMonster ? 1 : 0;
+    await setAttrsAsync({toggle_npc: primaryTab}, {silent: true});
+  }
+  // Determine current .wrapper class
+  let currentClass = '';
+  // currentClass = primaryTab === 99 ? 'show-settings' : isMonster && primaryTab === 1 ? 'show-monster' : 'show-pc';
+  if (isMonster) {
+    if (primaryTab === 0) {
+      currentClass = 'show-pc';
+    } else if (primaryTab === 1) {
+      currentClass = 'show-monster';
+    } else if (primaryTab === 99) {
+      currentClass = 'show-settings';
+    }
+  } else {
+    if (primaryTab !== 99) {
+      currentClass = 'show-pc';
+    } else {
+      currentClass = 'show-settings';
+    }
+  }
+  // remove all classes, then set the current class
+  $20('.wrapper').removeClass('show-pc show-monster show-settings').addClass(currentClass);
 });
