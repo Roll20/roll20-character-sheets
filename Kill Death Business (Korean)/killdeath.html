@@ -50,6 +50,7 @@
   <!-- 판정 띠 -->
   <div class="strip">
     <button type="action" class="rt" name="act_rsk" title="1D6 분야 · 2D6 특기"><i class="tdi"></i>랜덤 특기</button>
+    <button type="action" class="rt" name="act_init" title="D66 + 헬 사이버 「행동순 강화」"><i class="tdi"></i>행동순</button>
     <span class="rtg"><button type="action" class="rt" name="act_nd1">1D6</button><button type="action" class="rt" name="act_nd2">2D6</button><button type="action" class="rt" name="act_nd3">3D6</button></span>
     <span class="ckn">수정치<input type="number" class="modv" name="attr_mod" title="다음 판정 수정치"></span>
     <span class="sp"></span>
@@ -118,28 +119,33 @@
     <div class="box stat">
       <div class="st"><span class="chip">차지</span><span class="tok"><input type="hidden" class="hv" name="attr_charge" value="0"><button type="action" class="tk bu" name="act_chg1" title="1"></button><button type="action" class="tk bu" name="act_chg2" title="2"></button><button type="action" class="tk bu" name="act_chg3" title="3"></button></span></div>
       <div class="st"><span class="chip">블록</span><span class="tok"><input type="hidden" class="hv" name="attr_block" value="0"><button type="action" class="tk sh" name="act_blk1" title="1"></button><button type="action" class="tk sh" name="act_blk2" title="2"></button><button type="action" class="tk sh" name="act_blk3" title="3"></button></span></div>
-      <div class="st"><span class="chip">사망 횟수</span><span class="tok"><input type="hidden" class="hv" name="attr_deaths" value="0"><button type="action" class="tk sk" name="act_dth1" title="1"></button><button type="action" class="tk sk" name="act_dth2" title="2"></button><button type="action" class="tk sk" name="act_dth3" title="3"></button><button type="action" class="tk sk" name="act_dth4" title="4"></button><button type="action" class="tk sk" name="act_dth5" title="5"></button><button type="action" class="tk sk" name="act_dth6" title="6"></button></span></div>
+      <div class="st"><span class="chip">사망 횟수</span><span class="tok"><input type="hidden" class="hv" name="attr_deaths" value="0"><button type="action" class="tk sk" name="act_dth1" title="1"></button><button type="action" class="tk sk" name="act_dth2" title="2"></button><button type="action" class="tk sk" name="act_dth3" title="3"></button><button type="action" class="tk sk" name="act_dth4" title="4"></button><button type="action" class="tk sk" name="act_dth5" title="5"></button><button type="action" class="tk sk" name="act_dth6" title="6"></button></span><button type="action" class="rt die" name="act_die" title="소울 방출 · 소생 비용 · 헬 슬러그 · 사망 횟수">사망 처리</button></div>
       <div class="st"><span class="chip">소울</span><input type="number" name="attr_soul" title="소울"></div>
-      <div class="st slug"><span class="chip">헬 슬러그</span><div class="auto"><span class="mir" name="attr_hell_slug"></span><textarea class="at" name="attr_hell_slug" title="헬 슬러그"></textarea></div></div>
+      <div class="st"><span class="chip">헬 슬러그</span><input type="number" name="attr_hell_slug" title="헬 슬러그 (소생 비용만큼 얻음)"></div>
     </div>
   </div>
 
   <div class="box memo">
-    <div class="hb">메모</div>
+    <div class="hb">메모<span class="sp"></span><button type="action" class="hbt" name="act_scene" title="신 표 1 · 2 (D66)">신 표</button><button type="action" class="hbt" name="act_svc" title="서비스 신 표 (1D6 → 1D6)">서비스 신 표</button></div>
     <div class="auto"><span class="mir" name="attr_memo"></span><textarea class="at" name="attr_memo" title="메모"></textarea></div>
   </div>
 </div>
 <!-- 채팅 카드: 검은 머리띠(빨간 녹화 점 · 빨강/청회 띠) + 흰 본문. 굴림은 sheet worker 가 startRoll 로 보내고 computed:: 칸은 finishRoll 로 채운다.
      computed 칸(ok · total · tres)은 매크로 앞쪽에 있어야 하므로 워커가 맨 앞에 넣는다.
      판정: d1 · d2(큰 주사위, 6 검정 · 1 빨강) + add = 합 | 도장 ok 1 스페셜 · 2 펌블 · 3 성공 · 4 실패 (0 이면 도장 없음)
-     랜덤 특기: te1(분야) te2 te3(특기) 와 결과(tres). nD6: n1~n3 = 합. -->
+     공격 판정: tgx = 첫 공격 / 반격의 목표치 (리스크 1 · 2), asu · afa = 성공 · 실패 때 안내, vr = 회수인이면 스페셜 · 펌블 때 시청률.
+     사망 처리(dth): kb 1 = 회수인에게 살해 → sr(1D6) 소울 방출 drel, dres = 소생 비용 · 헬 슬러그 · 사망 횟수.
+     표: te1~te4 와 결과(tres). 랜덤 특기 te1(분야) te2 te3(특기). nD6: n1~n3 = 합. -->
 <rolltemplate class="sheet-rolltemplate-killdeath">
   <div class="sheet-card">
     {{#title}}<div class="sheet-hd">{{title}}</div>{{/title}}
     <div class="sheet-bd">
       {{#sub}}<div class="sheet-sub">{{sub}}</div>{{/sub}}
+      {{#tgx}}<div class="sheet-sub">{{computed::tgx}}</div>{{/tgx}}
       {{#d1}}<div class="sheet-roll sheet-big"><span class="sheet-die">{{d1}}</span><span class="sheet-die">{{d2}}</span>{{#add}}<span class="sheet-eq sheet-add">{{add}}</span>{{/add}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span>{{#rollTotal() computed::ok 1}}<span class="sheet-stp sheet-spc">스페셜</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stp sheet-fb">펌블</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stp">성공</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stp sheet-ng">실패</span>{{/rollTotal() computed::ok 4}}</div>{{/d1}}
-      {{#te1}}<div class="sheet-rt"><span class="sheet-die">{{te1}}</span><span class="sheet-die">{{te2}}</span><span class="sheet-die">{{te3}}</span><span class="sheet-rtx">{{computed::tres}}</span></div>{{/te1}}
+      {{#d1}}{{#asu}}{{#rollTotal() computed::ok 1}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 3}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 3}}{{/asu}}{{#afa}}{{#rollTotal() computed::ok 2}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 4}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 4}}{{/afa}}{{#vr}}{{#rollTotal() computed::ok 1}}<div class="sheet-note">시청률 +10%</div>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<div class="sheet-note">시청률 −20%</div>{{/rollTotal() computed::ok 2}}{{/vr}}{{/d1}}
+      {{#dth}}{{#rollTotal() kb 1}}<div class="sheet-rt"><span class="sheet-die">{{sr}}</span><span class="sheet-rtx">{{computed::drel}}</span></div>{{/rollTotal() kb 1}}<div class="sheet-note">{{computed::dres}}</div>{{/dth}}
+      {{#te1}}<div class="sheet-rt"><span class="sheet-die">{{te1}}</span>{{#te2}}<span class="sheet-die">{{te2}}</span>{{/te2}}{{#te3}}<span class="sheet-die">{{te3}}</span>{{/te3}}{{#te4}}<span class="sheet-die">{{te4}}</span>{{/te4}}<span class="sheet-rtx">{{computed::tres}}</span></div>{{/te1}}
       {{#n1}}<div class="sheet-roll"><span class="sheet-die">{{n1}}</span>{{#n2}}<span class="sheet-die">{{n2}}</span>{{/n2}}{{#n3}}<span class="sheet-die">{{n3}}</span>{{/n3}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span></div>{{/n1}}
       {{#k1}}<div class="sheet-kv"><b>{{k1}}</b>{{v1}}</div>{{/k1}}
       {{#k2}}<div class="sheet-kv"><b>{{k2}}</b>{{v2}}</div>{{/k2}}
@@ -229,16 +235,23 @@ const fumOf = v => { const f = num(v.fumble); return f === null ? 2 : f; };
 const spcOf = v => { const s = num(v.special); return s === null ? 12 : s; };
 const sgn = n => (n > 0 ? `+${n}` : String(n));
 const tgs = t => (t == null ? '' : ` · 목표치 ${t}`);
-const CTX = [...TKEYS, 'roll_display_to', 'fumble', 'special', 'fumble_adj', 'mod', 'charge'];
+const CTX = [...TKEYS, 'roll_display_to', 'fumble', 'special', 'fumble_adj', 'mod', 'charge', 'sheet_type'];
+const isPc = v => (v.sheet_type || 'pc') !== 'tg';
+const vr = v => (isPc(v) ? ' {{vr=1}}' : '');   // 회수인: 스페셜 시청률 +10% · 펌블 합계 −20% (룰북 1·04)
 const withCtx = (extra, cb) => getAttrs([...CTX, ...extra], v => cb(v, targets(v)));
 
 // 판정: 2D6 합(눈) ≥ 스페셜치 → 스페셜, ≤ 펌블치 → 펌블, 아니면 합 + 수정이 목표치 이상이면 성공
-function check(v, { title, sub, target, add = 0, fumble, eff }) {
+//   first: 리스크 1 · 2 어빌리티의 물음 (첫 공격이면 특기 없이 목표치 5 — 룰북 4·08·04). extra: 성공 · 실패 안내 칸
+function check(v, { title, sub, target, add = 0, fumble, eff, first, extra = '' }) {
   const fb = fumble == null ? fumOf(v) : fumble, sp = spcOf(v);
-  const s = `${prefix(v)}${TPL} {{ok=[[0]]}} {{total=[[0]]}} {{d1=[[1d6]]}} {{d2=[[1d6]]}}${add ? field('add', sgn(add)) : ''}${field('title', title)}${field('sub', sub)}${field('eff', eff)}`;
+  const s = `${prefix(v)}${TPL} {{ok=[[0]]}} {{total=[[0]]}}${first ? ' {{tgx=[[0]]}} {{fa=[[?{공격|첫 공격 (특기 없이 목표치 5),1|반격 (지정특기),0}]]}}' : ''} {{d1=[[1d6]]}} {{d2=[[1d6]]}}`
+    + `${add ? field('add', sgn(add)) : ''}${field('title', title)}${field('sub', sub)}${extra}${vr(v)}${field('eff', eff)}`;
   post(s, R => {
+    const fa = first && R.fa.result === 1, tg = fa ? 5 : target;
     const n = R.d1.result + R.d2.result, t = n + add;
-    return { ok: n >= sp ? 1 : n <= fb ? 2 : target == null ? 0 : t >= target ? 3 : 4, total: t };
+    const out = { ok: n >= sp ? 1 : n <= fb ? 2 : tg == null ? 0 : t >= tg ? 3 : 4, total: t };
+    if (first) out.tgx = fa ? '첫 공격 · 목표치 5' : `반격${tg == null ? ' · 지정특기 없음' : ` · 목표치 ${tg}`}`;
+    return out;
   });
 }
 const modOf = v => num(v.mod) || 0;
@@ -258,17 +271,82 @@ on(SKILL_IDS.map(id => `clicked:r${id.toLowerCase()}`).join(' '), e => {
   withCtx([], (v, T) => check(v, { title: `《${SK[p.f][p.r]}》 판정`, sub: FIELD_NAMES[p.f] + tgs(T[id]) + tail(v), target: T[id], add: modOf(v) }));
 });
 
-// 어빌리티 공격 판정: 지정특기의 목표치, 차지만큼 +, 펌블치 = 【리스크】 + 손 수정 (7 = 킬러 트릭, 레벨 없음)
+// 어빌리티 공격 판정 (룰북 4·08·04): 차지만큼 +, 펌블치 = 【리스크】 + 손 수정 (블록 1회마다 리스크 +1 → 펌블치 ▲), 7 = 킬러 트릭
+//   첫 공격은 리스크 1 · 2 어빌리티만, 특기 없이 목표치 5 — 반격은 받은 어빌리티보다 리스크가 1 · 2 높은 어빌리티로 지정특기 판정
+//   성공하면 상대가 반격 (킬러 트릭이면 상대가 대미지 · 시청률 +10%), 실패하면 공격한 쪽이 대미지 (회수인은 사망)
+const counter = k => (k >= 6 ? '킬러 트릭(리스크 7)' : `리스크 ${k + 1} · ${k + 2}${k + 2 === 7 ? '(킬러 트릭)' : ''} 어빌리티`);
 for (let k = 1; k <= 7; k++) {
   const keys = [`ab${k}_name`, `ab${k}_level`, `ab${k}_effect`, `ab${k}_skill`];
   on(`clicked:ab${k}`, () => withCtx(keys, (v, T) => {
     const nm = (v[`ab${k}_name`] || '').trim() || '어빌리티', lv = k === 7 ? '' : (v[`ab${k}_level`] || '').trim();
-    const sk = (v[`ab${k}_skill`] || '').replace(/[《》]/g, '').trim(), s = findSkill(sk), t = s ? T[s.id] : null;
+    const sk = (v[`ab${k}_skill`] || '').replace(/[《》]/g, '').trim(), s = findSkill(sk), t = s ? T[s.id] : null, first = k <= 2;
     const ch = Math.max(0, num(v.charge) || 0), fb = k + (num(v.fumble_adj) || 0);
-    const sub = [`리스크 ${k}`, lv && `레벨 ${lv}`, sk && `《${sk}》`].filter(Boolean).join(' · ') + tgs(t) + (ch ? ` · 차지 +${ch}` : '') + tail(v, fb);
-    check(v, { title: `【${nm}】 공격 판정`, sub, target: t, add: ch + modOf(v), fumble: fb, eff: v[`ab${k}_effect`] });
+    const sub = [`리스크 ${k}`, lv && `레벨 ${lv}`, sk && `《${sk}》`].filter(Boolean).join(' · ') + (first ? '' : tgs(t)) + (ch ? ` · 차지 +${ch}` : '') + tail(v, fb);
+    const su = k === 7 ? `킬러 트릭 성공 — 상대가 대미지 (라이프가 있는 NPC 는 라이프 0) · 시청률 +10%` : `상대는 ${counter(k)}로 반격해야 한다`;
+    const fa = isPc(v) ? '공격한 쪽이 대미지 — 회수인은 사망' : '공격한 쪽이 대미지 (라이프 −1 · 표적전이면 한 번 다시 굴림)';
+    check(v, { title: `【${nm}】 공격 판정`, sub, target: t, add: ch + modOf(v), fumble: fb, eff: v[`ab${k}_effect`], first, extra: field('asu', su) + field('afa', fa) });
   }));
 }
+
+// 사망 처리 (회수인, 룰북 4·08·07 · 4·09): 회수인에게 살해되면 소울 방출표(1D6)만큼 소울을 신에 방출 (가진 만큼만),
+//   헬 ER 소생 비용(사망 횟수별 50 · 100 · 200 · 400 · 800 · 1600)을 소울에서 내고(마이너스 가능) 같은 양의 헬 슬러그를 얻는다.
+//   7번째 사망이면 결과 페이즈까지 부활하지 못하고 소울은 마이너스 무한대
+const RELEASE = [100, 200, 200, 200, 300, 300], REVIVE = [50, 100, 200, 400, 800, 1600];
+on('clicked:die', () => getAttrs(['soul', 'hell_slug', 'deaths', 'roll_display_to'], v => {
+  const s = `${prefix(v)}${TPL} {{drel=[[0]]}} {{dres=[[0]]}} {{kb=[[?{누구에게 살해됐나|회수인 (소울 방출),1|표적 · 호위천사 등 (방출 없음),0}]]}} {{sr=[[1d6]]}}${field('title', '사망')} {{dth=1}}`;
+  post(s, R => {
+    const soul0 = num(v.soul) || 0, d0 = Math.max(0, num(v.deaths) || 0), slug0 = Math.max(0, num(v.hell_slug) || 0), byPc = R.kb.result === 1;
+    const x = RELEASE[R.sr.result - 1], rel = byPc ? Math.max(0, Math.min(soul0, x)) : 0, soul1 = soul0 - rel, n = d0 + 1;
+    const out = { drel: `소울 방출 ${x} → 실제 ${rel} (신에 남아 살아남은 회수인이 나눔)` };
+    if (n >= 7) {
+      setAttrs({ soul: soul1, deaths: 6 });
+      return { ...out, dres: '7번째 사망 — 결과 페이즈까지 부활할 수 없고, 소울은 마이너스 무한대' };
+    }
+    const cost = REVIVE[n - 1];
+    setAttrs({ soul: soul1 - cost, hell_slug: slug0 + cost, deaths: n });
+    return { ...out, dres: `${n}번째 사망 · 소생 비용 ${cost} · 소울 ${soul0} → ${soul1 - cost} · 헬 슬러그 +${cost}` };
+  });
+}));
+
+// 행동순 (룰북 4·02 · 4·08·02): D66 (작은 눈이 십의 자리) + 헬 사이버 「행동순 강화 +10 / +20 / +30」
+//   메인 페이즈는 작은 순, 전투는 큰 순. 강화 값은 헬 사이버 이름 · 효과에서 찾는다
+const initBonus = v => Math.max(0, ...[1, 2, 3, 4, 5].map(i => `${v[`cy${i}_name`] || ''} ${v[`cy${i}_effect`] || ''}`)
+  .map(t => { const m = t.match(/행동순\s*강화\s*\+?\s*(10|20|30)/); return m ? +m[1] : 0; }));
+on('clicked:init', () => getAttrs(['roll_display_to', ...[1, 2, 3, 4, 5].flatMap(i => [`cy${i}_name`, `cy${i}_effect`])], v => {
+  const b = initBonus(v);
+  post(`${prefix(v)}${TPL} {{tres=[[0]]}} {{te1=[[1d6]]}} {{te2=[[1d6]]}}${field('title', '행동순 D66')}${field('sub', '메인 페이즈는 작은 순 · 전투는 큰 순')}`, R => {
+    const a = R.te1.result, c = R.te2.result, d = Math.min(a, c) * 10 + Math.max(a, c);
+    return { tres: b ? `${d} + 행동순 강화 ${b} = ${d + b}` : String(d) };
+  });
+}));
+
+// 신 표 1 · 2 (D66, 룰북 4·03·01) · 서비스 신 표 (1D6 → 1D6, 4·05)
+const D66K = [11, 12, 13, 14, 15, 16, 22, 23, 24, 25, 26, 33, 34, 35, 36, 44, 45, 46, 55, 56, 66];
+const d66 = (a, b) => Math.min(a, b) * 10 + Math.max(a, b);
+const SCENE1 = ['당신이 근거지로 삼던', '당신의 사진으로 벽이 뒤덮인', '아날로그 TV 가 산더미처럼 쌓인', '쓰레기로 가득 찬', '헬', '밀려드는 모래에 파묻힌',
+  '값진 물건으로 호화롭게 꾸며진', '감시 장비로 전자 요새가 된', '기묘한 오브제투성이인', '거대한 구멍 가장자리에 아슬아슬하게 걸린', '극채색 벽화로 물든',
+  '꺼져 가며 깜빡이는 불빛에 비친', '창백하게 모든 것이 얼어붙은', '붉은 피와 쇠 냄새로 가득한', '태양이 강렬한 빛을 내리쬐는',
+  '새가 무수히 모여드는', '타오르는 불길에 비친', '흰 안개로 한 치 앞도 안 보이는', '썩은 시체가 겹겹이 쌓인', '유독한 오수가 잔뜩 고인', '약탈당해 텅 빈'];
+const SCENE2 = ['사무실', '제단', '스튜디오', '창고', '버스 정류장', '감옥', '어둠', '역', '옥상', '하수도', '학교', '연구실', '차 안', '숲', '정원', '가게', '농원', '폐허', '묘지', '민가', '들판'];
+const SVC = [['탈의계', ['의상 불량', '갈아입기', '탈의 마작', '입욕', '수영복으로 싸우기', '야구권']],
+  ['폭력계', ['이긴 뒤의 폭력', '집단 폭력', '폭력을 암시하는 대화', '진 뒤의 폭력', '전혀 무의미한 폭력', '무의미한 폭력']],
+  ['여행계', ['이동 수단 소개', '현지 놀이 소개', '현지 동물 소개', '현지 숙소 소개', '기상 몰래카메라', '명물 요리 소개']],
+  ['연애계', ['키스 신', '사랑을 깨닫다', '사랑에 고민하다', '데이트 신', '비밀을 고백하다', '러브 신']],
+  ['감동계', ['가족의 사랑을 깨닫다', '멋진 말을 하다', '실패해서 침울해하다', '현지 주민과 교류하다', '죽은 사람 이야기를 하다', '높은 곳에서 멋진 말을 하다']],
+  ['다른 장르', ['사이코 서스펜스', '스페이스 오페라', '동화', '히로익 판타지', '몬스터 호러', '로봇물']]];
+on('clicked:scene', () => getAttrs(['roll_display_to'], v => {
+  post(`${prefix(v)}${TPL} {{tres=[[0]]}} {{te1=[[1d6]]}} {{te2=[[1d6]]}} {{te3=[[1d6]]}} {{te4=[[1d6]]}}${field('title', '신 표')}`, R => {
+    const i = D66K.indexOf(d66(R.te1.result, R.te2.result)), j = D66K.indexOf(d66(R.te3.result, R.te4.result));
+    return { tres: `${SCENE1[i]} ${SCENE2[j]}` };
+  });
+}));
+on('clicked:svc', () => getAttrs(['roll_display_to'], v => {
+  post(`${prefix(v)}${TPL} {{tres=[[0]]}} {{te1=[[1d6]]}} {{te2=[[1d6]]}}${field('title', '서비스 신 표')}`
+    + field('eff', '롤플레이가 끝나면 1D6 으로 분야를 정하고, 상대가 그 분야에서 습득한 특기로 판정.\n성공: 소울 +100 · 시청률 +20% (스페셜 +10% 더) / 실패: 시청률 −10% (펌블 −10% 더)'), R => {
+    const [cat, list] = SVC[R.te1.result - 1];
+    return { tres: `${cat} · ${list[R.te2.result - 1]}` };
+  });
+}));
 
 // 관계 · 헬 사이버 · 서브플롯: 채팅에 출력
 for (let i = 1; i <= 6; i++) {
