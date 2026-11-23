@@ -1,6 +1,6 @@
 <!-- 신화창세 RPG 아마데우스 시트 (Roll20, legacy:false)
      이 파일은 amadeus/roll20/src/amadeus.src.html 을 build.py 로 변환해 만든다. 직접 고치지 말 것.
-     "@이름" 주석 자리는 build.py 가 능력치 · 부모신의 축복 · 식료 · 롤 템플릿 · sheet worker 로 채운다.
+     "@이름" 주석 자리는 build.py 가 능력치 · 롤 템플릿 · sheet worker 로 채운다.
      공식 캐릭터 시트(A4 가로)를 세로로 재배치. 시트의 글은 공식 시트에 인쇄된 것만. -->
 
 <input type="hidden" name="attr_sheet_version" value="">
@@ -93,11 +93,10 @@
       </div>
     </div>
 
-    <!-- 기프트: 첫 줄은 공식 시트에 인쇄된 부모신의 축복 -->
+    <!-- 기프트 -->
     <div class="hb">기프트</div>
     <div class="gifts">
       <div class="rh gift"><span></span><span>기프트명</span><span>분류</span><span>조건</span><span>판정</span><span>태그</span><span>효과</span><span></span></div>
-      <div class="rr gift printed"><input type="checkbox" class="pt" name="attr_blessing_seal" value="1" title="봉인"><span class="gn">부모신의 축복</span><span class="c">보조</span><span class="c">※</span><span class="c">없음</span><span></span><span class="ef">자신이 판정을 할 때, 그 판정이 자신의 부모신의 권능에 관한 것이라면 판정의 주사위를 굴리기 전에 사용할 수 있다. 자신의 【생명력】을 2점 소비할 때마다 그 판정의 달성치가 1점 상승한다. 단, 【생명력】은 [자신의 속성과 같은 영역의 각성단계×2]점까지만 소비할 수 있다.</span><button type="action" name="act_blessing" class="dic" title="채팅에 출력"></button></div>
       <fieldset class="repeating_gifts">
         <div class="rr gift"><input type="checkbox" class="pt" name="attr_seal" value="1" title="봉인"><input type="text" name="attr_name" title="기프트명"><input type="text" name="attr_cat" title="분류"><input type="text" name="attr_cond" title="조건"><input type="text" name="attr_check" title="판정"><input type="text" name="attr_tag" title="태그">
           <div class="ae"><span name="attr_eff"></span><div class="auto"><span class="mir" name="attr_eff"></span><textarea class="at" name="attr_eff" title="효과"></textarea></div></div>
@@ -118,7 +117,7 @@
             <button type="action" name="act_use" class="dic" title="채팅에 출력"></button></div>
         </fieldset>
         <div class="rr item food"><span class="fd"><b>식료</b><input type="number" name="attr_food" min="0" max="5" title="식료 개수"><span>개</span></span>
-          <span class="kind"><span class="kx">상</span><span class="kx on">소</span></span><span></span><span class="ef">휴식 시에 식사를 하는 것으로 【생명력】을 1점 회복할 수 있다.</span>
+          <span class="kind"><span class="kx">상</span><span class="kx on">소</span></span><span></span><span></span>
           <button type="action" name="act_eat" class="dic" title="식료 1개로 생명력 1점 회복"></button></div>
       </div>
     </div>
@@ -161,8 +160,8 @@
 </rolltemplate>
 <script type="text/worker">
 // 아마데우스 시트 워커 — 생명력 기본 · 최대치 · 굴림 · 채팅 출력(Custom Roll Parsing)
-// DATA(능력치 · 생명력 계수 · 부모신의 축복 · 식료 문구)는 build.py 가 아래 줄에 넣는다
-const DATA = {"abil": [["war", "무용", "WARFARE"], ["spi", "영력", "SPIRIT"], ["tec", "기술", "TECHNIQUE"], ["lov", "사랑", "LOVE"], ["bra", "두뇌", "BRAIN"], ["mun", "일상", "MUNDANE"]], "hpRank": {"S": 10, "A": 7, "B": 5, "C": 3, "D": 1}, "hpMode": {"3": 6, "2": 3, "1": 1, "0": 0, "-1": -1, "-2": -2}, "blessing": ["부모신의 축복", "보조", "※", "없음", "자신이 판정을 할 때, 그 판정이 자신의 부모신의 권능에 관한 것이라면 판정의 주사위를 굴리기 전에 사용할 수 있다. 자신의 【생명력】을 2점 소비할 때마다 그 판정의 달성치가 1점 상승한다. 단, 【생명력】은 [자신의 속성과 같은 영역의 각성단계×2]점까지만 소비할 수 있다."], "food": "휴식 시에 식사를 하는 것으로 【생명력】을 1점 회복할 수 있다."};
+// DATA(능력치 · 생명력 계수)는 build.py 가 아래 줄에 넣는다
+const DATA = {"abil": [["war", "무용", "WARFARE"], ["spi", "영력", "SPIRIT"], ["tec", "기술", "TECHNIQUE"], ["lov", "사랑", "LOVE"], ["bra", "두뇌", "BRAIN"], ["mun", "일상", "MUNDANE"]], "hpRank": {"S": 10, "A": 7, "B": 5, "C": 3, "D": 1}, "hpMode": {"3": 6, "2": 3, "1": 1, "0": 0, "-1": -1, "-2": -2}};
 const num = v => { const n = parseInt(v, 10); return isNaN(n) ? null : n; };
 const KEYS = DATA.abil.map(([k]) => k);
 const sign = n => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
@@ -247,12 +246,7 @@ on('clicked:vigor', () => getAttrs(['level', 'hp_base', 'character_name'], v => 
   });
 }));
 
-// 부모신의 축복(인쇄된 첫 줄) · 기프트 · 아이템: 채팅에 출력
-on('clicked:blessing', () => getAttrs(['blessing_seal', 'character_name'], v => {
-  const [name, cat, cond, chk, eff] = DATA.blessing;
-  post(T + field('title', name) + field('sub', `${cat} · 조건 ${cond}`) + rows([['판정', chk]]) + field('effect', eff)
-    + field('who', v.character_name) + (v.blessing_seal === '1' ? field('flag', '봉인') : ''));
-}));
+// 기프트 · 아이템: 채팅에 출력
 on('clicked:repeating_gifts:use', e => {
   const row = rowOf(e, 'gifts'); if (!row) return;
   getAttrs(['seal', 'name', 'cat', 'cond', 'check', 'tag', 'eff'].map(f => row + f).concat('character_name'), v => {
@@ -274,7 +268,7 @@ on('clicked:eat', () => getAttrs(['food', 'hp', 'hp_max', 'character_name'], v =
   const f = num(v.food) || 0; if (f <= 0) return;
   const hp = num(v.hp) || 0, mx = num(v.hp_max), nh = mx == null ? hp + 1 : Math.min(mx, hp + 1);
   setAttrs({ food: f - 1, hp: nh });
-  post(T + field('title', '식료') + field('sub', `식료 ${f} → ${f - 1}`) + field('effect', `${DATA.food} 【생명력】 ${hp} → ${nh}`) + field('who', v.character_name));
+  post(T + field('title', '식료') + field('sub', `식료 ${f} → ${f - 1}`) + field('effect', `【생명력】 ${hp} → ${nh}`) + field('who', v.character_name));
 }));
 
 </script>
