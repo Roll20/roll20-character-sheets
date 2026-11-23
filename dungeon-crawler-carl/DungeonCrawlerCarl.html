@@ -189,6 +189,20 @@
           <label class="dcc-setrow dcc-health-edit-fields dcc-not-vehicle dcc-not-gmscreen" title="Overrides the number of Health Bar boxes. Leave blank for the default: 10 for a crawler, the level (max 10) for a mob."><span class="dcc-flabel" data-i18n="hb-slots-custom">Health Bar Override</span>
             <input class="dcc-fline dcc-hb-custom-input" name="attr_hb_slots_custom" value="" type="number" title="@{hb_slots_custom}" min="1"/>
           </label>
+          <label class="dcc-setrow dcc-health-edit-fields dcc-not-vehicle dcc-not-gmscreen"><span class="dcc-flabel" data-i18n="health-ability">Health Bar Ability</span>
+            <select class="dcc-set-select" name="attr_health_stat" value="constitution" title="@{health_stat}">
+              <option value="constitution" data-i18n="stat-constitution">Constitution
+              </option>
+              <option value="strength" data-i18n="stat-strength">Strength
+              </option>
+              <option value="intelligence" data-i18n="stat-intelligence">Intelligence
+              </option>
+              <option value="dexterity" data-i18n="stat-dexterity">Dexterity
+              </option>
+              <option value="charisma" data-i18n="stat-charisma">Charisma
+              </option>
+            </select>
+          </label>
           <input name="attr_health_points" value="0" type="hidden" title="@{health_points}"/>
           <input name="attr_health_points_max" value="0" type="hidden" title="@{health_points|max}"/>
         </div>
@@ -2656,6 +2670,19 @@
             listener: "change:hb_slots_custom",
             listenerFunc: "accessSheet",
             defaultValue: "",
+            calculation: "",
+            initialFunc: "",
+            formula: ""
+        },
+        attr_health_stat: {
+            name: "health_stat",
+            type: "select",
+            triggeredFuncs: [ "recalcAll" ],
+            affects: [],
+            addFuncs: [],
+            listener: "change:health_stat",
+            listenerFunc: "accessSheet",
+            defaultValue: "constitution",
             calculation: "",
             initialFunc: "",
             formula: ""
@@ -9479,8 +9506,9 @@ const recalcAll = function({attributes: attributes, sections: sections}) {
     if (grown > 0 || (+attributes.health_bar || 0) > slots) {
         attributes.health_bar = Math.min(slots, (+attributes.health_bar || 0) + grown);
     }
-    attributes.health_points_max = slots * mod.constitution;
-    attributes.health_points = (+attributes.health_bar || 0) * mod.constitution;
+    const healthModifier = k.healthModifier(attributes);
+    attributes.health_points_max = slots * healthModifier;
+    attributes.health_points = (+attributes.health_bar || 0) * healthModifier;
     if (k.syncHbSlots) k.syncHbSlots(attributes, sections);
     if (k.syncShield) k.syncShield(attributes, sections);
     attributes.whisper = whisperPrefix(mode, attributes.mob_whisper);
@@ -13067,6 +13095,11 @@ const slotMax = max => max === undefined || max === null || max === "" ? HB_SLOT
 
 const clampSlots = (v, max) => Math.max(0, Math.min(slotMax(max), v));
 
+const healthModifier = function(attributes) {
+    const stat = attributes.mode !== "vehicle" && k.DCC_STATS.includes(attributes.health_stat) ? attributes.health_stat : "constitution";
+    return +attributes[`${stat}_modifier`] || 0;
+};
+
 const hpFromHb = function(healthBar, conMod) {
     return (+healthBar || 0) * (+conMod || 0);
 };
@@ -13178,7 +13211,7 @@ const syncSlotRows = function(attributes, sections, section, n, filled, slotHeal
 };
 
 const syncHbSlots = function(attributes, sections) {
-    syncSlotRows(attributes, sections, HB_SECTION, hbRowCount(attributes.health_bar_slots), +attributes.health_bar || 0, +attributes.constitution_modifier || 0);
+    syncSlotRows(attributes, sections, HB_SECTION, hbRowCount(attributes.health_bar_slots), +attributes.health_bar || 0, healthModifier(attributes));
 };
 
 const SHIELD_SECTION = "repeating_shieldslots";
@@ -13196,7 +13229,7 @@ const syncShield = function(attributes, sections) {
 const setHealthBar = function({attributes: attributes, sections: sections}, value, {push: push = true} = {}) {
     const hb = clampSlots(Math.floor(+value || 0), attributes.health_bar_slots);
     attributes.health_bar = hb;
-    attributes.health_points = hpFromHb(hb, attributes.constitution_modifier);
+    attributes.health_points = hpFromHb(hb, healthModifier(attributes));
     syncHbSlots(attributes, sections);
     if (push && k.pushCrewStats) k.pushCrewStats({
         attributes: attributes,
@@ -13208,6 +13241,7 @@ const setHealthBar = function({attributes: attributes, sections: sections}, valu
 const hbClickTarget = (idx, healthBar) => (+idx || 0) === (+healthBar || 0) ? (+idx || 0) - 1 : +idx || 0;
 
 Object.assign(k, {
+    healthModifier: healthModifier,
     hpFromHb: hpFromHb,
     maxHpFromCon: maxHpFromCon,
     damageToSlots: damageToSlots,
@@ -13256,7 +13290,7 @@ const shieldSlotClick = function({trigger: trigger, attributes: attributes, sect
 };
 
 const hpEdit = function({attributes: attributes, sections: sections}) {
-    const r = k.applyHpEdit(attributes.health_bar, attributes.health_points, attributes.constitution_modifier, attributes.health_bar_slots);
+    const r = k.applyHpEdit(attributes.health_bar, attributes.health_points, healthModifier(attributes), attributes.health_bar_slots);
     setHealthBar({
         attributes: attributes,
         sections: sections
