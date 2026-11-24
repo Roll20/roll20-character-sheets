@@ -7905,6 +7905,11 @@ on('sheet:opened change:sync_hp_flag', async (eventInfo) => {
   await toggleReadonlyClass(attr);
 });
 
+on('sheet:opened change:sync_ac_flag', async (eventInfo) => {
+  const attr = 'sync_ac_flag';
+  await toggleReadonlyClass(attr);
+});
+
 // Handles sheet mode (PC/Monster)
 // Sets class (.show-pc, .show-monster, or .show-settings)
 on('sheet:opened change:toggle_npc change:is_npc', async (eventInfo) => {
