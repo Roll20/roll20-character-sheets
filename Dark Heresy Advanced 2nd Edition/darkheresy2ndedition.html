@@ -4408,6 +4408,23 @@ const repeatingSum = (destinations, section, fields) => {
     }); 
 };
 
+// Repeating rows have no built-in token for their row id. Roll buttons can only
+// pass it to an API command by reading an attribute, so store each row's id in
+// attr_my_hidden_row_id. The Hit button expands that as:
+//   repeating_Rangedweapons_@{my_hidden_row_id}_Rangedweaponclip
+// sheet:opened covers rows created while this worker was missing; silent avoids
+// the write itself retriggering change:repeating_rangedweapons.
+const setRangedWeaponRowIds = () => {
+	getSectionIDs('repeating_rangedweapons', idArray => {
+		const setOps = {};
+		idArray.forEach(id => {
+			setOps['repeating_rangedweapons_' + id + '_my_hidden_row_id'] = id;
+		});
+		setAttrs(setOps, {silent: true});
+	});
+};
+on('change:repeating_rangedweapons sheet:opened', setRangedWeaponRowIds);
+
 // Advancement related calculations.  Finds XP amounts and puts them in arrays for each column
 on('change:repeating_advancements remove:repeating_advancements sheet:opened',function(){
 	repeatingSum('col_total1','advancements','advancementRe1xp');
