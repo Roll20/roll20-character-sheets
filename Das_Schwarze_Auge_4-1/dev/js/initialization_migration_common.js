@@ -84,21 +84,15 @@ function migrationCheck()
 			functionsToCall = [ ...functionsToCall, ...gatherMigrationFunctions(dataVersion)];
 		}
 
-			// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
-			// then we call the function with name "firstFunction"
-			if (functionsToCall.length > 0) {
-				functionsToCall.push("setCurrentVersion");
-				// Try to detect the game type
-				/// This might fail in a way that stops further execution of the action listener, so always call last.
-				if (initialized === false)
-				{
-					functionsToCall.push("initializeGameType");
-				}
-				console.log(caller, "functionsToCall", functionsToCall);
-				// shift() removes the first item of the array in place and returns it
-				const firstFunction = functionsToCall.shift();
-				window[firstFunction](functionsToCall);
-			}
+		// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+		// then we call the function with name "firstFunction"
+		if (functionsToCall.length > 0) {
+			functionsToCall.push("setCurrentVersion");
+			console.log(caller, "functionsToCall", functionsToCall);
+			// shift() removes the first item of the array in place and returns it
+			const firstFunction = functionsToCall.shift();
+			window[firstFunction](functionsToCall);
+		}
 	});
 }
 
@@ -130,16 +124,46 @@ function callNextMigration(migrationChain)
 function initializeGameType(migrationChain)
 {
 	const caller = "initializeGameType()";
-	debugLog(caller, "Running function prone to crashes.");
+	let skipDetection = false;
+
+	// Precaution
+	/// This function must be the last item of migration chains due to the crashy nature of detectGameType().
+	/// Therefore, this function must make sure that the following conditions are met:
+	/// * The migration chain is empty, so that this function is definitely the last function called during migration.
+	///
+	/// If the conditions are not met, this function call is not the last during the running migration risking premature abort of the migration.
+	/// Therefore, the following conditions need to be met to ensure a smooth(er) process:
+	/// * No other items are this function call
+	/// * This function call is the last item
+	/// The following code aims to guarantee these conditions:
+	if (migrationChain.length > 0)
+	{
+		const initGameType = "initializeGameType";
+		skipDetection = true;
+		// Contains at least one "initializeGameType"
+		if (migrationChain.indexOf(initGameType) !== -1)
+		{
+			debugLog(caller, "Pushed to the end of the migration chain.");
+			// Remove every occurrence
+			migrationChain = migrationChain.filter(item => (item !== initGameType));
+		}
+		// Add new call to the end
+		migrationChain.push(initGameType);
+	}
 
 	// Check Game Type
-	const gameType = detectGameType();
-	gameType.then(
-		(value) => {
-			safeSetAttrs(value, {}, function () {
-				callNextMigration(migrationChain);
-			});
-		}
-	);
+	if (skipDetection)
+	{
+		callNextMigration(migrationChain);
+	} else {
+		const gameType = detectGameType();
+		gameType.then(
+			(value) => {
+				safeSetAttrs(value, {}, function () {
+					callNextMigration(migrationChain);
+				});
+			}
+		);
+	}
 }
 /* initialization_migration_common end */

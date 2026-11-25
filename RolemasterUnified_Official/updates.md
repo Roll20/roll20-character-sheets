@@ -1,17 +1,39 @@
-# 2026-11-10
 
-- Fix for Endurance bonus on success
-- Fix for a number of calls using bad variables including healing/resting
-- Fix for PP ranges clamping range
-- Fix for logging endurance and mental endurance
-- Fix for status uninitialized variables
-- Remove duplicated fetch request
-- Healing is too fast, healing 10% per hour, instead of 10% per 2 hours
-- Fix missing `sheettype` in token markers fetch
-- Fix for `grapplestatus` using the wrong field (`statusstun25`), and triggering state
+
+
+# 2026-11-65
+
+MAKE SURE YOU FIX CREATURES DB
+   They use dbmod, and nothing else does
+
+
+# 2026-11-21
+
+- Fix some typos: Xbow no XBox, remove space in picklock
+- DB Update:
+    - Now calculate DB vs melee, missile, and area independently.
+    - Add movement mode and defense mode selectors
+    - Add selector if shield is active
+    - Add a dice button to roll shield from the page
+- Fix some dependencies
+- Use strict on skills.
+- Updates for spells
+- Fix for Endurance
+- FrontPage update no longer tries to update DB (old path).
+- Show all a targets DBs.
+- Handle creatures with critical reduction IV
+- Can now create 'area' attacks
+- Pull crit reduction when creating NPCs from PCs
+- Force crit reduction for everyone
+- Force change of movement mode on creation.
+- Attempt at auto update for characters
+
+
+# 2026-11-03?
+
 - Add a new onCheckAuto to reduce duplicate code and properties.
 - Tests for above.
-- Save events in the test support so you can change events in tests.
+- Save events in the tests so you can change events in tests.
 
 # 2026-11-02
 
@@ -131,18 +153,16 @@
 Fix RR Popup @snowdragon
 
 # 2026-08-21
-
 Fix an issue causing creature DB to be trashed.  Simple fix while I rewrite all
 the DBs.
+
+
 
 # 2026-08-03
 
 Post GenCon updates.
 
 - Updates to some of the options.  
-
-# 2026-07-30
-
 - Another attempt to hide initiative tracker on PC sheets
 
 # 2026-07-28

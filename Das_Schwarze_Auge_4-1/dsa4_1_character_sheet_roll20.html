@@ -17765,6 +17765,19 @@
 			<summary>
 				<h4>Update auf Version 20261018</h4>
 			</summary>
+			<h5>Fehlerbehebungen</h5>
+			<p>
+				<ul>
+					<li><span class="highlight">Ausweichen-Bonus aus Akrobatik:</span> Der Bonus wirkt jetzt ab einem TaW von 12.</li>
+					<li><span class="highlight">Migrationen:</span> Migrationen von Uralt-Charakterbögen schlagen jetzt nicht mehr bei der Migration zu 20190427 fehl.</li>
+				</ul>
+			</p>
+		</details>
+
+		<details>
+			<summary>
+				<h4>Update auf Version 20261018</h4>
+			</summary>
 			<h5>Neue Features</h5>
 			<p>
 				<ul>
@@ -19203,7 +19216,7 @@
 	</div>
 <!-- sheet section info end -->
 <!-- sheet footer start -->
-	<b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="stat-immutable stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20261018"><input type="hidden" class="stat-immutable stat-immutable-version" readonly="readonly" name="attr_data_version" value=""> (Spieltyp <span class="abbr" title="Roll20 hat im Jahr 2025 ein Update des virtuellen Spieltisches (Projekt &bdquo;Jumpgate&ldquo;) freigeschaltet. Alte Spiele werden seitdem als &bdquo;Legacy&ldquo; markiert und erhalten keine neuen Features mehr. Dieser Charakterbogen kann solche neuen Features nutzen, die in Legacy-Spielen nicht verfügbar sind. Standardmäßig versucht der Charakterbogen bei neuen Charakteren herauszufinden, ob das Spiel ein Legacy- oder ein Jumpgate-Spiel ist. Dabei kann es zu einer Fehlermeldung kommen. Im Konfiguration-Tab kann im Abschnitt &bdquo;Spieltyp&ldquo; durch Drücken des Knopfes &bdquo;Spieltyp überprüfen&ldquo; nach einem Upgrade eines Legacy-Spiels zu einem Jumpgate-Spiel eine manuelle Prüfung angestoßen werden, um so auch in den Genuss der neuen Features zu kommen.">&#x2139;&#xfe0f;</span>: <span name="attr_global_game_type">Legacy</span>)</b>
+	<b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="stat-immutable stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20261111"><input type="hidden" class="stat-immutable stat-immutable-version" readonly="readonly" name="attr_data_version" value=""> (Spieltyp <span class="abbr" title="Roll20 hat im Jahr 2025 ein Update des virtuellen Spieltisches (Projekt &bdquo;Jumpgate&ldquo;) freigeschaltet. Alte Spiele werden seitdem als &bdquo;Legacy&ldquo; markiert und erhalten keine neuen Features mehr. Dieser Charakterbogen kann solche neuen Features nutzen, die in Legacy-Spielen nicht verfügbar sind. Standardmäßig versucht der Charakterbogen bei neuen Charakteren herauszufinden, ob das Spiel ein Legacy- oder ein Jumpgate-Spiel ist. Dabei kann es zu einer Fehlermeldung kommen. Im Konfiguration-Tab kann im Abschnitt &bdquo;Spieltyp&ldquo; durch Drücken des Knopfes &bdquo;Spieltyp überprüfen&ldquo; nach einem Upgrade eines Legacy-Spiels zu einem Jumpgate-Spiel eine manuelle Prüfung angestoßen werden, um so auch in den Genuss der neuen Features zu kommen.">&#x2139;&#xfe0f;</span>: <span name="attr_global_game_type">Legacy</span>)</b>
 <!-- sheet footer end -->
 <!-- sheet outro start -->
 </div>
@@ -26068,21 +26081,15 @@ function migrationCheck()
 			functionsToCall = [ ...functionsToCall, ...gatherMigrationFunctions(dataVersion)];
 		}
 
-			// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
-			// then we call the function with name "firstFunction"
-			if (functionsToCall.length > 0) {
-				functionsToCall.push("setCurrentVersion");
-				// Try to detect the game type
-				/// This might fail in a way that stops further execution of the action listener, so always call last.
-				if (initialized === false)
-				{
-					functionsToCall.push("initializeGameType");
-				}
-				console.log(caller, "functionsToCall", functionsToCall);
-				// shift() removes the first item of the array in place and returns it
-				const firstFunction = functionsToCall.shift();
-				window[firstFunction](functionsToCall);
-			}
+		// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+		// then we call the function with name "firstFunction"
+		if (functionsToCall.length > 0) {
+			functionsToCall.push("setCurrentVersion");
+			console.log(caller, "functionsToCall", functionsToCall);
+			// shift() removes the first item of the array in place and returns it
+			const firstFunction = functionsToCall.shift();
+			window[firstFunction](functionsToCall);
+		}
 	});
 }
 
@@ -26114,17 +26121,47 @@ function callNextMigration(migrationChain)
 function initializeGameType(migrationChain)
 {
 	const caller = "initializeGameType()";
-	debugLog(caller, "Running function prone to crashes.");
+	let skipDetection = false;
+
+	// Precaution
+	/// This function must be the last item of migration chains due to the crashy nature of detectGameType().
+	/// Therefore, this function must make sure that the following conditions are met:
+	/// * The migration chain is empty, so that this function is definitely the last function called during migration.
+	///
+	/// If the conditions are not met, this function call is not the last during the running migration risking premature abort of the migration.
+	/// Therefore, the following conditions need to be met to ensure a smooth(er) process:
+	/// * No other items are this function call
+	/// * This function call is the last item
+	/// The following code aims to guarantee these conditions:
+	if (migrationChain.length > 0)
+	{
+		const initGameType = "initializeGameType";
+		skipDetection = true;
+		// Contains at least one "initializeGameType"
+		if (migrationChain.indexOf(initGameType) !== -1)
+		{
+			debugLog(caller, "Pushed to the end of the migration chain.");
+			// Remove every occurrence
+			migrationChain = migrationChain.filter(item => (item !== initGameType));
+		}
+		// Add new call to the end
+		migrationChain.push(initGameType);
+	}
 
 	// Check Game Type
-	const gameType = detectGameType();
-	gameType.then(
-		(value) => {
-			safeSetAttrs(value, {}, function () {
-				callNextMigration(migrationChain);
-			});
-		}
-	);
+	if (skipDetection)
+	{
+		callNextMigration(migrationChain);
+	} else {
+		const gameType = detectGameType();
+		gameType.then(
+			(value) => {
+				safeSetAttrs(value, {}, function () {
+					callNextMigration(migrationChain);
+				});
+			}
+		);
+	}
 }
 /* initialization_migration_common end */
 /* initialization start */
@@ -26331,6 +26368,9 @@ function initializeSheet(migrationChain) {
 						attrs[attr] = getDefaultValue(attr);
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
+					// Try to detect the game type
+					/// This might fail in a way that stops further execution of the action listener, so always call last.
+					migrationChain.push("initializeGameType");
 				}
 			} else {
 				debugLog(caller, "'data_version' set, safety stopping initialization and preventing future initialization attempts ...");
@@ -26365,6 +26405,7 @@ const versionsWithMigrations = [
 		20250122,
 		20250413,
 		20261018,
+		20261111,
 ];
 
 /*
@@ -26408,11 +26449,15 @@ function migrateTo20190427 (migrationChain) {
 				"---": "nothing",
 				"Ansitzjagd": "ansitzjagd",
 				"Hetzjagd": "hetzjagd",
+				"Kräuter suchen": "kraeutersuchen",
 				"Kräutersuchen": "kraeutersuchen",
+				"Nahrung sammeln": "nahrungsammeln",
 				"Nahrungsammeln": "nahrungsammeln",
 				"Pirschjagd": "pirschjagd",
 				"Speerfischen": "speerfischen",
+				"Tierfallen stellen": "tierfallenstellen",
 				"Tierfallenstellen": "tierfallenstellen",
+				"Wache Halten": "wachehalten",
 				"Wachehalten": "wachehalten",
 			};
 			const gaben = {
@@ -26438,7 +26483,7 @@ function migrateTo20190427 (migrationChain) {
 				"wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ],
 			};
 
-			const attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
+			const attrsToGet = statAttrs;
 			// GIFTS MIGRATION
 			if(gabenIDs.length === 0)
 			{
@@ -27947,6 +27992,52 @@ function migrateTo20261018(migrationChain) {
 		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function () {
 			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+
+* Correct Evade bonus from high acrobatics
+
+*/
+function migrateTo20261111(migrationChain) {
+	// Boilerplate
+	const caller = "migrateTo20261111";
+	debugLog(caller, "started");
+
+	// Preparation
+	/// Use double-set with value different from current value
+	/// Only one value needs to be changed to trigger recalculation
+	/// Note: There is no future-proof way to get a correct attribute
+	const attrsToGet = [ attrsEvadeModAcrobatics[0] ];
+
+	// Fix mod value
+	safeGetAttrs(attrsToGet, function(valuesOuter) {
+		const property = Object.keys(valuesOuter)[0];
+		const attrsToChange = { property: "" };
+		const offset = 1;
+
+		// Set value to trigger recalculation
+		/// Future-proofing: Make sure that this attribute is a number.
+		//// It might happen that the contents of attrsEvadeModAcrobatics change from the currently only attribute TaW_Akrobatik
+		let firstSet = parseInt(valuesOuter[property]);
+		if (typeof(firstSet) === "number")
+		{
+			firstSet += offset;
+		} else {
+			debugLog(caller, `firstSet not of type number. Type: ${typeof(firstSet)}.`);
+		}
+
+		// Use attribute
+		attrsToChange[property] = firstSet;
+		console.log(caller, "attrsToChange (outer)", attrsToChange);
+
+		safeSetAttrs(attrsToChange, {}, function () {
+			const attrsToChange = valuesOuter;
+			safeSetAttrs(attrsToChange, {}, function () {
+				callNextMigration(migrationChain);
+			});
 		});
 	});
 }
@@ -32283,7 +32374,7 @@ on(attrsEvadeModAcrobatics.map(attr => "change:" + attr).join(" ").toLowerCase()
 			function(values) {
 				// Boilerplate
 				const step = 3;
-				const offset = 12;
+				const offset = 9;
 				let attrsToChange = { 'k_ausweichen_mod_akrobatik': getDefaultValue("k_ausweichen_mod_akrobatik") };
 
 				// Calculation
