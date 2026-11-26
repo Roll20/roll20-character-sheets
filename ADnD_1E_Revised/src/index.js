@@ -1941,7 +1941,7 @@ versionator = async (current_version, final_version) => {
 };
 
 on('sheet:opened', async () => {
-  const final_version = 1.73; // must be >= last update versionator()
+  const final_version = 1.74; // must be >= last update versionator()
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
   let current_version = float(v.sheet_version);
   // New Sheet?
