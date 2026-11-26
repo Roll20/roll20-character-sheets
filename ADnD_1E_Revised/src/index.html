@@ -79,6 +79,7 @@
             <li>Tightened up repcontrol (add, modify, done) button transitions from the bottom of the repeating sections</li>
             <li>Replaced old autoexpand fields to newer CSS, field-sizing: content; Same functionality with less code.</li>
             <li>HP max field now becomes read-only when HP is synced with the Class Details HP calcs. Similarly, AC becomes a read-only when synced with Armor Details calc.</li>
+            <li>Fixed roll template alignment of failed rolls.</li>
 
             <li>Changed the attack's "show to-Hit?" AC table to use an "/ss" roll. (only viewable by the DM)</li>
             <li>Updated Attack, Equipment, and Special Ability rolls to use Custom Roll Parsing(CRP). This allows tracking of resources (ammo, uses, quantity) and determining the best AC hit without requiring API mods.</li>
@@ -3278,15 +3279,14 @@
                   <span>Platinum</span>
                 </div>
                 <div class="coin-columns">
-                  <label class="text-large right"><span>Carried Coins:</span></label>
+                  <label class="text-large right" title="Included in weight calculations.">
+                    <span>Carried Coins:</span>
+                  </label>
                   <input type="text" class="width-medium" name="attr_cp" title="@{cp}" value="0" />
                   <input type="text" class="width-medium" name="attr_sp" title="@{sp}" value="0" />
                   <input type="text" class="width-medium" name="attr_ep" title="@{ep}" value="0" />
                   <input type="text" class="width-medium" name="attr_gp" title="@{gp}" value="0" />
                   <input type="text" class="width-medium" name="attr_pp" title="@{pp}" value="0" />
-                  <label class="span-all">
-                    <span class="text-small"><b>hint:</b> 200cp = 20sp = 2ep = 1gp = 1/5pp</span>
-                  </label>
                 </div>
                 <hr>
                 <div class="coin-columns">
@@ -3296,6 +3296,9 @@
                   <input type="text" class="width-medium" name="attr_ep-total" title="@{ep-total}" value="0" />
                   <input type="text" class="width-medium" name="attr_gp-total" title="@{gp-total}" value="0" />
                   <input type="text" class="width-medium" name="attr_pp-total" title="@{pp-total}" value="0" />
+                  <label class="span-all center">
+                    <span class="text-small"><b>hint:</b> 200cp = 20sp = 2ep = 1gp = 1/5pp</span>
+                  </label>
                 </div>
                 <textarea class="height-tall" name="attr_wealthNotes" title="@{wealthNotes}" placeholder="Wealth Notes"></textarea>
               </div>
@@ -5638,30 +5641,26 @@
                   <!--Success/Failure for Roll High-->
                   {{#roll_high}}
                     {{#^rollLess() roll_high roll_target}}
-                    <span class="sheet-row">
-                      <span class="sheet-tcat sheet-span-two sheet-success">Success!</span>
+                    <span class="sheet-row"><span class="sheet-tcat sheet-span-two sheet-success">Success!</span></span>
                     {{/^rollLess() roll_high roll_target}}
                     {{#rollLess() roll_high roll_target}}
-                      <span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span>
+                      <span class="sheet-row"><span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span></span>
                     {{/rollLess() roll_high roll_target}}
-                    </span>
                     <span class="sheet-row sheet-span-two sheet-tcat"><span class="sheet-center">Roll =</span>&nbsp;{{roll_high}}&nbsp;<span class="sheet-center">vs</span>&nbsp;{{roll_target}}</span>
                   {{/roll_high}}
                   <!--Success/Failure for Roll Low-->
                   {{#roll_low}}
                     {{#^rollGreater() roll_low roll_target}}
-                    <span class="sheet-row">
-                      <span class="sheet-tcat sheet-span-two sheet-success">Success!</span>
+                    <span class="sheet-row"><span class="sheet-tcat sheet-span-two sheet-success">Success!</span></span>
                     {{/^rollGreater() roll_low roll_target}}
                     {{#rollGreater() roll_low roll_target}}
-                      <span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span>
+                      <span class="sheet-row"><span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span></span>
                     {{/rollGreater() roll_low roll_target}}
-                    </span>
                     <span class="sheet-row sheet-span-two sheet-tcat"><span class="sheet-center">Roll =</span>&nbsp;{{roll_low}}&nbsp;<span class="sheet-center">vs</span>&nbsp;{{roll_target}}</span>
                     {{#^rollGreater() roll_low roll_target2}}
-                    <span class="sheet-row">
                     {{/^rollGreater() roll_low roll_target2}}
                     {{#rollGreater() roll_low roll_target2}}
+                    <span class="sheet-row">
                       <span class="sheet-tcat sheet-span-two sheet-failure">Detected</span>
                       <span class="sheet-tcat sheet-span-two sheet-center">roll is >= +21% failure</span>
                     </span>
