@@ -999,7 +999,7 @@ on(attrsEvadeModAcrobatics.map(attr => "change:" + attr).join(" ").toLowerCase()
 			function(values) {
 				// Boilerplate
 				const step = 3;
-				const offset = 12;
+				const offset = 9;
 				let attrsToChange = { 'k_ausweichen_mod_akrobatik': getDefaultValue("k_ausweichen_mod_akrobatik") };
 
 				// Calculation
