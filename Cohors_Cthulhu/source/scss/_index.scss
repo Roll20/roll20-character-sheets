@@ -1,0 +1,449 @@
+@use './variables';
+
+@mixin variables {
+  @include variables.variables;
+}
+
+@mixin dark {
+  @include variables.dark;
+}
+
+@mixin generic {
+  /* Off-white page with a faint maroon aquila watermark in the top-right
+     corner, on every tab. The aquila is a public-domain Roman relief
+     (Wikimedia Commons, File:Better_Imperial_Aquila.png), tinted maroon, with
+     its low opacity baked into the PNG. "&" is .charsheet, since
+     Cohors_Cthulhu.scss includes this mixin there. */
+  & {
+    background: var(--cc-page-bg) url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cohors_Cthulhu/images/eagle-spqr.png') no-repeat top right / 260px auto;
+  }
+
+  /* Each roll button is a k-scaffold roller: a roll button (draggable to
+     the macro bar) plus a hidden action button that runs the roll. Keep the
+     hidden ones hidden whatever button styles apply. */
+  button[hidden] {
+    display: none;
+  }
+
+  /* k-scaffold leaves tab buttons unstyled. */
+  .tabs__nav-list {
+    gap: 0.3rem;
+    padding: 0;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .tabs__button {
+    display: inline-block;
+    padding: 0.4rem 1.1rem;
+    background: var(--cc-parchment-dark);
+    color: var(--cc-rule);
+    border: 1px solid var(--cc-rule);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    /* Body font, unlike .cc-banner. */
+    font-family: var(--cc-body-font);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--cc-parchment);
+    }
+
+    &.k-active-button {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+    }
+  }
+
+  /* Player/NPC switch (Cohors_Cthulhu.pug): top right, level with the tab
+     buttons. The transparent checkbox on top takes the clicks. */
+  main {
+    position: relative;
+  }
+
+  .cc-sheet-mode {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 1.8rem;
+    font-family: var(--cc-body-font);
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* input. outranks k-scaffold's input[type=checkbox] sizing. */
+  .cc-sheet-mode input.cc-sheet-mode-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .cc-sheet-mode-option {
+    color: var(--cc-ink);
+    opacity: 0.45;
+  }
+
+  .cc-sheet-mode-input:not(:checked) ~ .cc-sheet-mode-player,
+  .cc-sheet-mode-input:checked ~ .cc-sheet-mode-npc {
+    color: var(--cc-switch);
+    opacity: 1;
+  }
+
+  .cc-sheet-mode-track {
+    position: relative;
+    box-sizing: border-box;
+    width: 2rem;
+    height: 1rem;
+    border: 1px solid var(--cc-switch);
+    border-radius: 0.5rem;
+    background: var(--cc-parchment-dark);
+
+    /* The knob: left for Player, right for NPC. */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: calc(1rem - 4px);
+      height: calc(1rem - 4px);
+      border-radius: 50%;
+      background: var(--cc-switch);
+      transition: left 0.15s;
+    }
+  }
+
+  .cc-sheet-mode-input:checked ~ .cc-sheet-mode-track::after {
+    left: calc(1rem + 1px);
+  }
+
+  .cc-banner {
+    /* Brush-stroke ribbon (images/banner-brush.png) loaded by URL; a data:
+       URI breaks roll-template styling. No background-color, so the ribbon's
+       transparent edges show through. */
+    background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cohors_Cthulhu/images/banner-brush.png') no-repeat center / 100% 100%;
+    color: var(--cc-banner-text);
+    font-family: var(--cc-header-font);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 1.6rem 0.3rem 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 0.3rem;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  }
+
+  .cc-field-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .cc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1 1 auto;
+
+    > span {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+    }
+
+    > input,
+    > textarea,
+    > select {
+      // background-color, not the shorthand, so the select chevron survives.
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid var(--cc-rule);
+      font-family: var(--cc-body-font);
+      color: var(--cc-ink);
+      padding: 0.1rem 0.1rem;
+    }
+
+    // Light fill marks player-editable fields; calculated (readonly) ones
+    // stay transparent. Every <select> is a player choice but never matches
+    // :read-write, so it always gets the fill.
+    > input:read-write,
+    > textarea:read-write,
+    > select {
+      background-color: var(--cc-editable-fill);
+    }
+
+    // Restate padding-right after the shorthand to keep room for the chevron.
+    > select {
+      padding-right: 1.3rem;
+    }
+  }
+
+  // CSS chevron for every <select> and datalist combobox (input[list]).
+  //  - <select>: appearance: none removes the native arrow.
+  //  - input[list]: the native suggestions arrow is ::-webkit-calendar-
+  //    picker-indicator, which only display: none !important hides.
+  select,
+  input[list] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--cc-ink) 50%),
+      linear-gradient(135deg, var(--cc-ink) 50%, transparent 50%);
+    background-position: calc(100% - 13px) 55%, calc(100% - 8px) 55%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 1.3rem;
+  }
+
+  input[list]::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+
+  .cc-panel {
+    border: 1px solid var(--cc-rule);
+    /* Parchment fallback color under a marble texture (images/marble-
+       texture.jpg: ambientCG Marble018, CC0, see the README's Credits), its
+       color shifted to the parchment tones. The tile is seamless; 1024px
+       wide, shown at 512px for high-density screens. Loaded by URL, never as
+       a data: URI. */
+    background: var(--cc-parchment-dark) url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cohors_Cthulhu/images/marble-texture.jpg') top left / 512px auto repeat;
+    padding: 0.4rem;
+    margin-bottom: 0.4rem;
+    border-radius: 3px;
+  }
+
+  .cc-rep-table {
+    .cc-rep-header,
+    fieldset,
+    .repcontainer .repitem {
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .cc-rep-header {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.4rem;
+    }
+
+    fieldset,
+    .repcontainer .repitem {
+      border: none;
+      border-bottom: 1px solid var(--cc-rule-soft);
+      padding: 0.15rem 0.4rem;
+      margin: 0;
+    }
+
+    /* k-scaffold's .repcontainer is a grid with a 1rem gap between rows; the
+       row borders already separate them. */
+    .repcontainer {
+      gap: 0;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      // background-color, not the shorthand, so the chevron survives.
+      background-color: transparent;
+      border: 1px solid var(--cc-rule);
+      color: var(--cc-ink);
+      border-radius: 2px;
+    }
+
+    // Every field in these rows is player-entered.
+    input:read-write,
+    textarea:read-write,
+    select {
+      background-color: var(--cc-editable-fill);
+    }
+  }
+
+  .cc-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0.2rem 0.4rem;
+    }
+
+    td {
+      border-bottom: 1px solid var(--cc-rule);
+      padding: 0.1rem 0.3rem;
+
+      input,
+      textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: var(--cc-ink);
+        font-family: var(--cc-body-font);
+      }
+    }
+  }
+
+  /* Roll20's own Modify and +Add Item links (repcontrol_edit/repcontrol_add)
+     can only be restyled with CSS. Styled as maroon buttons with a laurel
+     wreath icon (images/laurel-icon.png: Wikimedia Commons, CC0, recolored),
+     cream on maroon and dark ink (laurel-icon-dark.png) on hover. */
+  .repcontrol_add,
+  .repcontrol_edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--cc-banner);
+    color: var(--cc-banner-text);
+    border: 1px solid var(--cc-rule);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    /* Space between Modify and Add when side by side. */
+    margin: 0.2rem 0.5rem 0.2rem 0;
+    font-family: var(--cc-body-font);
+    font-weight: bold;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 11px;
+      flex: 0 0 auto;
+      background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cohors_Cthulhu/images/laurel-icon.png') no-repeat center / contain;
+    }
+
+    &:hover {
+      background: var(--cc-parchment);
+      color: var(--cc-ink);
+
+      /* Swap to the dark icon on hover; a background-image doesn't follow
+         `color`. */
+      &:before {
+        background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cohors_Cthulhu/images/laurel-icon-dark.png');
+      }
+    }
+
+    /* Normalize Roll20's inner <a>/<span>. */
+    a,
+    span {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  /* Shorten "+Add Item" to "Add": font-size: 0 on the real text (on the
+     container, since Roll20 renders it as an <a> or a <span>) and replacement
+     text in :after. */
+  .repcontrol_add {
+    font-size: 0;
+
+    a,
+    span {
+      font-size: 0;
+    }
+
+    &:after {
+      content: 'Add';
+      font-size: 0.65rem;
+    }
+  }
+
+  /* Print styles: sheet workers can't print or download, so this makes the
+     browser's Print / Save as PDF produce the whole sheet without UI chrome. */
+  @media print {
+    /* Hide tab navigation, the Player/NPC switch, Edit Focuses,
+       repeating-section controls and the build footer. */
+    .tabs__header,
+    .cc-sheet-mode,
+    .cc-skills-edit-toggle,
+    .repcontrol_add,
+    .repcontrol_edit,
+    .cc-footer {
+      display: none !important;
+    }
+
+    /* Spell Effect and Momentum print whether or not their info icon is
+       pressed; the icon itself doesn't. */
+    .cc-spell-info-toggle {
+      display: none !important;
+    }
+
+    .cc-spell-info-toggle ~ .cc-spell-collapse-content {
+      display: block !important;
+    }
+
+    /* Show every tab, stacked. k-scaffold hides inactive tabs with an
+       !important :not(.k-active-tab) rule; doubling the class matches its
+       specificity, and this rule compiles later. */
+    .tabs__container.tabs__container {
+      display: block !important;
+    }
+
+    /* Light-on-dark headers vanish when backgrounds aren't printed, so print
+       them as dark ink on white with borders. Same for the roll buttons on
+       those headers. */
+    .cc-banner {
+      background: none !important;
+      color: var(--cc-rule) !important;
+      border: 1px solid var(--cc-rule);
+      text-shadow: none !important;
+    }
+
+    .cc-table th,
+    .cc-rep-header {
+      background: none !important;
+      color: var(--cc-rule) !important;
+      border-bottom: 2px solid var(--cc-rule);
+    }
+
+    .cc-attribute-roll,
+    .cc-skill-name-roll {
+      background: none !important;
+      border-color: var(--cc-rule) !important;
+      color: var(--cc-rule) !important;
+    }
+
+    /* Ask to keep the tracker fill colors. */
+    .fill-left__radio {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    /* Avoid splitting a row or panel across pages. */
+    .cc-panel,
+    .cc-rep-table .repitem,
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  }
+}
