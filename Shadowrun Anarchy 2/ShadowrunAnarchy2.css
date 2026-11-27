@@ -1,0 +1,1634 @@
+/* Shadowrun Anarchy 2 | Roll20 character sheet | Version 39
+ * Layout: base styles, character overview, tabs and panels, repeating rows,
+ * responsive rules, Roll20 compatibility overrides and conditional visibility.
+ * Native repeating templates must remain hidden by Roll20.
+ */
+
+/* DESIGN TOKENS: shared colors, typography and control dimensions. Later Roll20-specific rules intentionally override some base styles; inspect the full cascade before changing a shared token. */
+:root {
+    --ink: #542719;
+    --ink-soft: #7b3b26;
+    --gold: #e4b400;
+    --gold-dark: #c99600;
+    --paper: #f8f7f2;
+    --line: #c8795c;
+    --muted: #8c8178;
+  }
+
+/* Shared sheet typography and control geometry. Chat templates remain independent. */
+.charsheet .sheet, .sheet {
+    --sra-control-h: 29px;
+    --sra-font-sm: 11px;
+    --sra-font-base: 12px;
+    --sra-font-label: 13px;
+    --sra-font-bold: 700;
+    --sra-skill-w: 70px;
+    --sra-roll-w: 54px;
+    --sra-amp-w: 65px;
+    --sra-control-gap: 4px;
+    --sra-grid-gap: 10px;
+}
+
+
+  /* BASE: form and page geometry. Border-box sizing keeps borders inside the declared control widths. */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 22px;
+    color: #211d1a;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background:
+      radial-gradient(ellipse at 15% 15%, rgba(255,255,255,.95), transparent 42%),
+      radial-gradient(ellipse at 85% 75%, rgba(226,220,207,.42), transparent 45%),
+      repeating-linear-gradient(115deg, rgba(110,90,65,.025) 0 1px, transparent 1px 5px),
+      #eeece5;
+  }
+
+  .sheet {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(255,255,255,.85), transparent 35%),
+      radial-gradient(circle at 90% 90%, rgba(230,224,210,.35), transparent 40%),
+      var(--paper);
+    border: 1px solid #d8d1c4;
+    box-shadow: 0 8px 28px rgba(48,35,25,.14);
+  }
+
+
+  /* Character overview: identity and wounds. */
+  .top-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, .9fr) minmax(420px, 1.35fr);
+    gap: 28px;
+  }
+
+
+  /* Shared identity field grid. */
+  .identity {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: 122px minmax(0, 1fr);
+    align-items: end;
+    gap: 10px;
+  }
+
+  .field label, .section-title, .attribute-name {
+    color: var(--ink);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+  }
+
+  .field label { font-size: var(--sra-font-label,13px); }
+  #streetname { font-size: 20px; font-weight: 800; }
+
+  input, select {
+    min-width: 0;
+    color: #211d1a;
+    font: inherit;
+    border: 0;
+    border-bottom: 1.5px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    padding: 5px 4px 4px;
+    outline-offset: 2px;
+  }
+
+  input:focus, select:focus {
+    outline: 2px solid rgba(228,180,0,.35);
+    border-bottom-color: var(--gold-dark);
+  }
+
+
+  /* OVERVIEW: wound thresholds and tracks. Keep the track columns aligned with the threshold grid. */
+  .wounds {
+    padding-top: 1px;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 19px;
+  }
+
+  .wound-track.group-light { grid-column: 2; }
+  .wound-track.group-serious { grid-column: 3; }
+  .wound-track.group-incap { grid-column: 4; }
+
+  .wound-track label {
+    display: inline-flex;
+    cursor: pointer;
+  }
+
+  .wound-track input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .wound-track span {
+    border: 2px solid #9b4b31;
+    border-radius: 50%;
+    background: transparent;
+  }
+
+  .wound-track input:checked + span {
+    background: #9b4b31;
+    box-shadow: inset 0 0 0 4px var(--paper);
+  }
+
+  .wound-table .wound-th {
+    padding: 7px 5px 5px;
+    color: #211d1a;
+    font-size: 14px;
+    text-align: center;
+    border-bottom: 1px solid #e4d6c9;
+  }
+
+  .wound-table .wound-th:first-child {
+    width: 55%;
+  }
+
+  .wound-table .wound-td {
+    height: 34px;
+    padding: 3px 5px;
+    font-size: 15px;
+  }
+
+  .wound-table input[type="text"] {
+    width: 100%;
+    padding: 3px 2px;
+  }
+
+  .wound-table .armor-name { width: 100%; }
+  .wound-table input.thr-calc { text-align:center; font-weight: var(--sra-font-bold,700); background:rgba(228,180,0,.12); cursor:default; }
+
+
+  /* OVERVIEW: six circular attributes. The ring styling must remain separate from ordinary rectangular form controls. */
+  .attributes {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 4px 8px;
+  }
+
+  .attribute {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .attribute-name {
+    font-size: clamp(12px, 1.7vw, 19px);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .attribute-ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: clamp(66px, 9vw, 100px);
+    aspect-ratio: 1;
+    border: 5px dashed var(--gold);
+    border-radius: 50%;
+    transform: rotate(-9deg);
+    background: rgba(255,255,255,.22);
+  }
+
+  .attribute-ring::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid rgba(228,180,0,.45);
+    border-radius: 43% 57% 48% 52% / 53% 44% 56% 47%;
+    transform: rotate(24deg);
+  }
+
+  .attribute-ring input {
+    width: 64%;
+    padding: 4px 0;
+    border: 0;
+    text-align: center;
+    font-weight: 800;
+    transform: rotate(9deg);
+    background: transparent;
+  }
+
+
+  /* Keine numerischen Hoch-runter-Regler im gesamten Dokument. */
+  input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+
+  /* NAVIGATION: native tab state controls panel visibility. Keep the selector relationship between controls and panels. */
+  .tabs {
+    margin-top: 25px;
+    border-top: 2px solid var(--gold);
+  }
+
+  .tab-controls {
+    padding-top: 10px;
+  }
+
+  .tab-controls input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tab-controls label {
+    padding: 9px 15px;
+    color: var(--ink);
+    font-weight: 800;
+    cursor: pointer;
+    border: 1px solid #d7c9b9;
+    border-bottom: 0;
+    background: rgba(255,255,255,.35);
+  }
+
+  .tab-controls input:checked + label {
+    color: #fff;
+    background: var(--ink-soft);
+    border-color: var(--ink-soft);
+  }
+
+  .tab-panel {
+    display: none;
+    min-height: 230px;
+    padding: 18px;
+    border: 1px solid #d7c9b9;
+    background: rgba(255,255,255,.3);
+  }
+
+
+  /* Roll20-sichere Tabs: Radio-Inputs sind direkte Geschwister der Panels. */
+  .tabs { position: relative; }
+  .tabs > input.tab-selector {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+  }
+  #tab-main:checked ~ .tab-controls label[for="tab-main"],
+  #tab-skills:checked ~ .tab-controls label[for="tab-skills"],
+  #tab-amps:checked ~ .tab-controls label[for="tab-amps"],
+  #tab-combat:checked ~ .tab-controls label[for="tab-combat"],
+  #tab-magic:checked ~ .tab-controls label[for="tab-magic"],
+  #tab-matrix:checked ~ .tab-controls label[for="tab-matrix"],
+  #tab-vehicles:checked ~ .tab-controls label[for="tab-vehicles"],
+  #tab-contacts:checked ~ .tab-controls label[for="tab-contacts"],
+  #tab-misc:checked ~ .tab-controls label[for="tab-misc"],
+  #tab-config:checked ~ .tab-controls label[for="tab-config"] {
+    color: #fff;
+    background: var(--ink-soft);
+    border-color: var(--ink-soft);
+  }
+  #tab-main:checked ~ .tab-panels .panel-main,
+  #tab-skills:checked ~ .tab-panels .panel-skills,
+  #tab-amps:checked ~ .tab-panels .panel-amps,
+  #tab-combat:checked ~ .tab-panels .panel-combat,
+  #tab-magic:checked ~ .tab-panels .panel-magic,
+  #tab-matrix:checked ~ .tab-panels .panel-matrix,
+  #tab-vehicles:checked ~ .tab-panels .panel-vehicles,
+  #tab-contacts:checked ~ .tab-panels .panel-contacts,
+  #tab-misc:checked ~ .tab-panels .panel-misc,
+  #tab-config:checked ~ .tab-panels .panel-config { display: block; }
+
+  .placeholder {
+    color: var(--muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 8px; }
+    .sheet { padding: 15px; }
+    .top-grid { grid-template-columns: 1fr; gap: 22px; }
+    .attributes { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 18px; }
+    .attribute-name { font-size: 15px; }
+    .attribute-ring { width: 82px; }
+  }
+
+  @media (max-width: 390px) {
+    .field { grid-template-columns: 105px minmax(0, 1fr); }
+    .wound-table .wound-th:first-child { width: 45%; }
+    .wound-table .wound-td, .wound-table .wound-th { font-size: var(--sra-font-base,12px); }
+    .wound-track { gap: 4px; }
+    .wound-track span { width: 18px; height: 18px; }
+  }
+
+
+  /* SKILLS: group expansion, shared column layout and specialization controls. The parent DP cell is intentionally empty; preserve its grid track for RR alignment. */
+  .skills-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-bottom: 12px;
+  }
+  .skills-toggle-all { padding:4px 12px; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(228,180,0,.10); color:var(--ink); font:inherit; font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); cursor:pointer; }
+  .skills-toggle-all:hover { background:rgba(228,180,0,.22); }
+
+  .skills-list { display: grid; gap: 8px; }
+  .skill-group {
+    border: 1px solid #d7c9b9;
+    background: rgba(255,255,255,.28);
+  }
+  .skill-group-toggle { display:none !important; }
+  .skill-group > .skill-main-row {
+    padding:0 0 0 8px;
+    color:var(--ink);
+    background:rgba(228,180,0,.10);
+    font-weight:800;
+  }
+  .skill-group .skill-main-row .skill-name {
+    display:flex;
+    align-items:center;
+    flex:1;
+    min-width:0;
+    cursor:pointer;
+  }
+  .skill-group-toggle:checked ~ .skill-main-row .skill-name::before {
+    content:"−";
+    display:inline-block;
+    width:18px;
+    color:var(--gold-dark);
+  }
+  .skill-group-toggle:not(:checked) ~ .skill-main-row .skill-name::before {
+    content:"＋";
+    display:inline-block;
+    width:18px;
+    color:var(--gold-dark);
+  }
+  .skill-group-toggle:not(:checked) ~ .specializations { display:none !important; }
+  .skills-top-head { padding-left: 38px; margin-bottom: 4px; }
+
+  
+  .skill-column-head, .skill-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) minmax(120px, .8fr) repeat(3, var(--sra-skill-w,70px)) var(--sra-roll-w,54px);
+    gap: 10px;
+    align-items: center;
+  }
+  .skill-column-head {
+    padding: 7px 12px 4px;
+    color: var(--ink-soft);
+    font-size: var(--sra-font-sm,11px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .skill-row { padding: 5px 12px; }
+  .skill-main-row {
+    border-top: 1px solid #e6d9cc;
+    border-bottom: 1px solid #e6d9cc;
+    background: rgba(255,255,255,.32);
+  }
+  .specialization-row { padding-left: 30px; }
+  .skill-name { font-size: var(--sra-font-label,13px); }
+  .skill-main-row .skill-name { color: var(--ink); font-weight: 800; }
+  .skill-row input[type="number"], .skill-row input.dp-calc, .skill-row select {
+    width: 100%;
+    min-height: var(--sra-control-h,29px);
+    padding: 4px 5px;
+    font-size: var(--sra-font-base,12px);
+    border: 1px solid #d8c9ba;
+    border-bottom: 1.5px solid var(--line);
+    background: rgba(255,255,255,.55);
+  }
+  .skill-row input.dp-calc { font-weight: var(--sra-font-bold,700); color: var(--ink); background: rgba(228,180,0,.12); cursor: default; }
+  .skill-attr-fixed { font-size: var(--sra-font-base,12px); color:var(--ink-soft); }
+  .skill-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--ink-soft);
+    font-size: var(--sra-font-base,12px);
+    cursor: pointer;
+  }
+  .skill-mark input { accent-color: var(--gold-dark); }
+  .skill-mark span { font-weight: var(--sra-font-bold,700); }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+  @media (max-width: 650px) {
+    .skill-column-head { display: none; }
+    .skill-row {
+      grid-template-columns: minmax(115px, 1fr) repeat(4, minmax(48px, .55fr)) 46px;
+      gap: 5px;
+      padding: 6px 8px;
+    }
+    .specialization-row { padding-left: 15px; }
+    .skill-row input[type="number"], .skill-row select { font-size: var(--sra-font-sm,11px); }
+  }
+
+
+  /* Amps panel and repeating-row layout. */
+
+  /* AMPS: base repeating-row layout. See the later Essence alignment and reminder overrides before changing column widths. */
+  .amps-header { margin-bottom:6px; }
+  .amps-list { display:grid; gap:10px; padding-top:6px; }
+  .amp-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
+  .amp-fields { display:grid; align-items:end; }
+  .amp-field { display:grid; gap:5px; min-width:0; color:var(--ink); font-size: var(--sra-font-base,12px); font-weight:800; }
+  .amp-field input, .amp-field select { width:100%; min-height:32px; padding:5px 7px; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); font-size: var(--sra-font-label,13px); font-weight:400; }
+  .amp-description { margin-top:10px; border-top:1px solid #e6d9cc; padding-top:8px; }
+  .amp-description summary { color:var(--ink-soft); font-weight:800; cursor:pointer; }
+  .amp-description textarea { display:block; width:100%; min-height:90px; margin-top:8px; padding:8px; resize:vertical; border:1px solid #d8c9ba; background:rgba(255,255,255,.55); color:#211d1a; font:inherit; }
+  @media (max-width:650px) { .amp-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; } }
+
+
+  /* Roll20-generated repeating-section controls, presented as clear add buttons. */
+  .repcontrol { display:flex; justify-content:flex-start; margin-top:10px; }
+  .repcontrol_add {
+    display:inline-flex !important; align-items:center; justify-content:center;
+    min-height:34px; padding:7px 13px !important; border:1px solid var(--gold-dark) !important;
+    border-radius:3px !important; background:var(--gold) !important; color:#38230f !important;
+    font:700 12px "Trebuchet MS", Arial, sans-serif !important; cursor:pointer;
+  }
+  .repcontrol_add:hover { filter:brightness(.96); }
+  .panel-amps .repcontrol_add { font-size:0 !important; }
+  .panel-amps .repcontrol_add::after { content:"＋ Add Amp"; font-size: var(--sra-font-base,12px); }
+  .panel-combat .repcontrol_add { font-size:0 !important; }
+  .panel-combat .repcontrol_add::after { content:"＋ Add Weapon"; font-size: var(--sra-font-base,12px); }
+
+
+  /* Combat panel: defense mirrors and weapon rows. */
+
+  /* COMBAT: defensive mirrors and weapon row geometry. The fixed Unarmed entry shares the weapon control styles. */
+  .combat-defenses { margin-bottom:22px; }
+  .combat-defense {
+    border:1px solid #d7c9b9; background:rgba(228,180,0,.10); padding:11px 13px;
+  }
+  .combat-defense h3 { margin:0 0 8px; color:var(--ink); font-size: var(--sra-font-label,13px); }
+
+  
+
+  
+  .combat-list { display:grid; gap:10px; }
+  .combat-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
+  .combat-fields { display:grid; grid-template-columns:minmax(140px,1.5fr) minmax(70px,.55fr) auto minmax(190px,1.5fr) 52px 52px 54px; gap:9px; align-items:end; }
+
+  .combat-range-block .combat-field { width:52px; }
+  .combat-range-block .combat-field select { padding:4px 1px; }
+
+  .combat-field input.combat-calc { font-weight: var(--sra-font-bold,700); color:var(--ink); background:rgba(228,180,0,.12); cursor:default; }
+  .combat-field { display:grid; gap:5px; min-width:0; color:var(--ink); font-size: var(--sra-font-sm,11px); font-weight:800; }
+  .combat-field input, .combat-field select { width:100%; min-height:31px; padding:4px 5px; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); font-size: var(--sra-font-base,12px); font-weight:400; }
+  @media (max-width:900px) {
+    .combat-fields { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .combat-field-name,
+.combat-field-skill,
+.combat-range-block { grid-column:span 2; }
+
+    
+  }
+  @media (max-width:650px) {
+    .combat-defenses { grid-template-columns:1fr; }
+    .combat-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .combat-field-name, .combat-field-skill { grid-column:span 2; }
+  }
+
+
+  /* Vehicle panel and native add control. */
+  .panel-vehicles .repcontrol { display:flex; justify-content:flex-start; margin-top:10px; }
+  .panel-vehicles .repcontrol_add {
+    display:inline-flex !important; align-items:center; justify-content:center;
+    min-height:34px; padding:7px 13px !important; border:1px solid var(--gold-dark) !important;
+    border-radius:3px !important; background:var(--gold) !important; color:#38230f !important;
+    font:700 12px "Trebuchet MS", Arial, sans-serif !important; cursor:pointer; font-size:0 !important;
+  }
+  .panel-vehicles .repcontrol_add::after { content:"＋ Add Vehicle"; font-size: var(--sra-font-base,12px); }
+
+  /* VEHICLES: repeating vehicle rows and damage tracks. Later responsive rules adjust the stat and skill grids. */
+  .vehicles-list { display:grid; gap:10px; }
+  .vehicle-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
+  .vehicle-fields { display:grid; align-items:end; }
+  .vehicle-stat-block { display:flex; gap:0; }
+  .vehicle-stat-block .vehicle-field { width:40px; }
+  .vehicle-stat-block .vehicle-field input { padding:4px 2px; text-align:center; }
+  .vehicle-stat-block .vehicle-field + .vehicle-field input { border-left-width:0; }
+  .vehicle-field input.vehicle-calc { font-weight: var(--sra-font-bold,700); color:var(--ink); background:rgba(228,180,0,.12); cursor:default; }
+  .vehicle-threshold { flex-wrap:wrap; margin-top:10px; padding-top:8px; border-top:1px solid #e6d9cc; font-size: var(--sra-font-base,12px); color:var(--ink); }
+  .vehicle-threshold .vt-title { font-size: var(--sra-font-base,12px); }
+
+  .vehicle-threshold .vt-label { color:var(--ink-soft); font-weight: var(--sra-font-bold,700); }
+  .vehicle-threshold .vt-value { border:0; border-bottom:0; background:transparent; color:var(--ink); font:inherit; font-weight: var(--sra-font-bold,700); }
+
+  
+  .vehicle-field { display:grid; gap:5px; min-width:0; color:var(--ink); font-size: var(--sra-font-sm,11px); font-weight:800; }
+  .vehicle-field input, .vehicle-field select { width:100%; min-height:31px; padding:4px 5px; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); font-size: var(--sra-font-base,12px); font-weight:400; }
+  .vehicle-description { margin-top:10px; border-top:1px solid #e6d9cc; padding-top:8px; }
+  .vehicle-description summary { cursor:pointer; color:var(--ink-soft); font-size: var(--sra-font-sm,11px); font-weight:800; }
+  .vehicle-description textarea { display:block; width:100%; min-height:70px; margin-top:7px; padding:7px; border:1px solid #d8c9ba; background:rgba(255,255,255,.55); resize:vertical; }
+  @media (max-width:900px) { .vehicle-fields { grid-template-columns:repeat(4,minmax(0,1fr)); } .vehicle-field-name,.vehicle-field-type,.vehicle-field-skill,
+.vehicle-stat-block { grid-column:span 2; }  }
+  @media (max-width:650px) { .vehicle-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } .vehicle-field-name,.vehicle-field-type,.vehicle-field-skill,
+.vehicle-stat-block { grid-column:span 2; }  }
+
+
+  /* Magic and Matrix panels */
+  .magic-mirrors, .matrix-mirrors { display:grid; margin-bottom:18px; }
+
+  /* MAGIC AND MATRIX: shared display-only skill mirrors. Their DP and RR values are bound to worker-managed attributes. */
+  .magic-mirror-row { display:grid; grid-template-columns: minmax(190px,1fr) 84px 84px var(--sra-roll-w,54px); gap:9px; align-items:end; padding:8px 10px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
+  .magic-mirror-name { align-self:center; color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); }
+  .magic-mirror-row label, .magic-limits label { display:grid; gap:3px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
+  .magic-mirror-row input, .magic-mirror-row select, .magic-limits input, .spell-fields input, .spell-fields select, .program-fields input, .spell-description textarea, .program-description textarea { width:100%; min-width:0; min-height: var(--sra-control-h,29px); padding:4px 6px; border:1px solid #d8c9ba; border-radius:3px; background:rgba(255,255,255,.65); color:var(--ink); font:inherit; }
+  .magic-mirror-row input[readonly] { font-weight: var(--sra-font-bold,700); }
+  .magic-conj-row .magic-mirror-name { display:flex; align-items:center; gap:8px; }
+  .magic-conj-row .magic-mirror-name select { width:150px; }
+
+  .magic-mirrors .magic-mirror-row,
+.matrix-mirrors .magic-mirror-row { align-items:center; padding:5px 10px; }
+
+  .magic-mirrors .magic-mirror-row.no-dv-field > label:first-of-type { grid-column:3; }
+  .magic-mirror-head { padding:2px 10px 0 !important; border:0 !important; background:transparent !important; color:var(--ink-soft); font-size: var(--sra-font-sm,11px); font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+  .magic-mirror-head span { text-align:left; }
+  .magic-mirrors,
+.matrix-mirrors { gap:4px; } 
+
+  
+
+  
+
+  
+  .magic-limits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 20px; max-width:520px; }
+  .magic-spells, .matrix-programs { margin-top:18px; }
+  .magic-spells > .section-title, .matrix-programs > .section-title { margin-bottom:10px; }
+  .spell-entry, .program-entry { min-width:0; margin:0 0 9px; padding:10px; border:1px solid #d7c9b9; background:rgba(255,255,255,.25); }
+  .spell-fields { display:grid; grid-template-columns:minmax(110px,.8fr) 150px 60px 190px 56px 56px 54px; align-items:end; }
+  .magic-traits { margin-top:18px; display:grid; gap:12px; }
+  .magic-traits .magic-limits { margin:0; }
+
+  .magic-checks label { color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); cursor:pointer; }
+  .magic-checks input { accent-color:var(--gold-dark); }
+  .spell-field { min-width:0; }
+  .spell-fields input.spell-calc { font-weight: var(--sra-font-bold,700); background:rgba(228,180,0,.12); cursor:default; }
+  .spell-field, .program-field { display:grid; gap:4px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
+  .spell-description, .program-description { margin-top:9px; color:var(--ink); font-size: var(--sra-font-sm,11px); }
+  .spell-description summary, .program-description summary { cursor:pointer; font-weight: var(--sra-font-bold,700); padding:5px 0; }
+  .spell-description textarea, .program-description textarea { min-height:72px; resize:vertical; font-size: var(--sra-font-base,12px); }
+
+  /* REPEATING LISTS: reusable compact name/type fields for programs and similar entries. */
+  .program-fields { display:grid; grid-template-columns:minmax(150px,.7fr) minmax(220px,1.3fr); gap:10px; align-items:start; }
+  .matrix-modes { margin:10px 0 20px; }
+  .matrix-modes label { color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); }
+  .matrix-modes input { width:16px; height:16px; }
+  .panel-magic .repcontrol_add, .panel-matrix .repcontrol_add, .panel-misc .repcontrol_add { font-size:0 !important; }
+  .panel-misc .repcontrol_add::after { content:"＋ Add Gear"; font-size: var(--sra-font-base,12px); }
+  .panel-magic .repcontrol_add::after { content:"＋ Add Spell"; font-size: var(--sra-font-base,12px); }
+  .panel-matrix .matrix-programs .repcontrol_add::after { content:"＋ Add Program / Complex Form"; font-size: var(--sra-font-base,12px); }
+  @media (max-width:650px) {
+    .magic-mirror-row, .magic-mirrors .magic-mirror-row { grid-template-columns:minmax(0,1fr) 68px 68px 46px; gap:6px; }
+    .magic-mirrors .magic-mirror-row { grid-template-columns:minmax(0,1fr) 52px 60px 60px 46px; }
+
+    .spell-fields { grid-template-columns:1fr 1fr 56px 56px; }
+    .spell-field-name, .spell-field-skill { grid-column:span 2; }
+    .spell-field-skill { grid-column:1 / -1; }
+    .program-fields { grid-template-columns:1fr; }
+  }
+
+
+  /* Center numeric value fields. */
+  .wound-table input:not(.armor-name),
+.skill-value input,
+.skill-row input.dp-calc,
+.magic-mirror-row input[readonly],
+.combat-field input.combat-calc,
+.spell-fields input.spell-calc,
+.vehicle-field input.vehicle-calc,
+.amp-fields input[type="number"],
+.combat-field input[name$="_dv"],
+.combat-field input[name="attr_dv"],
+.amp-fields input[type="number"], .combat-field input[name$="_dv"], .combat-field input[name="attr_dv"] { text-align:center; }
+
+  .combat-range-block select { text-align:center; text-align-last:center; }
+  .misc-checks { margin-bottom:14px; }
+  .misc-checks label { color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); cursor:pointer; }
+  .misc-checks input { accent-color:var(--gold-dark); }
+
+  /* MAIN: generic roll controls and narrative entries. Later rules align their numeric fields with Skills. */
+  .generic-roll { flex-wrap:wrap; margin-bottom:20px; padding:10px 12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
+  .generic-roll-title { color:var(--ink); font-size: var(--sra-font-label,13px); }
+  .generic-roll-field { display:grid; gap:3px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
+  .generic-roll-field input { width:100%; min-height:31px; padding:4px 5px; text-align:center; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); font-size: var(--sra-font-label,13px); }
+  .generic-roll-button { min-height:31px; padding:4px 18px; border:1px solid var(--gold-dark); background:rgba(228,180,0,.25); color:var(--ink); font:inherit; font-size: var(--sra-font-label,13px); font-weight:800; cursor:pointer; }
+  .generic-roll-button:hover { background:rgba(228,180,0,.45); }
+  .main-list { display:grid; gap:6px; max-width:520px; margin-bottom:20px; }
+  .main-list > .section-title { margin-bottom:4px; }
+  .main-list input { width:100%; min-height:31px; padding:4px 7px; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); font-size: var(--sra-font-label,13px); }
+  .main-list input::placeholder { color:var(--muted); font-style:italic; opacity:.8; }
+  .roll-btn { min-height:26px; padding:2px 8px; border:1px solid var(--gold-dark); background:rgba(228,180,0,.22); color:var(--ink); font:inherit; font-size: var(--sra-font-sm,11px); font-weight:800; cursor:pointer; white-space:nowrap; align-self:center; }
+  .roll-btn:hover { background:rgba(228,180,0,.45); }
+  .combat-fields .roll-btn, .spell-fields .roll-btn, .vehicle-fields .roll-btn { align-self:end; min-height:31px; }
+  .misc-notes { margin-top:18px; }
+  .misc-notes > .section-title { margin-bottom:10px; }
+  .misc-notes textarea { display:block; width:100%; min-height:260px; padding:8px; resize:vertical; border:1px solid #d8c9ba; border-bottom:1.5px solid var(--line); background:rgba(255,255,255,.55); color:#211d1a; font:inherit; font-size: var(--sra-font-label,13px); }
+  .list-heading { display:flex; align-items:center; gap:12px; }
+  .list-heading .section-title { margin:0; }
+  .combat-list > .list-heading, .magic-spells > .list-heading, .matrix-programs > .list-heading { margin-bottom:10px; }
+
+  
+
+  
+  .list-entry { grid-template-columns:auto minmax(0,1fr); column-gap:10px; }
+  .list-entry > * { grid-column:2; }
+
+  .sheet-hidden { display:none !important; }
+
+
+/* PLATFORM COMPATIBILITY: selectors in this section account for the Roll20 sheet wrapper and native generated controls. Preserve specificity and source order when editing. */
+
+/* Roll20 layout and conditional visibility compatibility. */
+.tab-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 4px;
+}
+.tab-controls label {
+  display: inline-flex !important;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.wound-track {
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+}
+
+.wound-track span { display: block; }
+.matrix-modes, .magic-checks, .misc-checks {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+.matrix-modes label, .magic-checks label, .misc-checks label {
+  display: inline-flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.visibility-flag,
+.visibility-flag:checked + .skill-group,
+.visibility-flag:checked + .skill-row,
+.visibility-flag:checked + .magic-mirror-row,
+.visibility-flag:checked + .wound-extra,
+.visibility-flag:checked + .magic-spells { display: none !important; }
+
+.skills-toggle-check {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.skills-toggle-all .toggle-show-text,
+#skills-toggle-all:checked ~ .skills-header .toggle-hide-text { display: none; }
+
+#skills-toggle-all:checked ~ .skills-header .toggle-show-text { display: inline; }
+@media (max-width: 520px) {
+
+  .wound-track.group-light,
+  .wound-track.group-serious,
+  .wound-track.group-incap { grid-column: 1; }
+  .matrix-modes, .magic-checks, .misc-checks { gap: 7px 12px; }
+}
+
+
+/* Roll20 layout corrections. */
+
+/* Tabs: float-based row is more resilient to Roll20's sheet label defaults. */
+.charsheet .tabs > .tab-controls,
+.tabs > .tab-controls {
+  display: block !important;
+  width: 100% !important;
+  min-height: 38px;
+  overflow: hidden !important;
+  padding: 8px 0 0 !important;
+  margin: 0 !important;
+  clear: both !important;
+}
+.charsheet .tabs > .tab-controls > label,
+.tabs > .tab-controls > label {
+  display: inline-block !important;
+  float: left !important;
+  clear: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 4px 0 0 !important;
+  padding: 8px 13px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+.charsheet .tabs > .tab-panels,
+.tabs > .tab-panels { display: block !important; clear: both !important; width: 100% !important; }
+
+
+/* Wound circles are centered over the matching three threshold columns. */
+
+.charsheet .wound-track,
+.wound-track {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 3px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+.charsheet .wound-track label,
+.wound-track label { flex: 0 0 auto !important; margin: 0 !important; }
+.charsheet .wound-track span,
+.wound-track span { width: 20px !important; height: 20px !important; }
+
+
+/* Generic Roll: title, both fields and Roll button stay on one line when space permits. */
+.charsheet .generic-roll,
+.generic-roll {
+  display: grid !important;
+  grid-template-columns: minmax(92px, auto) 110px 125px auto !important;
+  align-items: end !important;
+  justify-content: start !important;
+  gap: 8px 12px !important;
+  width: max-content !important;
+  max-width: 100% !important;
+}
+.charsheet .generic-roll-title,
+.generic-roll-title { align-self: center !important; white-space: nowrap !important; }
+.charsheet .generic-roll-field,
+.generic-roll-field { width: auto !important; min-width: 0 !important; }
+.charsheet .generic-roll-button,
+.generic-roll-button { width: auto !important; min-width: 0 !important; white-space: nowrap !important; }
+
+
+/* Hide/Show all is one compact button, not a full-width label. */
+.charsheet .skills-header .skills-toggle-all,
+.skills-header .skills-toggle-all {
+  display: inline-block !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  padding: 4px 9px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* The master control changes actual Roll20 checkbox values in the worker.
+   Do not add a second pseudo-symbol after the skill name. */
+#skills-toggle-all:checked ~ .skills-list .skill-group .skill-main-row .skill-name::after,
+#skills-toggle-all:not(:checked) ~ .skills-list .skill-group .skill-main-row .skill-name::after {
+  content: none !important;
+}
+#skills-toggle-all:checked ~ .skills-list .specializations,
+#skills-toggle-all:not(:checked) ~ .skills-list .specializations { display: block; }
+
+
+/* Skill group checkboxes remain functional but visually hidden. */
+.charsheet .skill-group-toggle,
+.skill-group-toggle { position: absolute !important; opacity: 0 !important; width: 1px !important; height: 1px !important; pointer-events: none !important; }
+
+@media (max-width: 520px) {
+  .charsheet .generic-roll, .generic-roll {
+    grid-template-columns: minmax(92px, auto) minmax(80px, 1fr) minmax(95px, 1fr) auto !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  .charsheet .wound-track span, .wound-track span { width: 17px !important; height: 17px !important; }
+}
+
+
+/* Wound and vehicle threshold alignment. */
+
+/* Match the wound-circle columns exactly to the threshold table columns. */
+
+
+/* Vehicle damage thresholds: each value and its wound-circle block form one column. */
+
+.charsheet .vehicle-threshold > .vt-title,
+.vehicle-threshold > .vt-title {
+  display: block !important;
+}
+
+@media (max-width: 520px) {
+  .charsheet .vehicle-threshold, .vehicle-threshold {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .charsheet .vehicle-threshold .vt-label, .vehicle-threshold .vt-label { text-align: center !important; }
+}
+
+
+/* === Final Roll20 corrections (2026-11) === */
+
+/* Match the Wounds header tracks to the exact columns of the threshold table. */
+
+
+/* Vehicle thresholds: each value sits above its own compact ring block. */
+
+.charsheet .vehicle-threshold .wound-track label,
+.vehicle-threshold .wound-track label { display: inline-flex !important; flex: 0 0 auto !important; margin: 0 !important; }
+.charsheet .vehicle-threshold .wound-track span,
+.vehicle-threshold .wound-track span { display: block !important; width: 17px !important; height: 17px !important; }
+
+
+/* Every repeating item gets its own frame; no empty grid column is reserved for a removed button. */
+.charsheet .list-entry,
+.list-entry {
+  display: block !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  padding: 11px !important;
+  border: 1px solid #d7c9b9 !important;
+  border-radius: 3px !important;
+  background: rgba(255,255,255,.28) !important;
+}
+.charsheet .list-entry > *,
+.list-entry > * { min-width: 0 !important; }
+
+.charsheet .spell-entry,
+.spell-entry { font-size: var(--sra-font-sm,11px) !important; }
+.charsheet .spell-fields,
+.spell-fields { gap: 7px !important; font-size: 10px !important; }
+.charsheet .spell-fields input,
+.charsheet .spell-fields select,
+.spell-fields input,
+.spell-fields select { font-size: var(--sra-font-sm,11px) !important; min-height: 26px !important; }
+.charsheet .spell-description,
+.spell-description { font-size: 10px !important; }
+.charsheet .spell-description textarea,
+.spell-description textarea { font-size: var(--sra-font-sm,11px) !important; min-height: 60px !important; }
+
+@media (max-width: 520px) {
+
+  .charsheet .wound-table col.wound-col-label, .wound-table col.wound-col-label { width: 43% !important; }
+  .charsheet .wound-table col.wound-col-light, .wound-table col.wound-col-light,
+  .charsheet .wound-table col.wound-col-serious, .wound-table col.wound-col-serious,
+  .charsheet .wound-table col.wound-col-incap, .wound-table col.wound-col-incap { width: 19% !important; }
+  .charsheet .vehicle-threshold, .vehicle-threshold { grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 5px !important; }
+}
+
+
+/* === Corrective layout and repeating-row rules === */
+
+/* Put the wound circles in the same table columns as their labels: this prevents drift/overlap. */
+
+.charsheet .wound-table, .wound-table {
+  width:100% !important;
+  table-layout:fixed !important;
+  border-collapse:collapse !important;
+}
+.charsheet .wound-table col.wound-col-label, .wound-table col.wound-col-label { width:55% !important; }
+.charsheet .wound-table col.wound-col-light, .wound-table col.wound-col-light,
+.charsheet .wound-table col.wound-col-serious, .wound-table col.wound-col-serious,
+.charsheet .wound-table col.wound-col-incap, .wound-table col.wound-col-incap { width:15% !important; }
+.charsheet .wound-table .wound-rings-row > .wound-th, .wound-table .wound-rings-row > .wound-th {
+  height:27px !important;
+  padding:2px 0 !important;
+  text-align:center !important;
+  vertical-align:middle !important;
+  overflow:hidden !important;
+}
+.charsheet .wound-rings-row .wound-track, .wound-rings-row .wound-track {
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:2px !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 auto !important;
+  padding:0 !important;
+}
+.charsheet .wound-rings-row .wound-track > label,
+.wound-rings-row .wound-track > label {
+  display:inline-flex !important;
+  flex:0 0 17px !important;
+  width:17px !important;
+  min-width:17px !important;
+  max-width:17px !important;
+  height:17px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+.charsheet .wound-rings-row .wound-track > label > span,
+.wound-rings-row .wound-track > label > span {
+  display:block !important;
+  flex:0 0 17px !important;
+  width:17px !important;
+  min-width:17px !important;
+  max-width:17px !important;
+  height:17px !important;
+  box-sizing:border-box !important;
+}
+.charsheet .wound-rings-row .visibility-flag, .wound-rings-row .visibility-flag { display:none !important; }
+
+
+/* Vehicle damage groups are three equal columns; each value is directly above its ring block. */
+.charsheet .vehicle-threshold, .vehicle-threshold {
+  grid-auto-flow:row !important;
+  justify-items:stretch !important;
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+.charsheet .vehicle-threshold > .vt-title, .vehicle-threshold > .vt-title { grid-column:1 / -1 !important; }
+
+.charsheet .vehicle-threshold .vt-label, .vehicle-threshold .vt-label {
+  grid-area:label !important; text-align:center !important; white-space:nowrap !important;
+}
+.charsheet .vehicle-threshold .vt-value, .vehicle-threshold .vt-value {
+  grid-area:value !important; display:block !important;
+  margin:0 !important; padding:0 !important; text-align:center !important;
+}
+.charsheet .vehicle-threshold .wound-track, .vehicle-threshold .wound-track {
+  grid-area:rings !important;
+  display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important;
+  justify-content:center !important; align-items:center !important;
+  gap:3px !important; width:max-content !important; max-width:100% !important;
+  min-width:0 !important; margin:0 auto !important; padding:0 !important;
+}
+.charsheet .vehicle-threshold .wound-track > label, .vehicle-threshold .wound-track > label {
+  display:inline-flex !important; flex:0 0 17px !important;
+  width:17px !important; min-width:17px !important; max-width:17px !important;
+  height:17px !important; margin:0 !important; padding:0 !important;
+}
+.charsheet .vehicle-threshold .wound-track > label > span, .vehicle-threshold .wound-track > label > span {
+  display:block !important; width:17px !important; min-width:17px !important;
+  max-width:17px !important; height:17px !important; box-sizing:border-box !important;
+}
+
+
+/* Roll20 wraps repeating rows in .repitem; style that generated wrapper, not just the template fieldset. */
+.charsheet .repcontainer > .repitem, .repcontainer > .repitem {
+  display:block !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 0 9px !important;
+  padding:10px !important;
+  border:1px solid #d7c9b9 !important;
+  border-radius:4px !important;
+  background:rgba(255,255,255,.28) !important;
+  box-sizing:border-box !important;
+}
+
+.charsheet .repcontainer .repitem .list-entry,
+.repcontainer .repitem .list-entry {
+  display:block !important; width:100% !important; min-width:0 !important;
+  margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important;
+}
+
+@media (max-width:520px) {
+  .charsheet .wound-table col.wound-col-label, .wound-table col.wound-col-label { width:43% !important; }
+  .charsheet .wound-table col.wound-col-light, .wound-table col.wound-col-light,
+  .charsheet .wound-table col.wound-col-serious, .wound-table col.wound-col-serious,
+  .charsheet .wound-table col.wound-col-incap, .wound-table col.wound-col-incap { width:19% !important; }
+}
+
+
+/* conditional extra wound circles override the ring layout. */
+.charsheet .wound-rings-row .wound-track > .visibility-flag:checked + label.wound-extra,
+.wound-rings-row .wound-track > .visibility-flag:checked + label.wound-extra { display:none !important; }
+
+/* Unarmed range selectors use the same styling as repeating weapon selectors. */
+
+
+/* shared identity sizing, including Nuyen. */
+.charsheet .identity .field > input, .identity .field > input,
+.charsheet .identity .field > select, .identity .field > select {
+  width:100% !important; min-width:0 !important; max-width:100% !important;
+  box-sizing:border-box !important; margin:0 !important;
+}
+.charsheet #nuyen, #nuyen { text-align:right; font-variant-numeric:tabular-nums; }
+
+
+/* Weapon ranges: adjacent controls with a shared border and compact labels. */
+.charsheet .combat-range-block, .combat-range-block { display:flex; gap:0 !important; }
+.charsheet .combat-range-block > .combat-field, .combat-range-block > .combat-field {
+  flex:0 0 52px; width:52px; margin:0 !important; padding:0 !important;
+}
+.combat-range-block > .combat-field > input,
+.combat-range-block > .combat-field > select { width:100%; margin:0 !important; box-sizing:border-box; }
+.combat-range-block > .combat-field + .combat-field > input,
+.combat-range-block > .combat-field + .combat-field > select { border-left-width:0; }
+
+
+/* SRA2 chat output: independent of the character sheet layout. */
+.sheet-rolltemplate-sra2 .sheet-sra2-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
+.sheet-rolltemplate-sra2 .sheet-sra2-heading { background: #332a24; color: #fff; font-weight: bold; padding: 9px; }
+.sheet-rolltemplate-sra2 .sheet-sra2-meta { padding: 6px 9px; font-size: 11px; }
+.sheet-rolltemplate-sra2 .sheet-sra2-row { display: flex; justify-content: space-between; padding: 7px 9px; border-top: 1px solid #d7c9b9; }
+.sheet-rolltemplate-sra2 .sheet-sra2-total { background: #ead9b5; font-size: 17px; font-weight: bold; }
+.sheet-rolltemplate-sra2 .sheet-sra2-warning { color: #a32121; font-weight: bold; padding: 6px 9px; }
+
+
+/* identify the skill or item in the chat result. */
+
+
+/* center attribute captions and enlarge the numeric values. */
+.charsheet .attribute > .attribute-name, .attribute > .attribute-name {
+  width: 100%; padding: 0; margin: 0; text-align: center !important;
+}
+.charsheet .attribute-ring input, .attribute-ring input { font-size: 30px !important; }
+
+/* Keep the Conjuring selector inside its grid track; DP and RR match other mirrors. */
+.charsheet .magic-mirrors .magic-conj-row > .magic-mirror-name, .magic-mirrors .magic-conj-row > .magic-mirror-name { min-width: 0; }
+.charsheet .magic-conj-row .magic-mirror-name select, .magic-conj-row .magic-mirror-name select { flex: 1 1 150px; max-width: 150px; min-width: 0; }
+.charsheet .magic-mirrors .magic-mirror-row > label, .magic-mirrors .magic-mirror-row > label { min-width: 0; width: 100%; margin: 0; padding: 0; }
+.charsheet .magic-mirrors .magic-mirror-row > label > input, .magic-mirrors .magic-mirror-row > label > input { box-sizing: border-box; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
+/* Threshold report action and chat template. */
+.charsheet button.threshold-button, button.threshold-button { font: inherit; font-weight: 800; padding: 3px 8px; border: 1px solid var(--gold-dark); background: rgba(228,180,0,.20); color: var(--ink); cursor: pointer; }
+.sheet-rolltemplate-thresholds .sheet-threshold-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
+.sheet-rolltemplate-thresholds .sheet-threshold-heading { background: #332a24; color: #fff; font-weight: bold; padding: 9px; }
+.sheet-rolltemplate-thresholds .sheet-threshold-type { padding: 8px 9px; font-weight: bold; }
+.sheet-rolltemplate-thresholds .sheet-threshold-row { display: grid; grid-template-columns: 1fr 32px 65px; gap: 5px; padding: 7px 9px; border-top: 1px solid #d7c9b9; align-items: center; }
+.sheet-rolltemplate-thresholds .sheet-threshold-row > span:last-child { letter-spacing: 2px; white-space: nowrap; }
+
+
+/* center the numeric input independently of Roll20's input defaults. */
+.charsheet .attribute-ring > input[type="number"], .attribute-ring > input[type="number"] {
+  position:absolute !important; left:50% !important; top:50% !important;
+  transform:translate(-50%, -50%) rotate(9deg) !important;
+  box-sizing:border-box !important; width:80% !important; min-width:0 !important; max-width:80% !important;
+  margin:0 !important; padding:0 !important; text-indent:0 !important;
+  text-align:center !important; border:0 !important; line-height:1.2 !important;
+  appearance:textfield !important; -moz-appearance:textfield !important;
+}
+.attribute-ring > input::-webkit-inner-spin-button, .attribute-ring > input::-webkit-outer-spin-button { -webkit-appearance:none !important; margin:0 !important; }
+
+
+/* Vehicle damage thresholds: one horizontal row of three label/value/track groups.
+   Keep the report button above the row and allow horizontal scrolling on narrow sheets. */
+.charsheet .vehicle-threshold, .vehicle-threshold {
+  grid-template-columns:repeat(3,max-content) !important;
+  justify-content:start !important; 
+}
+.charsheet .vehicle-threshold > .vt-title, .vehicle-threshold > .vt-title { justify-self:start !important; }
+
+.charsheet .vehicle-threshold .vt-value, .vehicle-threshold .vt-value {
+  width:28px !important; min-width:28px !important; max-width:28px !important;
+}
+
+
+/* align vehicle controls and use nine direct cells for damage thresholds. */
+
+.charsheet .vehicle-threshold, .vehicle-threshold {
+   overflow:visible !important;
+}
+.charsheet .vehicle-threshold > button.vt-title, .vehicle-threshold > button.vt-title {
+  display:inline-block !important; width:auto !important; min-width:0 !important;
+  max-width:none !important;  padding:3px 8px !important;
+  font-size: var(--sra-font-base,12px) !important; line-height:normal !important;
+}
+.vehicle-threshold > button.vt-title::before { content:none !important; }
+.charsheet .vehicle-threshold-line, .vehicle-threshold-line {
+  display:flex !important; flex-flow:row nowrap !important; align-items:center !important;
+    overflow-x:auto !important;
+}
+.charsheet .vehicle-threshold-line > *, .vehicle-threshold-line > * {
+  flex:0 0 auto !important; grid-area:auto !important; margin:0 !important;
+}
+.vehicle-threshold-line > .vt-label:not(:first-child) { margin-left:8px !important; }
+
+
+/* Vehicle report uses the same visual style as the character report. */
+.sheet-rolltemplate-vehiclethresholds .sheet-threshold-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
+.sheet-rolltemplate-vehiclethresholds .sheet-threshold-heading { background: #332a24; color: #fff; font-weight: bold; padding: 9px; }
+.sheet-rolltemplate-vehiclethresholds .sheet-threshold-type { padding: 8px 9px; font-weight: bold; }
+.sheet-rolltemplate-vehiclethresholds .sheet-threshold-row { display: grid; grid-template-columns: 1fr 32px 65px; gap: 5px; padding: 7px 9px; border-top: 1px solid #d7c9b9; align-items: center; }
+.sheet-rolltemplate-vehiclethresholds .sheet-threshold-row > span:last-child { letter-spacing: 2px; white-space: nowrap; }
+
+
+/* weapon metadata in the shared SRA2 chat template. */
+.sheet-rolltemplate-sra2 .sheet-sra2-weapon { padding: 4px 9px 0; font-weight: bold; }
+
+
+/* normalize native Roll20 label and control geometry in repeating rows.
+ * Explicit grid rows prevent select margins and inline label defaults from shifting fields. */
+
+.charsheet .amp-fields .amp-field, .amp-fields .amp-field {
+  display:grid !important; grid-template-rows: auto 32px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-self:end !important;
+  align-items:end !important; gap:4px !important; margin:0 !important; padding:0 !important;
+  line-height:1.2 !important;
+}
+.charsheet .amp-fields .amp-field > input, .charsheet .amp-fields .amp-field > select,
+.amp-fields .amp-field > input, .amp-fields .amp-field > select {
+  display:block !important; box-sizing:border-box !important; width:100% !important;
+  height:32px !important; min-height:32px !important; max-height:32px !important;
+  margin:0 !important; align-self:end !important;
+}
+
+.charsheet .combat-fields .combat-field, .combat-fields .combat-field {
+  display:grid !important; grid-template-rows: auto 31px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-self:end !important;
+  align-items:end !important; gap:4px !important; margin:0 !important; padding:0 !important;
+  line-height:1.2 !important;
+}
+.charsheet .combat-fields .combat-field > input, .charsheet .combat-fields .combat-field > select,
+.combat-fields .combat-field > input, .combat-fields .combat-field > select {
+  display:block !important; box-sizing:border-box !important; width:100% !important;
+  height:31px !important; min-height:31px !important; max-height:31px !important;
+  margin:0 !important; align-self:end !important;
+}
+.charsheet .combat-fields > .roll-btn, .combat-fields > .roll-btn { box-sizing:border-box !important; height:31px !important; min-height:31px !important; max-height:31px !important; margin:0 !important; align-self:end !important; }
+
+.charsheet .vehicle-fields .vehicle-field, .vehicle-fields .vehicle-field {
+  display:grid !important; grid-template-rows: auto 31px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-self:end !important;
+  align-items:end !important; gap:4px !important; margin:0 !important; padding:0 !important;
+  line-height:1.2 !important;
+}
+.charsheet .vehicle-fields .vehicle-field > input, .charsheet .vehicle-fields .vehicle-field > select,
+.vehicle-fields .vehicle-field > input, .vehicle-fields .vehicle-field > select {
+  display:block !important; box-sizing:border-box !important; width:100% !important;
+  height:31px !important; min-height:31px !important; max-height:31px !important;
+  margin:0 !important; align-self:end !important;
+}
+.charsheet .vehicle-fields > .roll-btn, .vehicle-fields > .roll-btn { box-sizing:border-box !important; height:31px !important; min-height:31px !important; max-height:31px !important; margin:0 !important; align-self:end !important; }
+
+.charsheet .spell-fields .spell-field, .spell-fields .spell-field {
+  display:grid !important; grid-template-rows: auto 28px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-self:end !important;
+  align-items:end !important; gap:4px !important; margin:0 !important; padding:0 !important;
+  line-height:1.2 !important;
+}
+.charsheet .spell-fields .spell-field > input, .charsheet .spell-fields .spell-field > select,
+.spell-fields .spell-field > input, .spell-fields .spell-field > select {
+  display:block !important; box-sizing:border-box !important; width:100% !important;
+  height:28px !important; min-height:28px !important; max-height:28px !important;
+  margin:0 !important; align-self:end !important;
+}
+.charsheet .spell-fields > .roll-btn, .spell-fields > .roll-btn { box-sizing:border-box !important; height:28px !important; min-height:28px !important; max-height:28px !important; margin:0 !important; align-self:end !important; }
+
+
+/* Nested weapon range and vehicle stat blocks share the same bottom baseline. */
+.charsheet .combat-fields > .combat-range-block, .combat-fields > .combat-range-block,
+.charsheet .vehicle-fields > .vehicle-stat-block, .vehicle-fields > .vehicle-stat-block {
+  align-self:end !important; align-items:end !important; margin:0 !important; padding:0 !important;
+}
+
+
+/* compact overview, independent Edge and device damage tracks. */
+.charsheet .wound-table .wound-rings-row > .wound-th.wounds-title-cell, .wound-table .wound-rings-row > .wound-th.wounds-title-cell { text-align:left !important; }
+.wounds-title-cell .section-title { margin:0 !important; padding:0 !important; }
+.charsheet .top-grid, .top-grid { align-items:stretch; }
+.charsheet .identity, .identity { align-content:space-between; gap:5px; }
+.charsheet .amp-fields, .amp-fields { grid-template-columns: minmax(0,1fr) minmax(95px,22%) repeat(2, var(--sra-amp-w,65px)) !important; gap: var(--sra-grid-gap,10px) !important; }
+.charsheet .magic-traits .magic-limits, .magic-traits .magic-limits { max-width:none !important; gap:12px !important; align-items:end; }
+.magic-limits .magic-adept { display:flex !important; align-items:center; gap:5px; white-space:nowrap; }
+.charsheet .magic-limits .magic-adept input { width:auto !important; min-height:0 !important; }
+.charsheet .magic-checks, .charsheet .matrix-modes, .charsheet .misc-checks { display:flex !important; flex-flow:row wrap !important; gap:8px 16px !important; }
+.charsheet .magic-checks label, .charsheet .matrix-modes label, .charsheet .misc-checks label { display:inline-flex !important; width:auto !important; flex:0 0 auto !important; margin:0 !important; }
+.charsheet .vehicle-fields, .vehicle-fields { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto !important; gap:9px !important; }
+.charsheet .vehicle-fields.vehicle-skill-row, .vehicle-fields.vehicle-skill-row { margin-top:8px; }
+.charsheet .vehicle-fields > *, .vehicle-fields > * { grid-column:auto !important; min-width:0; }
+.charsheet .vehicle-threshold, .vehicle-threshold { display:flex !important; flex-flow:row nowrap !important; align-items:center !important; gap:8px !important; overflow-x:auto !important; }
+.charsheet .vehicle-threshold > button.vt-title, .vehicle-threshold > button.vt-title { flex:0 0 auto !important; margin:0 !important; }
+.charsheet .vehicle-threshold-line, .vehicle-threshold-line { width:auto !important; flex:0 0 auto !important; overflow:visible !important; gap:4px !important; }
+.charsheet .vehicle-threshold-line > .wound-track, .vehicle-threshold-line > .wound-track { margin:0 !important; }
+.current-edge { margin:10px 0 14px; }
+.current-edge .wound-track { display:flex !important; flex-wrap:nowrap !important; width:auto !important; gap:5px !important; }
+.panel-misc > .section-title { margin-top:16px; }
+@media(max-width:650px) {.charsheet .magic-traits .magic-limits,.magic-traits .magic-limits,
+.charsheet .vehicle-fields:not(.vehicle-skill-row),.vehicle-fields:not(.vehicle-skill-row) { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }  .charsheet .vehicle-fields > .vehicle-stat-block { grid-column:1/-1 !important; } }
+
+
+/* compact vehicle skill row, magic traits and isolated Edge tracker. */
+.charsheet .current-edge, .current-edge { display:flex !important; flex-direction:row !important; justify-content:flex-start !important; align-items:center !important; gap:12px !important; width:100%; }
+.charsheet .current-edge > strong, .current-edge > strong { flex:0 0 auto !important; white-space:nowrap; }
+.charsheet .current-edge > .edge-track, .current-edge > .edge-track { display:flex !important; flex:0 0 auto !important; flex-flow:row nowrap !important; align-items:center !important; justify-content:flex-start !important; gap:5px !important; width:auto !important; }
+.charsheet .edge-track > label, .edge-track > label { display:inline-flex !important; position:relative; flex:0 0 20px !important; width:20px !important; min-width:20px !important; max-width:20px !important; height:20px !important; margin:0 !important; padding:0 !important; cursor:pointer; }
+.charsheet .edge-track input, .edge-track input { position:absolute !important; inset:0; opacity:0; width:100% !important; height:100% !important; margin:0 !important; cursor:pointer; }
+.charsheet .edge-track span, .edge-track span { display:block !important; box-sizing:border-box; width:20px !important; height:20px !important; border:2px solid #9b4b31; border-radius:50%; pointer-events:none; }
+.edge-track input:checked + span { background:#9b4b31; box-shadow:inset 0 0 0 4px var(--paper); }
+.edge-track input:focus-visible + span { outline:2px solid var(--gold-dark); outline-offset:2px; }
+.charsheet .magic-traits .magic-limits, .magic-traits .magic-limits { grid-template-columns:max-content max-content minmax(110px,180px) !important; }
+.charsheet .magic-checks input[type="checkbox"], .magic-checks input[type="checkbox"] { accent-color:var(--gold-dark); }
+
+/* Use identical first-column sizing for the vehicle name and skill. */
+.charsheet .vehicle-fields:not(.vehicle-skill-row), .vehicle-fields:not(.vehicle-skill-row) { grid-template-columns:minmax(0, min(40%, 280px)) minmax(0,1fr) 200px !important; }
+.charsheet .vehicle-fields.vehicle-skill-row, .vehicle-fields.vehicle-skill-row { grid-template-columns: minmax(0, min(40%, 280px)) 52px 52px var(--sra-roll-w,54px) !important; }
+
+/* Matrix damage is a separate line below the device statistics. */
+.matrix-damage-title { flex:0 0 auto; font-weight: var(--sra-font-bold,700); white-space:nowrap; }
+@media(max-width:650px) {
+ .charsheet .magic-traits .magic-limits, .magic-traits .magic-limits,
+.charsheet .vehicle-fields:not(.vehicle-skill-row), .vehicle-fields:not(.vehicle-skill-row) { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+
+ .charsheet .vehicle-fields.vehicle-skill-row, .vehicle-fields.vehicle-skill-row { grid-template-columns: minmax(0,1fr) 52px 52px var(--sra-roll-w,54px) !important; }
+ .charsheet .current-edge, .current-edge { overflow-x:auto; }
+}
+
+
+/* semantic-free grid for wound thresholds; no HTML layout tables. */
+.charsheet .wound-table, .wound-table { display:block !important; }
+.wound-table .wound-row { display:grid; grid-template-columns:minmax(0,55fr) repeat(3,minmax(0,15fr)); align-items:center; }
+.wound-table .wound-th, .wound-table .wound-td { min-width:0; box-sizing:border-box; width:auto !important; }
+.wound-table .wound-th:first-child { text-align:left; }
+.wound-table .wound-td:first-child { white-space:normal; overflow-wrap:anywhere; }
+@media (max-width: 700px) { .wound-table .wound-row { grid-template-columns:minmax(0,43fr) repeat(3,minmax(0,19fr)); } }
+
+
+/* narrative chat controls, knowledge list and compact derived values. */
+.charsheet .narrative-row, .narrative-row { display:flex; align-items:center; gap:8px; min-width:0; }
+.charsheet .narrative-row input, .narrative-row input { flex:1 1 auto; min-width:0; width:0; margin:0; }
+.charsheet button.narrative-post, button.narrative-post { flex:0 0 auto; width:auto; margin:0; padding:4px 9px; background:#f7e9b2; color:#542719; border:1px solid #c99600; font:inherit; font-weight:bold; }
+.charsheet button.narrative-post::before, button.narrative-post::before { content:none !important; }
+.knowledge-list { margin-top:20px; }
+.knowledge-list .repcontrol_add { font-size:0 !important; }
+.knowledge-list .repcontrol_add::after { content:"＋ Add Knowledge Skill"; font-size: var(--sra-font-base,12px); }
+.essence-summary { margin:0 0 12px; }
+.essence-summary label { font-weight:bold; color:#542719; }
+.charsheet .essence-summary input, .essence-summary input { text-align:center; font-weight:bold; background:#f7e9b2; }
+.matrix-cracking-values { flex-wrap:wrap; margin:12px 0; }
+.matrix-cracking-values label { display:grid; gap:3px; font-size:10px; font-weight:bold; color:#542719; }
+.charsheet .matrix-cracking-values input, .matrix-cracking-values input { min-height: var(--sra-control-h,29px); text-align:center; border:1px solid #d8c9ba; border-radius:3px; margin:0; }
+
+/* Original CSS-only palette inspired by warm paper and golden ink. */
+.charsheet .sheet, .sheet { --gold:#edb900; --gold-dark:#c99600; --paper:#faf8f0; --ink:#542719; }
+.charsheet .section-title, .section-title { color:#542719; border-bottom-color:#edb900; }
+
+
+/* consistent editable and derived control styles, compact headers. */
+.charsheet .sheet, .sheet { --muted:#542719; }
+.charsheet .sheet :is(input[type="text"],input[type="number"],select,textarea):not([readonly]):not([disabled]),
+.sheet :is(input[type="text"],input[type="number"],select,textarea):not([readonly]):not([disabled]) {
+  color:#332a24 !important; background:#fffdf9 !important;
+  border:1px solid #c9b6a5 !important; border-bottom:2px solid #bf7359 !important;
+}
+.charsheet .sheet :is(input[type="text"],input[type="number"])[readonly],
+.sheet :is(input[type="text"],input[type="number"])[readonly] {
+  color:#332a24 !important; background:transparent !important; border:1px solid #d8c9ba !important;
+}
+
+/* Preserve the circular attribute controls rather than adding rectangular borders. */
+.charsheet .sheet .attribute-ring input[type="number"]:not([readonly]):not([disabled]), .sheet .attribute-ring input[type="number"]:not([readonly]):not([disabled]) { border:0 !important; background:transparent !important; }
+.charsheet .matrix-cracking-values, .matrix-cracking-values { display:flex !important; flex-flow:row nowrap !important; align-items:end; gap:16px !important; overflow-x:auto; }
+.charsheet .matrix-cracking-values > label, .matrix-cracking-values > label { display:flex !important; flex-direction:column; flex:0 0 auto !important; width:auto !important; margin:0 !important; color:#542719 !important; }
+.charsheet .matrix-cracking-values input, .matrix-cracking-values input { width:48px !important; }
+.charsheet .wound-table .wound-rings-row > .wounds-title-cell, .wound-table .wound-rings-row > .wounds-title-cell { height:auto !important; overflow:visible !important; align-self:center; padding:0 0 5px !important; }
+.charsheet .wounds-title-cell .section-title, .wounds-title-cell .section-title { line-height:1.15 !important; border:0 !important; transform:translateY(-2px); }
+
+/* Match the Skills DP/RR columns (70px, 29px controls) in mirrored skill rows. */
+
+.charsheet .matrix-mirrors .magic-mirror-row, .matrix-mirrors .magic-mirror-row { grid-template-columns: minmax(0,1fr) repeat(2, var(--sra-skill-w,70px)) var(--sra-roll-w,54px) !important; }
+.charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"],
+.sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"] { box-sizing:border-box !important; width:100% !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; padding:4px 5px !important; font-size: var(--sra-font-base) !important; text-align:center !important; border-radius:0 !important; margin:0 !important; }
+
+/* Keep the total Essence field aligned with the repeating Amp Essence column.
+ * Match the repeating row frame (10px padding + 1px border).
+ * Reset native label and input spacing so the right edges of both Essence fields align.
+ * The header and list each reserve 6px around the optional reminders. */
+.charsheet .amps-header, .amps-header { display:grid !important; grid-template-columns: minmax(0,1fr) minmax(95px,22%) repeat(2, var(--sra-amp-w,65px)) !important; gap: var(--sra-grid-gap,10px) !important; padding:0 11px; align-items:center; }
+.amps-header > .list-heading { grid-column:1; }
+.charsheet .amps-header > .essence-summary, .amps-header > .essence-summary { grid-column:2/4; margin:0; min-width:0; }
+.charsheet .essence-summary label, .essence-summary label { display:flex !important; flex-direction:row; justify-content:flex-end; gap:var(--sra-grid-gap,10px); align-items:center; width:100% !important; min-width:0; padding:0 !important; margin:0 !important; }
+.charsheet .essence-summary input, .essence-summary input { box-sizing:border-box !important; margin:0 !important; min-width:0 !important; width: var(--sra-amp-w,65px) !important; flex:0 0 var(--sra-amp-w,65px); height: var(--sra-control-h,29px); }
+
+
+/* RISK REDUCTION: editable tracks depend on the ordered radio/pip siblings; mirrors read a hidden state instead of exposing editable radios. */
+
+/* native RR radio controls and attribute-backed display-only mirrors.
+ * Keep the original numeric RR attribute keys; the three dots fill cumulatively. */
+.charsheet .sheet .rr-track, .sheet .rr-track { display:inline-flex !important; align-items:center; justify-content:center; gap: var(--sra-control-gap); min-width:0; height: var(--sra-control-h); box-sizing:border-box; position:relative; white-space:nowrap; margin:0 !important; padding:0 !important; }
+.charsheet .sheet .rr-edit, .sheet .rr-edit { flex-direction:row-reverse; }
+.charsheet .sheet .rr-pip, .sheet .rr-pip { display:block !important; flex:0 0 11px; width:11px !important; height:11px !important; box-sizing:border-box; border:1px solid #c7b8a8; border-radius:50%; background:transparent; margin:0 !important; padding:0 !important; pointer-events:none; }
+.charsheet .sheet .rr-pip-0, .sheet .rr-pip-0 { border:0; font-size:10px; line-height:11px; text-align:center; color:#806d5c; }
+.charsheet .sheet input.rr-radio, .sheet input.rr-radio { appearance:none !important; display:block !important; opacity:0 !important; position:relative !important; z-index:1; flex:0 0 11px !important; width:11px !important; min-width:11px !important; height:21px !important; min-height:0 !important; margin:0 -15px 0 0 !important; padding:0 !important; cursor:pointer; border:0 !important; }
+.charsheet .sheet .rr-radio:focus-visible + .rr-pip, .sheet .rr-radio:focus-visible + .rr-pip { outline:2px solid #9b4b31; outline-offset:2px; }
+.charsheet .sheet .rr-edit .rr-radio:checked ~ .rr-pip:not(.rr-pip-0), .sheet .rr-edit .rr-radio:checked ~ .rr-pip:not(.rr-pip-0) { background:#99482e; border-color:#99482e; }
+.charsheet .sheet .rr-mirror, .sheet .rr-mirror { pointer-events:none; }
+.charsheet .sheet input.rr-state, .sheet input.rr-state { display:none !important; }
+.charsheet .sheet .rr-state[value="1"] ~ .rr-pip-1, .sheet .rr-state[value="1"] ~ .rr-pip-1,
+.charsheet .sheet .rr-state[value="2"] ~ .rr-pip-1, .sheet .rr-state[value="2"] ~ .rr-pip-1,
+.charsheet .sheet .rr-state[value="2"] ~ .rr-pip-2, .sheet .rr-state[value="2"] ~ .rr-pip-2,
+.charsheet .sheet .rr-state[value="3"] ~ .rr-pip-1, .sheet .rr-state[value="3"] ~ .rr-pip-1,
+.charsheet .sheet .rr-state[value="3"] ~ .rr-pip-2, .sheet .rr-state[value="3"] ~ .rr-pip-2,
+.charsheet .sheet .rr-state[value="3"] ~ .rr-pip-3, .sheet .rr-state[value="3"] ~ .rr-pip-3 { background:#99482e; border-color:#99482e; }
+
+
+/* Readonly inputs remain live Roll20 attribute bindings, but are not interactive. */
+.charsheet .sheet input[readonly], .sheet input[readonly] { pointer-events:none !important; user-select:none !important; cursor:default !important; }
+
+/* Align labels and controls in the Magic limit row and mirrored skill selectors. */
+.charsheet .sheet .magic-limits > label, .sheet .magic-limits > label { display:grid !important; grid-template-rows: auto var(--sra-control-h) !important; align-self:end !important; align-items:end !important; gap: var(--sra-control-gap) !important; margin:0 !important; padding:0 !important; }
+.charsheet .sheet .magic-limits > label > :is(input,select), .sheet .magic-limits > label > :is(input,select) { box-sizing:border-box !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; max-height: var(--sra-control-h) !important; margin:0 !important; align-self:end !important; }
+.charsheet .sheet .magic-mirror-name, .sheet .magic-mirror-name { align-self:center !important; }
+.charsheet .sheet .magic-mirror-name select, .sheet .magic-mirror-name select { box-sizing:border-box !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; margin:0 !important; align-self:center !important; }
+.charsheet .sheet .magic-conj-row .magic-mirror-name, .sheet .magic-conj-row .magic-mirror-name { display:flex !important; align-items:center !important; gap:8px; }
+
+.charsheet .sheet .rr-edit, .sheet .rr-edit { display:grid !important; grid-template-columns:repeat(4,11px); grid-template-rows: var(--sra-control-h); justify-content:center; column-gap: var(--sra-control-gap); }
+.charsheet .sheet .rr-edit :is(.rr-radio-0,.rr-pip-0), .sheet .rr-edit :is(.rr-radio-0,.rr-pip-0) { grid-column:1; grid-row:1; align-self:center; margin:0 !important; }
+.charsheet .sheet .rr-edit :is(.rr-radio-1,.rr-pip-1), .sheet .rr-edit :is(.rr-radio-1,.rr-pip-1) { grid-column:2; grid-row:1; align-self:center; margin:0 !important; }
+.charsheet .sheet .rr-edit :is(.rr-radio-2,.rr-pip-2), .sheet .rr-edit :is(.rr-radio-2,.rr-pip-2) { grid-column:3; grid-row:1; align-self:center; margin:0 !important; }
+.charsheet .sheet .rr-edit :is(.rr-radio-3,.rr-pip-3), .sheet .rr-edit :is(.rr-radio-3,.rr-pip-3) { grid-column:4; grid-row:1; align-self:center; margin:0 !important; }
+
+
+/* Display-only labels must not forward pointer clicks to readonly inputs. */
+.charsheet .sheet .display-only, .sheet .display-only { pointer-events:none !important; }
+
+/* Both Corporate RR displays edit a single stored value via action buttons. */
+.charsheet .sheet button.rr-action-pip, .sheet button.rr-action-pip { pointer-events:auto !important; cursor:pointer; min-width:0 !important; min-height:0 !important; box-shadow:none !important; font:inherit; font-size:10px; line-height:11px; text-shadow:none !important; }
+.charsheet .sheet button.rr-action-pip::before, .sheet button.rr-action-pip::before { content:none !important; }
+.charsheet .sheet .matrix-mirrors .magic-mirror-name, .sheet .matrix-mirrors .magic-mirror-name { align-items:center; }
+
+
+/* shared skill column geometry and consistent damage/Edge indicators.
+ * Only indent the skill name; never shift the numeric columns of specialization rows. */
+.charsheet .sheet .skill-column-head,
+.charsheet .sheet .skill-row,
+.sheet .skill-column-head,
+.sheet .skill-row {
+  grid-template-columns: minmax(0,1fr) minmax(0,.8fr) repeat(3, var(--sra-skill-w)) var(--sra-roll-w);
+  gap:10px; align-items:center; box-sizing:border-box;
+  padding:5px 12px !important;
+}
+
+/* Match the one-pixel border on each skill group. */
+.charsheet .sheet .skills-top-head, .sheet .skills-top-head {
+  border-left:1px solid transparent; border-right:1px solid transparent;
+}
+.charsheet .sheet .skill-column-head > span:nth-child(n/**/+3),
+.sheet .skill-column-head > span:nth-child(n/**/+3) { text-align:center; }
+.charsheet .sheet .specialization-row > .skill-name,
+.sheet .specialization-row > .skill-name { padding-left:18px; min-width:0; overflow-wrap:anywhere; }
+.charsheet .sheet .skill-row > :is(.skill-value,.skill-mark),
+.sheet .skill-row > :is(.skill-value,.skill-mark) {
+  display:flex !important; align-items:center; justify-content:center;
+  width:100% !important; min-width:0 !important; margin:0 !important; padding:0 !important;
+  box-sizing:border-box;
+}
+.charsheet .sheet .skill-row > .skill-value > input:not(.rr-radio),
+.sheet .skill-row > .skill-value > input:not(.rr-radio) {
+  width:100% !important; max-width:100% !important; min-width:0 !important;
+  box-sizing:border-box; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important;
+  margin:0 !important; padding:4px 5px !important; text-align:center !important;
+}
+
+/* Reserve identical space for the reset control and three RR dots. */
+.charsheet .sheet .skill-value > .rr-track, .sheet .skill-value > .rr-track {
+  width: var(--sra-skill-w) !important; max-width:100%; justify-content:center !important;
+}
+
+/* Generic roll fields use the same typography and label/control baseline. */
+.charsheet .sheet .generic-roll > .generic-roll-field, .sheet .generic-roll > .generic-roll-field {
+  display:grid !important; grid-template-rows: auto var(--sra-control-h) !important;
+  align-items:center !important; justify-items:center; align-self:end !important;
+  gap: var(--sra-control-gap) !important; margin:0 !important; padding:0 !important;
+  font-size: var(--sra-font-base) !important; font-weight: var(--sra-font-bold) !important; line-height:1.2 !important;
+  color:#542719 !important;
+}
+.charsheet .sheet .generic-roll-field > span[data-i18n], .sheet .generic-roll-field > span[data-i18n] {
+  font-size: var(--sra-font-base) !important; font-weight: var(--sra-font-bold) !important; line-height:1.2 !important;
+  text-align:center; margin:0 !important; padding:0 !important;
+}
+.charsheet .sheet .generic-roll-field > input, .sheet .generic-roll-field > input {
+  width: var(--sra-skill-w) !important; min-width:0 !important; height: var(--sra-control-h) !important;
+  min-height: var(--sra-control-h) !important; margin:0 !important; box-sizing:border-box;
+}
+.charsheet .sheet .generic-roll-field > .rr-track, .sheet .generic-roll-field > .rr-track { width: var(--sra-skill-w) !important; }
+.charsheet .sheet .generic-roll-button, .sheet .generic-roll-button { height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; margin:0 !important; }
+
+/* Leave a narrow paper-colored ring around the larger selected center.
+ * Apply equally to character wounds, vehicles, matrix damage and current Edge. */
+.charsheet .sheet :is(.edge-track,.wound-track) input:checked + span,
+.sheet :is(.edge-track,.wound-track) input:checked + span {
+  background:#9b4b31 !important; box-shadow:inset 0 0 0 2px var(--paper,#faf8f0) !important;
+}
+
+/* Keep the compact grid on narrow sheets; reserve enough width for the RR dots. */
+@media(max-width:650px) {
+  .charsheet .sheet .skill-row, .sheet .skill-row {
+    grid-template-columns: minmax(90px,1fr) minmax(70px,.8fr) 48px 48px var(--sra-skill-w) 46px;
+    gap:5px; padding:6px 8px !important;
+  }
+  .charsheet .sheet .specialization-row > .skill-name, .sheet .specialization-row > .skill-name { padding-left:8px; }
+  .charsheet .sheet .skill-group, .sheet .skill-group { overflow-x:auto; }
+}
+.sheet-rolltemplate-sra2 .sheet-sra2-minor { color:#805114; }
+.sheet-rolltemplate-sra2 .sheet-sra2-disaster { font-weight:800; }
+
+
+/* contacts and compact Magic mirrors without a DV column. */
+.charsheet .magic-mirrors .magic-mirror-row, .magic-mirrors .magic-mirror-row { grid-template-columns: minmax(0,1fr) repeat(2, var(--sra-skill-w,70px)) var(--sra-roll-w,54px) !important; }
+.panel-contacts .contact-fields { grid-template-columns:minmax(0,2fr) minmax(0,1fr); align-items:start; }
+.panel-contacts .contact-fields .program-description { grid-column:1 / -1; margin-top:0; }
+.panel-contacts .repcontrol_add { font-size:0 !important; }
+.panel-contacts .repcontrol_add::after { content:"＋ Add Contact"; font-size: var(--sra-font-base,12px); }
+
+
+/* editable user-supplied image URLs in Main and repeating rows.
+ * Flex wrapping follows the available panel width, not the browser viewport.
+ * No image assets, API scripts or external libraries are required. */
+.sheet .sra-main-layout { display:flex; flex-wrap:wrap; align-items:flex-start; gap:18px; }
+.sheet .sra-main-text { flex:1 1 320px; min-width:0; max-width:100%; }
+.sheet .sra-main-text .main-list { max-width:none; }
+.sheet .sra-main-portrait { flex:0 1 180px; min-width:0; max-width:100%; }
+.sheet .sra-description-layout { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px; margin-top:6px; }
+.sheet .sra-description-layout > textarea { flex:1 1 220px; min-width:0; width:100%; margin:0; }
+.sheet .sra-image-tools { flex:0 1 150px; min-width:0; max-width:100%; display:grid; gap:6px; }
+.sheet .sra-image-state { display:none !important; }
+.sheet .sra-image-preview { display:grid; gap:6px; justify-items:start; }
+.sheet .sra-image-state[value=""] + .sra-image-preview { display:none; }
+.sheet img.sra-user-image { display:block; width:auto; height:auto; max-width:100%; max-height:260px; object-fit:contain; border:1px solid #d8c9ba; }
+.sheet .sra-main-portrait img.sra-user-image { max-height:420px; }
+.sheet .sra-image-url { display:grid; gap:3px; font-size: var(--sra-font-sm); font-weight: var(--sra-font-bold); color:var(--ink); min-width:0; }
+.sheet .sra-image-url input { width:100% !important; min-width:0 !important; }
+.sheet button.sra-show-image { width:auto !important; min-width:0 !important; margin:0 !important; padding:3px 8px !important; border:1px solid #c99600; background:#f7e9b2; color:#542719; font:inherit; font-size: var(--sra-font-sm); font-weight: var(--sra-font-bold); cursor:pointer; }
+.sheet button.sra-show-image::before { content:none !important; }
+.sheet .sra-weapon-image { margin-top:8px; border-top:1px solid #d8c9ba; padding-top:5px; }
+.sheet .sra-weapon-image summary { cursor:pointer; font-weight: var(--sra-font-bold); color:var(--ink); }
+
+
+/* Keep URL controls available even when no image has been assigned. */
+.sheet .sra-main-portrait .sra-image-tools { width:100%; }
+.sheet .sra-image-url input { box-sizing:border-box; max-width:100%; }
+
+
+/* manually maintained custom skill rows, using native RR controls. */
+.sheet .custom-skills-list { margin-top:20px; }
+.sheet .custom-skill-row { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(90px,.8fr) 42px 42px var(--sra-skill-w) var(--sra-roll-w); gap:8px; align-items:end; padding:6px 8px; border-bottom:1px solid #e6d9cc; }
+.sheet .custom-skill-field { display:grid; grid-template-rows: auto var(--sra-control-h); gap: var(--sra-control-gap); min-width:0; margin:0; font-size: var(--sra-font-base); font-weight: var(--sra-font-bold); color:var(--ink-soft); }
+.sheet .custom-skill-field > :is(input,select,button) { width:100%; min-width:0; box-sizing:border-box; height: var(--sra-control-h); margin:0; font-size: var(--sra-font-base); }
+.sheet .custom-skill-field > input[type="number"], .sheet .custom-skill-field > input.dp-calc { text-align:center; padding:4px 2px; }
+.sheet .custom-skill-field > .rr-track { width: var(--sra-skill-w); align-self:center; justify-content:center; }
+.sheet .custom-skills-list .repcontrol_add { font-size:0 !important; }
+.sheet .custom-skills-list .repcontrol_add::after { content:"＋ Add Custom Skill"; font-size: var(--sra-font-base); }
+@media(max-width:650px) {
+  .sheet .custom-skill-row { grid-template-columns: repeat(2,minmax(0,1fr)) var(--sra-skill-w) var(--sra-roll-w); gap:6px; }
+  .sheet .custom-skill-field:nth-child(1), .sheet .custom-skill-field:nth-child(2),
+.sheet .custom-skill-field:nth-child(3) { grid-column:span 2; }
+
+  .sheet .custom-skill-field:nth-child(6) { grid-column:3; }
+}
+
+
+/* REMINDERS: attribute-backed hidden inputs select the visible messages. Keep zero-state messages out of layout and leave the original editable attributes intact. */
+
+/* Shared initiative and Magic limit reminders; compact selectors. */
+.sheet .initiative-bonuses input[type="hidden"] { display:none !important; }
+.sheet .initiative-edge, .sheet .initiative-action, .sheet .initiative-hot, .sheet .initiative-cold, .sheet .magic-limit, .sheet .essence-reminder, .sheet .vehicle-reminder { display:none; color:var(--ink); font-size: var(--sra-font-base); line-height:1.4; background:#f7e9b2; padding:4px 8px; }
+.sheet .magic-limit-state[value="1"] + .magic-limit,
+.sheet .initiative-edge-state[value="1"] + .initiative-edge,
+.sheet .initiative-edge-state[value="2"] + .initiative-edge,
+.sheet .initiative-action-state[value="1"] + .initiative-action,
+.sheet .initiative-hot-state[value="1"] ~ .initiative-hot,
+.sheet .initiative-cold-state[value="1"] ~ .initiative-cold { display:block; }
+.sheet .initiative-hot-state[value="1"] ~ .initiative-cold { display:none; }
+.sheet .initiative-settings { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:12px; }
+.sheet .initiative-settings label { display:flex; align-items:center; gap:6px; width:auto; margin:0; font-size: var(--sra-font-sm); font-weight: var(--sra-font-bold); color:var(--ink); }
+.sheet .initiative-settings select { width:48px; margin:0; }
+
+
+/* CONFIG: shared field geometry and documentation. Mirrored settings must remain editable; example macros and URLs must remain selectable. */
+
+/* configuration mirrors and selectable documentation. */
+.sheet .panel-config { color:var(--ink); font-size: var(--sra-font-base); line-height:1.45; }
+.sheet .panel-config .section-title { margin-top:16px; margin-bottom:8px; }
+.sheet .panel-config p { margin:4px 0 8px; }
+.sheet .config-option { margin:0 0 8px; }
+.sheet .config-option label { display:flex; align-items:center; gap:7px; font-weight: var(--sra-font-bold); width:auto; margin:0; }
+.sheet .config-option input[type="checkbox"] { accent-color:var(--gold-dark); flex:none; margin:0; }
+.sheet .config-option p { margin:2px 0 0 20px; color:var(--ink-soft); }
+.sheet .config-select label { flex-wrap:wrap; }
+.sheet .config-select select { width:48px; margin:0; }
+.sheet .config-select p { margin-left:0; }
+
+/* Magic settings reuse the shared control dimensions; tradition needs room for translated labels. */
+.sheet .config-magic-field input[type="number"] { width:var(--sra-skill-w,70px); margin:0; }
+.sheet .config-magic-field select { width:120px; max-width:100%; }
+.sheet .config-about dl { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:3px 12px; margin:8px 0; }
+.sheet .config-about dt { font-weight: var(--sra-font-bold); }
+.sheet .config-about dd { margin:0; }
+.sheet .panel-config h3 { font-size: var(--sra-font-label); margin:12px 0 5px; }
+.sheet .panel-config ol { margin:4px 0 8px 20px; padding:0; }
+.sheet .config-macro-example { margin:4px 0 8px; padding:6px 8px; font-family:monospace; font-size: var(--sra-font-sm); line-height:1.4; white-space:pre-wrap; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+.sheet .config-macro-example code { font:inherit; white-space:inherit; user-select:text; -webkit-user-select:text; }
+.sheet .config-copy-url { display:block; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+.sheet .config-macro-row { display:flex; flex-wrap:wrap; gap:4px 12px; margin:4px 0; }
+.sheet .config-macro-row > span { min-width:70px; font-weight: var(--sra-font-bold); }
+.sheet .config-macro-row code { font-size: var(--sra-font-sm); overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+
+
+/* AMPS REMINDERS: a single derived tier selects the applicable social, healing and magic messages; a death warning excludes all other penalties. */
+
+/* Essence tiers are exclusive; multiple penalties may share one tier. */
+.sheet .essence-tier[value="0"] ~ .essence-death,
+.sheet .essence-tier[value="1"] ~ .essence-social,
+.sheet .essence-tier[value="1"] ~ .essence-heal-two,
+.sheet .essence-tier[value="2"] ~ .essence-heal-two,
+.sheet .essence-tier[value="3"] ~ .essence-heal-one,
+.sheet .essence-tier[value="4"] ~ .essence-heal-one,
+.sheet .essence-tier[value="1"] ~ .essence-magic-two,
+.sheet .essence-tier[value="2"] ~ .essence-magic-two,
+.sheet .essence-tier[value="3"] ~ .essence-magic-two,
+.sheet .essence-tier[value="4"] ~ .essence-magic-one,
+.sheet .essence-tier[value="5"] ~ .essence-magic-one { display:block; }
+
+
+/* RIGGER REMINDERS: derived rig mode and RCC capacity flags select messages; the SIM checkboxes use the Matrix attributes. */
+
+/* Vehicle reminders and mirrored rig settings. Keep the list clear of the last reminder. */
+.sheet .panel-vehicles .vehicles-list { margin-top:6px; }
+.sheet .vehicle-rig-mode[value="2"] ~ .vehicle-rig-hot,
+.sheet .vehicle-rig-mode[value="1"] ~ .vehicle-rig-cold,
+.sheet .vehicle-rcc-visible[value="1"] ~ .vehicle-rcc-single,
+.sheet .vehicle-rcc-visible[value="2"] ~ .vehicle-rcc-capacity,
+.sheet .vehicle-rcc-extra-state[value="1"] + .vehicle-rcc-extra { display:block; }
+.sheet .vehicle-modes { margin:12px 0 0; }
+.sheet .vehicle-rcc-setting { margin-top:8px; }
+.sheet .vehicle-rcc-setting input[type="number"] { width:var(--sra-skill-w,70px); margin:0; }
+
+
+/* MATRIX DEVICES: repeating cards use the common form controls and threshold track.
+   Keep Name and Type flexible; only the two numerical fields have fixed widths.
+   The threshold line can scroll horizontally on narrow sheets, like Vehicles. */
+/* Match the native repeating-row control geometry, including Roll20's numeric width defaults. */
+.charsheet .matrix-device-fields, .matrix-device-fields {
+  display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) repeat(2,var(--sra-amp-w,65px));
+  align-items:end; gap:9px;
+}
+.charsheet .matrix-device-fields .vehicle-field, .matrix-device-fields .vehicle-field {
+  display:grid !important; grid-template-rows:auto 31px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-items:end !important;
+  gap:var(--sra-control-gap,4px) !important; margin:0 !important; padding:0 !important;
+  min-width:0 !important; width:100% !important;
+}
+.charsheet .matrix-device-fields .vehicle-field > input, .matrix-device-fields .vehicle-field > input {
+  display:block !important; box-sizing:border-box !important;
+  width:100% !important; min-width:0 !important; max-width:100% !important;
+  height:31px !important; min-height:31px !important; max-height:31px !important;
+  margin:0 !important; align-self:end !important;
+}
+.matrix-device-stat > input { text-align:center; font-weight:var(--sra-font-bold,700); }
+.matrix-device-stat > span { text-align:center; }
+.matrix-devices-list { margin:14px 0; }
+.matrix-devices-list > .list-heading { margin-bottom:10px; }
+.panel-matrix .matrix-devices-list .repcontrol_add::after { content:"＋ Add Matrix Device"; font-size:var(--sra-font-base,12px); }
+@media(max-width:650px) {
+  .charsheet .matrix-device-fields, .matrix-device-fields { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+
+/* COMPACT FIELD HEADINGS: reuse the Skills header typography throughout the sheet.
+   Target captions only, not values, section titles, checkbox labels or chat templates.
+   Explicit span styling avoids Roll20's native label font-size overrides. */
+.charsheet .sheet :is(.amp-field,.combat-field,.vehicle-field,.spell-field,.program-field,.custom-skill-field,.generic-roll-field,.sra-image-url) > span[data-i18n],
+.sheet :is(.amp-field,.combat-field,.vehicle-field,.spell-field,.program-field,.custom-skill-field,.generic-roll-field,.sra-image-url) > span[data-i18n],
+.charsheet .sheet :is(.magic-limits,.matrix-cracking-values) > label > span[data-i18n],
+.sheet :is(.magic-limits,.matrix-cracking-values) > label > span[data-i18n],
+.charsheet .sheet .field > label, .sheet .field > label {
+  font-size:var(--sra-font-sm,11px) !important;
+  font-weight:800 !important; line-height:1.2 !important;
+  color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;
+  margin:0 !important; padding:0 !important;
+  min-width:0; overflow-wrap:anywhere;
+}
+
+/* Keep the same compact heading size on damage columns and thresholds. */
+.charsheet .sheet :is(.wound-th,.vt-label,.matrix-damage-title),
+.sheet :is(.wound-th,.vt-label,.matrix-damage-title) {
+  font-size:var(--sra-font-sm,11px) !important;
+  line-height:1.2 !important;
+}
