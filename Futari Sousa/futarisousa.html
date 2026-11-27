@@ -316,7 +316,7 @@
   <div class="sheet-card">
     <div class="sheet-hd"><span class="sheet-ttl">{{title}}</span>{{#sub}}<span class="sheet-sub">{{sub}}</span>{{/sub}}</div>
     <div class="sheet-bd">
-      {{#ok}}<div class="sheet-chk"><div class="sheet-dice"><span class="sheet-die">{{computed::d1}}</span>{{#rollGreater() n 1}}<span class="sheet-die">{{computed::d2}}</span>{{/rollGreater() n 1}}{{#rollGreater() n 2}}<span class="sheet-die">{{computed::d3}}</span>{{/rollGreater() n 2}}</div>{{#rollTotal() computed::ok 1}}<span class="sheet-stamp sheet-s1">{{computed::res}}</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stamp sheet-s2">{{computed::res}}</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stamp sheet-s3">{{computed::res}}</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stamp sheet-s4">{{computed::res}}</span>{{/rollTotal() computed::ok 4}}</div>
+      {{#ok}}<div class="sheet-chk"><div class="sheet-dice"><span class="sheet-die">{{computed::d1}}</span>{{#rollGreater() n 1}}<span class="sheet-die">{{computed::d2}}</span>{{/rollGreater() n 1}}{{#rollGreater() n 2}}<span class="sheet-die">{{computed::d3}}</span>{{/rollGreater() n 2}}</div>{{#rollTotal() computed::ok 1}}<span class="sheet-stamp sheet-s1">{{computed::res}}</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stamp sheet-s2">{{computed::res}}</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stw"><span class="sheet-stamp sheet-s3">{{computed::res}}</span><span class="sheet-cap">여유+1</span></span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stw"><span class="sheet-stamp sheet-s4">{{computed::res}}</span><span class="sheet-cap">마음고생+1</span><span class="sheet-cap">상태이상</span></span>{{/rollTotal() computed::ok 4}}</div>
       <div class="sheet-mode">{{computed::mode}}</div>{{#rollTotal() computed::hn 1}}<div class="sheet-note">{{computed::note}}</div>{{/rollTotal() computed::hn 1}}{{/ok}}
       {{^ok}}{{#res}}<div class="sheet-res"><span class="sheet-die">{{computed::dice}}</span><span class="sheet-rt">{{computed::res}}</span></div>{{/res}}{{/ok}}
       {{#eff}}<div class="sheet-tx">{{computed::eff}}</div>{{/eff}}
@@ -348,7 +348,8 @@ on('change:sheet_type', setup);
 // ════════ 굴림 — Custom Roll Parsing (startRoll → finishRoll) ════════
 // 채팅 카드는 src/rolltemplate.html. computed 칸은 매크로 앞쪽에 둔다 (roll20kit/LESSONS.md 2장)
 // 매크로에 넣는 글: 템플릿 · 인라인 굴림 · 속성 호출을 깨뜨리는 문자를 바꾼다(줄바꿈은 공백)
-const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, ' ').replace(/\{/g, '｛').replace(/\}/g, '｝')
+// 줄바꿈은 Roll20 의 %NEWLINE% 로 (날 줄바꿈은 채팅 명령을 끊는다)
+const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, '%NEWLINE%').replace(/\{/g, '｛').replace(/\}/g, '｝')
   .replace(/\[\[/g, '[ [').replace(/\]\]/g, '] ]').replace(/([@%&])\{/g, '$1 {').trim();
 const field = (k, v) => (v === '' || v == null ? '' : ` {{${k}=${clean(v)}}}`);
 const post = (s, computed) => startRoll(s, r => finishRoll(r.rollId, computed ? computed(r.results) : {}));
@@ -372,7 +373,8 @@ DATA.skills.forEach(([group, names], g) => names.forEach((name, i) => {
       + field('who', v.character_name) + (v[id] === '1' ? '' : field('flag', '미습득')),
     r => {
       const n = Math.max(1, Math.min(3, r.n.result)), ds = [r.d1.result, r.d2.result, r.d3.result].slice(0, n), [ok, res] = judge(ds);
-      const notes = [ok === 3 && '【여유】+1', ok === 4 && '상태이상 · 【마음고생】+1', asi && ds.some(d => d >= 4) && '탐정이 조수에 대한 감정 1 · 【여유】+1'].filter(Boolean);
+      // 스페셜 【여유】+1 · 펌블 【마음고생】+1 · 상태이상은 도장 밑 작은 글씨(템플릿). 여기는 조수 안내만
+      const notes = [asi && ds.some(d => d >= 4) && '탐정이 조수에 대한 감정 1 · 【여유】+1'].filter(Boolean);
       return { ok, res, mode: `${MODE[n]} ${n}D${die}`, note: notes.join(' / '), hn: notes.length ? 1 : 0, d1: r.d1.result, d2: r.d2.result, d3: r.d3.result };
     });
   }));
