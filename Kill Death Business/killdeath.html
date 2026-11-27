@@ -142,8 +142,8 @@
     <div class="sheet-bd">
       {{#sub}}<div class="sheet-sub">{{sub}}</div>{{/sub}}
       {{#tgx}}<div class="sheet-sub">{{computed::tgx}}</div>{{/tgx}}
-      {{#d1}}<div class="sheet-roll sheet-big"><span class="sheet-die">{{d1}}</span><span class="sheet-die">{{d2}}</span>{{#add}}<span class="sheet-eq sheet-add">{{add}}</span>{{/add}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span>{{#rollTotal() computed::ok 1}}<span class="sheet-stp sheet-spc">스페셜</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stp sheet-fb">펌블</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stp">성공</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stp sheet-ng">실패</span>{{/rollTotal() computed::ok 4}}</div>{{/d1}}
-      {{#d1}}{{#asu}}{{#rollTotal() computed::ok 1}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 3}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 3}}{{/asu}}{{#afa}}{{#rollTotal() computed::ok 2}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 4}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 4}}{{/afa}}{{#vr}}{{#rollTotal() computed::ok 1}}<div class="sheet-note">시청률 +10%</div>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<div class="sheet-note">시청률 −20%</div>{{/rollTotal() computed::ok 2}}{{/vr}}{{/d1}}
+      {{#d1}}<div class="sheet-roll sheet-big"><span class="sheet-die">{{d1}}</span><span class="sheet-die">{{d2}}</span>{{#add}}<span class="sheet-eq sheet-add">{{add}}</span>{{/add}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span>{{#rollTotal() computed::ok 1}}<span class="sheet-stw"><span class="sheet-stp sheet-spc">스페셜</span>{{#vr}}<span class="sheet-cap">시청률+10%</span>{{/vr}}</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stw"><span class="sheet-stp sheet-fb">펌블</span>{{#vr}}<span class="sheet-cap">시청률−20%</span>{{/vr}}</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stp">성공</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stp sheet-ng">실패</span>{{/rollTotal() computed::ok 4}}</div>{{/d1}}
+      {{#d1}}{{#asu}}{{#rollTotal() computed::ok 1}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 3}}<div class="sheet-note">{{asu}}</div>{{/rollTotal() computed::ok 3}}{{/asu}}{{#afa}}{{#rollTotal() computed::ok 2}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 4}}<div class="sheet-note">{{afa}}</div>{{/rollTotal() computed::ok 4}}{{/afa}}{{/d1}}
       {{#dth}}{{#rollTotal() kb 1}}<div class="sheet-rt"><span class="sheet-die">{{sr}}</span><span class="sheet-rtx">{{computed::drel}}</span></div>{{/rollTotal() kb 1}}<div class="sheet-note">{{computed::dres}}</div>{{/dth}}
       {{#te1}}<div class="sheet-rt"><span class="sheet-die">{{te1}}</span>{{#te2}}<span class="sheet-die">{{te2}}</span>{{/te2}}{{#te3}}<span class="sheet-die">{{te3}}</span>{{/te3}}{{#te4}}<span class="sheet-die">{{te4}}</span>{{/te4}}<span class="sheet-rtx">{{computed::tres}}</span></div>{{/te1}}
       {{#n1}}<div class="sheet-roll"><span class="sheet-die">{{n1}}</span>{{#n2}}<span class="sheet-die">{{n2}}</span>{{/n2}}{{#n3}}<span class="sheet-die">{{n3}}</span>{{/n3}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span></div>{{/n1}}
@@ -174,6 +174,8 @@ const SKILL_IDS = COLS.flatMap(c => SK[0].map((_, r) => `${c}${r + 2}`));
 const on1 = v => v === '1' || v === 1 || v === 'on';
 const num = v => { const n = parseInt(String(v == null ? '' : v).replace(/[−－]/g, '-').trim(), 10); return Number.isNaN(n) ? null : n; };
 const pos = id => ({ f: COLS.indexOf(id[0]), r: +id.slice(1) - 2 });
+// 특기 표기 《분야n/특기》 (룰북 표기 — 모술11/유언비어). 특기 리스트에 없는 이름은 《이름》 그대로
+const skTag = (s, name) => (s ? `《${FIELD_NAMES[s.f]}${s.r + 2}/${SK[s.f][s.r]}》` : `《${name}》`);
 const findSkill = s => {
   const n = String(s || '').replace(/[《》〈〉<>\s]/g, '');
   for (let f = 0; f < 6; f++) { const r = SK[f].findIndex(x => x.replace(/\s/g, '') === n); if (r >= 0) return { f, r, id: `${COLS[f]}${r + 2}` }; }
@@ -222,7 +224,8 @@ on('sheet:opened', () => getAttrs(['sheet_version'], v => { if ((num(v.sheet_ver
 // 공개: roll_display_to 가 "/w gm " 이면 GM 에게 귓속말
 
 // 매크로에 넣는 글: 템플릿 · 인라인 굴림 · 속성 호출을 깨뜨리는 문자를 바꾼다(줄바꿈은 공백)
-const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, ' ').replace(/\{/g, '｛').replace(/\}/g, '｝')
+// 줄바꿈은 Roll20 의 %NEWLINE% 로 (날 줄바꿈은 채팅 명령을 끊는다)
+const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, '%NEWLINE%').replace(/\{/g, '｛').replace(/\}/g, '｝')
   .replace(/\[\[/g, '[ [').replace(/\]\]/g, '] ]').replace(/([@%&])\{/g, '$1 {').trim();
 const field = (k, v) => (v === '' || v == null ? '' : ` {{${k}=${clean(v)}}}`);
 const prefix = v => (String(v.roll_display_to || '').trim() ? '/w gm ' : '');
@@ -268,7 +271,7 @@ on(SKILL_IDS.map(id => `clicked:r${id.toLowerCase()}`).join(' '), e => {
   const m = (e.triggerName || '').match(/clicked:r([a-f])(\d+)$/i);
   if (!m) return;
   const id = m[1].toUpperCase() + m[2], p = pos(id);
-  withCtx([], (v, T) => check(v, { title: `《${SK[p.f][p.r]}》 판정`, sub: FIELD_NAMES[p.f] + tgs(T[id]) + tail(v), target: T[id], add: modOf(v) }));
+  withCtx([], (v, T) => check(v, { title: `${skTag(p)} 판정`, sub: (tgs(T[id]) + tail(v)).replace(/^ · /, ''), target: T[id], add: modOf(v) }));
 });
 
 // 어빌리티 공격 판정 (룰북 4·08·04): 차지만큼 +, 펌블치 = 【리스크】 + 손 수정 (블록 1회마다 리스크 +1 → 펌블치 ▲), 7 = 킬러 트릭
@@ -281,7 +284,7 @@ for (let k = 1; k <= 7; k++) {
     const nm = (v[`ab${k}_name`] || '').trim() || '어빌리티', lv = k === 7 ? '' : (v[`ab${k}_level`] || '').trim();
     const sk = (v[`ab${k}_skill`] || '').replace(/[《》]/g, '').trim(), s = findSkill(sk), t = s ? T[s.id] : null, first = k <= 2;
     const ch = Math.max(0, num(v.charge) || 0), fb = k + (num(v.fumble_adj) || 0);
-    const sub = [`리스크 ${k}`, lv && `레벨 ${lv}`, sk && `《${sk}》`].filter(Boolean).join(' · ') + (first ? '' : tgs(t)) + (ch ? ` · 차지 +${ch}` : '') + tail(v, fb);
+    const sub = [`리스크 ${k}`, lv && `레벨 ${lv}`, sk && skTag(s, sk)].filter(Boolean).join(' · ') + (first ? '' : tgs(t)) + (ch ? ` · 차지 +${ch}` : '') + tail(v, fb);
     const su = k === 7 ? `킬러 트릭 성공 — 상대가 대미지 (라이프가 있는 NPC 는 라이프 0) · 시청률 +10%` : `상대는 ${counter(k)}로 반격해야 한다`;
     const fa = isPc(v) ? '공격한 쪽이 대미지 — 회수인은 사망' : '공격한 쪽이 대미지 (라이프 −1 · 표적전이면 한 번 다시 굴림)';
     check(v, { title: `【${nm}】 공격 판정`, sub, target: t, add: ch + modOf(v), fumble: fb, eff: v[`ab${k}_effect`], first, extra: field('asu', su) + field('afa', fa) });
@@ -367,7 +370,7 @@ on('clicked:sub', () => getAttrs(['sub_name', 'sub_clear', 'sub_reward', 'roll_d
 // 랜덤 특기: 1D6 분야 · 2D6 특기
 on('clicked:rsk', () => getAttrs(['roll_display_to'], v => {
   post(`${prefix(v)}${TPL} {{tres=[[0]]}} {{te1=[[1d6]]}} {{te2=[[1d6]]}} {{te3=[[1d6]]}}${field('title', '랜덤 특기')}`,
-    R => { const f = R.te1.result - 1; return { tres: `${FIELD_NAMES[f]} · 《${SK[f][R.te2.result + R.te3.result - 2]}》` }; });
+    R => { const f = R.te1.result - 1; return { tres: skTag({ f, r: R.te2.result + R.te3.result - 2 }) }; });
 }));
 [1, 2, 3].forEach(n => on(`clicked:nd${n}`, () => getAttrs(['roll_display_to'], v => {
   const ks = Array.from({ length: n }, (_, i) => `n${i + 1}`);
