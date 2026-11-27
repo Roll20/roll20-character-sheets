@@ -1,0 +1,33 @@
+# Copied from roll20-private-sheets/.actions/sheet-checks/public. Edit it there, not here.
+#
+# Adding the "approve sheet" label to a new sheet's pull request opens a second pull request that adds
+# the sheet to approved.yaml, and for official sheets to CODEOWNERS.json and CODEOWNERS. Only people who
+# can label pull requests can start it, and nothing from the pull request is checked out or run.
+name: Approve Sheet
+
+on:
+  pull_request_target:
+    types: [labeled]
+    branches: [master]
+
+permissions: {}
+
+jobs:
+  approve-sheet:
+    name: Open Approval Pull Request
+    if: github.event.label.name == 'approve sheet'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check out master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .actions/sheet-checks
+          persist-credentials: false
+      - name: Open the approval pull request
+        uses: ./.actions/sheet-checks
+        with:
+          mode: approve
