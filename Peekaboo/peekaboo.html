@@ -166,7 +166,7 @@
 </div>
 <!-- 채팅 카드: 둥근 상자 · 먹색(스푸키 보라 밑줄) 또는 노랑(이노센트) 머리띠 + 흰 본문. 굴림은 sheet worker 가 startRoll 로 보내고 computed:: 칸은 finishRoll 로 채운다.
      computed 칸(ok · total · up · tres)은 매크로 앞쪽에 있어야 하므로 워커가 맨 앞에 넣는다. in = 이노센트(노랑 테마).
-     판정: d1 · d2 + add = total | 하나마루 도장 ok 1 스페셜 · 2 펌블 · 3 성공 · 4 실패 (0 이면 도장 없음) | up 1~3 = 실패 때 졸음 증가
+     판정: d1 · d2 + add = total | 하나마루 도장 ok 1 스페셜 · 2 펌블 · 3 성공 · 4 실패 (0 이면 도장 없음) | up 1~3 = 실패 · 펌블 때 늘어날 졸음 (도장 밑 작은 글씨)
      랜덤 특기: te1(분야) te2 te3(특기) 와 결과(tres). nD6: n1~n3 = total. -->
 <rolltemplate class="sheet-rolltemplate-peekaboo">
   <div class="sheet-card">
@@ -174,8 +174,7 @@
     {{#title}}<div class="sheet-hd">{{title}}</div>{{/title}}
     <div class="sheet-bd">
       {{#sub}}<div class="sheet-sub">{{sub}}</div>{{/sub}}
-      {{#d1}}<div class="sheet-roll sheet-big"><span class="sheet-die">{{d1}}</span><span class="sheet-die">{{d2}}</span>{{#add}}<span class="sheet-eq">{{add}}</span>{{/add}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span>{{#rollTotal() computed::ok 1}}<span class="sheet-stp sheet-spc">스페셜</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stp sheet-fb">펌블</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stp">성공</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stp sheet-ng">실패</span>{{/rollTotal() computed::ok 4}}</div>{{/d1}}
-      {{#up}}{{#rollTotal() computed::up 1}}<div class="sheet-note">실패 · 졸음 +1</div>{{/rollTotal() computed::up 1}}{{#rollTotal() computed::up 2}}<div class="sheet-note">실패 · 졸음 +2</div>{{/rollTotal() computed::up 2}}{{#rollTotal() computed::up 3}}<div class="sheet-note">실패 · 졸음 +3</div>{{/rollTotal() computed::up 3}}{{/up}}
+      {{#d1}}<div class="sheet-roll sheet-big"><span class="sheet-die">{{d1}}</span><span class="sheet-die">{{d2}}</span>{{#add}}<span class="sheet-eq">{{add}}</span>{{/add}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span>{{#rollTotal() computed::ok 1}}<span class="sheet-stp sheet-spc">스페셜</span>{{/rollTotal() computed::ok 1}}{{#rollTotal() computed::ok 2}}<span class="sheet-stw"><span class="sheet-stp sheet-fb">펌블</span>{{#up}}{{#rollTotal() computed::up 1}}<span class="sheet-cap">졸음+1</span>{{/rollTotal() computed::up 1}}{{#rollTotal() computed::up 2}}<span class="sheet-cap">졸음+2</span>{{/rollTotal() computed::up 2}}{{#rollTotal() computed::up 3}}<span class="sheet-cap">졸음+3</span>{{/rollTotal() computed::up 3}}{{/up}}</span>{{/rollTotal() computed::ok 2}}{{#rollTotal() computed::ok 3}}<span class="sheet-stp">성공</span>{{/rollTotal() computed::ok 3}}{{#rollTotal() computed::ok 4}}<span class="sheet-stw"><span class="sheet-stp sheet-ng">실패</span>{{#up}}{{#rollTotal() computed::up 1}}<span class="sheet-cap">졸음+1</span>{{/rollTotal() computed::up 1}}{{#rollTotal() computed::up 2}}<span class="sheet-cap">졸음+2</span>{{/rollTotal() computed::up 2}}{{#rollTotal() computed::up 3}}<span class="sheet-cap">졸음+3</span>{{/rollTotal() computed::up 3}}{{/up}}</span>{{/rollTotal() computed::ok 4}}</div>{{/d1}}
       {{#te1}}<div class="sheet-rt"><span class="sheet-die">{{te1}}</span><span class="sheet-die">{{te2}}</span><span class="sheet-die">{{te3}}</span><span class="sheet-rtx">{{computed::tres}}</span></div>{{/te1}}
       {{#n1}}<div class="sheet-roll"><span class="sheet-die">{{n1}}</span>{{#n2}}<span class="sheet-die">{{n2}}</span>{{/n2}}{{#n3}}<span class="sheet-die">{{n3}}</span>{{/n3}}<span class="sheet-eq">=</span><span class="sheet-tot">{{computed::total}}</span></div>{{/n1}}
       {{#note}}<div class="sheet-note">{{note}}</div>{{/note}}
@@ -201,6 +200,8 @@ const SK = [
 const GAPS = ['gap_a', 'gap_b', 'gap_c', 'gap_d', 'gap_e'];   // k 번째 공백 = k 번째 분야 오른쪽
 const SLOTS = ['slot_a', 'slot_b', 'slot_c', 'slot_d', 'slot_e', 'slot_f'];   // 원기 슬롯 (분야 이름 옆 □)
 const SKILL_IDS = COLS.flatMap(c => SK[0].map((_, r) => `${c}${r + 2}`));
+// 채팅 카드 특기 표기 《분야n/특기》 (예: 《친구9/용기》)
+const skTag = (f, r) => `《${FIELD_NAMES[f]}${r + 2}/${SK[f][r]}》`;
 
 const on1 = v => v === '1' || v === 1 || v === 'on';
 const num = v => { const n = parseInt(String(v == null ? '' : v).replace(/[−－]/g, '-').trim(), 10); return Number.isNaN(n) ? null : n; };
@@ -254,7 +255,8 @@ on('sheet:opened', () => getAttrs(['sheet_version'], v => { if ((num(v.sheet_ver
 // 공개: roll_display_to 가 "/w gm " 이면 GM 에게 귓속말. 이노센트 시트면 {{in=1}} (카드 노랑 테마)
 
 // 매크로에 넣는 글: 템플릿 · 인라인 굴림 · 속성 호출을 깨뜨리는 문자를 바꾼다(줄바꿈은 공백)
-const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, ' ').replace(/\{/g, '｛').replace(/\}/g, '｝')
+// 줄바꿈은 Roll20 의 %NEWLINE% 로 (날 줄바꿈은 채팅 명령을 끊는다)
+const clean = s => String(s == null ? '' : s).replace(/\r?\n/g, '%NEWLINE%').replace(/\{/g, '｛').replace(/\}/g, '｝')
   .replace(/\[\[/g, '[ [').replace(/\]\]/g, '] ]').replace(/([@%&])\{/g, '$1 {').trim();
 const field = (k, v) => (v === '' || v == null ? '' : ` {{${k}=${clean(v)}}}`);
 const prefix = v => (String(v.roll_display_to || '').trim() ? '/w gm ' : '');
@@ -296,9 +298,9 @@ const tail = v => {
 function rollSkill(id, title) {
   const p = pos(id);
   withCtx([], (v, T) => {
-    const t = title || `《${SK[p.f][p.r]}》 판정`;
+    const t = title || `${skTag(p.f, p.r)} 판정`;
     if (isIn(v) && sleepOf(v) >= 30) return info(v, { title: t, note: '졸음 30 · 행동 불능' });
-    check(v, { title: t, sub: FIELD_NAMES[p.f] + tgs(T[id]) + tail(v), target: T[id] });
+    check(v, { title: t, sub: (tgs(T[id]) + tail(v)).replace(/^ · /, ''), target: T[id] });
   });
 }
 
@@ -307,8 +309,8 @@ on(SKILL_IDS.map(id => `clicked:r${id.toLowerCase()}`).join(' '), e => {
   const m = (e.triggerName || '').match(/clicked:r([a-f])(\d+)$/i);
   if (m) rollSkill(m[1].toUpperCase() + m[2]);
 });
-// 공포 판정: 처음 보는 오바케를 만나면 《용기》 (친구 8 = C9)
-on('clicked:fear', () => rollSkill('C9', '공포 판정 《용기》'));
+// 공포 판정: 처음 보는 오바케를 만나면 《용기》 (친구 9 = C9)
+on('clicked:fear', () => rollSkill('C9', `공포 판정 ${skTag(2, 7)}`));
 
 // 마법 사용: 마력에서 코스트를 빼고 카드
 for (let i = 1; i <= 3; i++) {
@@ -322,7 +324,7 @@ for (let i = 1; i <= 3; i++) {
 // 랜덤 특기: 1D6 분야 · 2D6 특기
 on('clicked:rsk', () => getAttrs(['roll_display_to', 'sheet_type'], v => {
   post(`${prefix(v)}${TPL} {{tres=[[0]]}} {{te1=[[1d6]]}} {{te2=[[1d6]]}} {{te3=[[1d6]]}}${inf(v)}${field('title', '랜덤 특기')}`,
-    R => { const f = R.te1.result - 1; return { tres: `${FIELD_NAMES[f]} · 《${SK[f][R.te2.result + R.te3.result - 2]}》` }; });
+    R => { const f = R.te1.result - 1; return { tres: skTag(f, R.te2.result + R.te3.result - 2) }; });
 }));
 [1, 2, 3].forEach(n => on(`clicked:nd${n}`, () => getAttrs(['roll_display_to', 'sheet_type'], v => {
   const ks = Array.from({ length: n }, (_, i) => `n${i + 1}`);
