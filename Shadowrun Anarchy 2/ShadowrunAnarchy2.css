@@ -1,8 +1,10 @@
-/* Shadowrun Anarchy 2 | Roll20 character sheet | Version 38
+/* Shadowrun Anarchy 2 | Roll20 character sheet | Version 39
  * Layout: base styles, character overview, tabs and panels, repeating rows,
  * responsive rules, Roll20 compatibility overrides and conditional visibility.
  * Native repeating templates must remain hidden by Roll20.
  */
+
+/* DESIGN TOKENS: shared colors, typography and control dimensions. Later Roll20-specific rules intentionally override some base styles; inspect the full cascade before changing a shared token. */
 :root {
     --ink: #542719;
     --ink-soft: #7b3b26;
@@ -12,6 +14,7 @@
     --line: #c8795c;
     --muted: #8c8178;
   }
+
 /* Shared sheet typography and control geometry. Chat templates remain independent. */
 .charsheet .sheet, .sheet {
     --sra-control-h: 29px;
@@ -26,6 +29,8 @@
     --sra-grid-gap: 10px;
 }
 
+
+  /* BASE: form and page geometry. Border-box sizing keeps borders inside the declared control widths. */
   * { box-sizing: border-box; }
 
   body {
@@ -52,12 +57,14 @@
     box-shadow: 0 8px 28px rgba(48,35,25,.14);
   }
 
+
   /* Character overview: identity and wounds. */
   .top-grid {
     display: grid;
     grid-template-columns: minmax(280px, .9fr) minmax(420px, 1.35fr);
     gap: 28px;
   }
+
 
   /* Shared identity field grid. */
   .identity {
@@ -99,6 +106,8 @@
     border-bottom-color: var(--gold-dark);
   }
 
+
+  /* OVERVIEW: wound thresholds and tracks. Keep the track columns aligned with the threshold grid. */
   .wounds {
     padding-top: 1px;
   }
@@ -160,6 +169,8 @@
   .wound-table .armor-name { width: 100%; }
   .wound-table input.thr-calc { text-align:center; font-weight: var(--sra-font-bold,700); background:rgba(228,180,0,.12); cursor:default; }
 
+
+  /* OVERVIEW: six circular attributes. The ring styling must remain separate from ordinary rectangular form controls. */
   .attributes {
     margin-top: 26px;
     display: grid;
@@ -213,6 +224,7 @@
     background: transparent;
   }
 
+
   /* Keine numerischen Hoch-runter-Regler im gesamten Dokument. */
   input[type="number"] {
     appearance: textfield;
@@ -224,6 +236,8 @@
     margin: 0;
   }
 
+
+  /* NAVIGATION: native tab state controls panel visibility. Keep the selector relationship between controls and panels. */
   .tabs {
     margin-top: 25px;
     border-top: 2px solid var(--gold);
@@ -262,6 +276,7 @@
     border: 1px solid #d7c9b9;
     background: rgba(255,255,255,.3);
   }
+
 
   /* Roll20-sichere Tabs: Radio-Inputs sind direkte Geschwister der Panels. */
   .tabs { position: relative; }
@@ -320,6 +335,8 @@
     .wound-track span { width: 18px; height: 18px; }
   }
 
+
+  /* SKILLS: group expansion, shared column layout and specialization controls. The parent DP cell is intentionally empty; preserve its grid track for RR alignment. */
   .skills-header {
     display: flex;
     align-items: baseline;
@@ -433,7 +450,10 @@
     .skill-row input[type="number"], .skill-row select { font-size: var(--sra-font-sm,11px); }
   }
 
+
   /* Amps panel and repeating-row layout. */
+
+  /* AMPS: base repeating-row layout. See the later Essence alignment and reminder overrides before changing column widths. */
   .amps-header { margin-bottom:6px; }
   .amps-list { display:grid; gap:10px; padding-top:6px; }
   .amp-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
@@ -444,6 +464,7 @@
   .amp-description summary { color:var(--ink-soft); font-weight:800; cursor:pointer; }
   .amp-description textarea { display:block; width:100%; min-height:90px; margin-top:8px; padding:8px; resize:vertical; border:1px solid #d8c9ba; background:rgba(255,255,255,.55); color:#211d1a; font:inherit; }
   @media (max-width:650px) { .amp-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; } }
+
 
   /* Roll20-generated repeating-section controls, presented as clear add buttons. */
   .repcontrol { display:flex; justify-content:flex-start; margin-top:10px; }
@@ -459,7 +480,10 @@
   .panel-combat .repcontrol_add { font-size:0 !important; }
   .panel-combat .repcontrol_add::after { content:"＋ Add Weapon"; font-size: var(--sra-font-base,12px); }
 
+
   /* Combat panel: defense mirrors and weapon rows. */
+
+  /* COMBAT: defensive mirrors and weapon row geometry. The fixed Unarmed entry shares the weapon control styles. */
   .combat-defenses { margin-bottom:22px; }
   .combat-defense {
     border:1px solid #d7c9b9; background:rgba(228,180,0,.10); padding:11px 13px;
@@ -493,6 +517,7 @@
     .combat-field-name, .combat-field-skill { grid-column:span 2; }
   }
 
+
   /* Vehicle panel and native add control. */
   .panel-vehicles .repcontrol { display:flex; justify-content:flex-start; margin-top:10px; }
   .panel-vehicles .repcontrol_add {
@@ -502,6 +527,8 @@
     font:700 12px "Trebuchet MS", Arial, sans-serif !important; cursor:pointer; font-size:0 !important;
   }
   .panel-vehicles .repcontrol_add::after { content:"＋ Add Vehicle"; font-size: var(--sra-font-base,12px); }
+
+  /* VEHICLES: repeating vehicle rows and damage tracks. Later responsive rules adjust the stat and skill grids. */
   .vehicles-list { display:grid; gap:10px; }
   .vehicle-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
   .vehicle-fields { display:grid; align-items:end; }
@@ -527,12 +554,15 @@
   @media (max-width:650px) { .vehicle-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } .vehicle-field-name,.vehicle-field-type,.vehicle-field-skill,
 .vehicle-stat-block { grid-column:span 2; }  }
 
+
   /* Magic and Matrix panels */
   .magic-mirrors, .matrix-mirrors { display:grid; margin-bottom:18px; }
+
+  /* MAGIC AND MATRIX: shared display-only skill mirrors. Their DP and RR values are bound to worker-managed attributes. */
   .magic-mirror-row { display:grid; grid-template-columns: minmax(190px,1fr) 84px 84px var(--sra-roll-w,54px); gap:9px; align-items:end; padding:8px 10px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
   .magic-mirror-name { align-self:center; color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); }
-  .magic-mirror-row label, .magic-limits label, .matrix-values label { display:grid; gap:3px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
-  .magic-mirror-row input, .magic-mirror-row select, .magic-limits input, .matrix-values input, .spell-fields input, .spell-fields select, .program-fields input, .spell-description textarea, .program-description textarea { width:100%; min-width:0; min-height: var(--sra-control-h,29px); padding:4px 6px; border:1px solid #d8c9ba; border-radius:3px; background:rgba(255,255,255,.65); color:var(--ink); font:inherit; }
+  .magic-mirror-row label, .magic-limits label { display:grid; gap:3px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
+  .magic-mirror-row input, .magic-mirror-row select, .magic-limits input, .spell-fields input, .spell-fields select, .program-fields input, .spell-description textarea, .program-description textarea { width:100%; min-width:0; min-height: var(--sra-control-h,29px); padding:4px 6px; border:1px solid #d8c9ba; border-radius:3px; background:rgba(255,255,255,.65); color:var(--ink); font:inherit; }
   .magic-mirror-row input[readonly] { font-weight: var(--sra-font-bold,700); }
   .magic-conj-row .magic-mirror-name { display:flex; align-items:center; gap:8px; }
   .magic-conj-row .magic-mirror-name select { width:150px; }
@@ -551,7 +581,7 @@
   
 
   
-  .magic-limits, .matrix-values { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 20px; max-width:520px; }
+  .magic-limits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 20px; max-width:520px; }
   .magic-spells, .matrix-programs { margin-top:18px; }
   .magic-spells > .section-title, .matrix-programs > .section-title { margin-bottom:10px; }
   .spell-entry, .program-entry { min-width:0; margin:0 0 9px; padding:10px; border:1px solid #d7c9b9; background:rgba(255,255,255,.25); }
@@ -567,6 +597,8 @@
   .spell-description, .program-description { margin-top:9px; color:var(--ink); font-size: var(--sra-font-sm,11px); }
   .spell-description summary, .program-description summary { cursor:pointer; font-weight: var(--sra-font-bold,700); padding:5px 0; }
   .spell-description textarea, .program-description textarea { min-height:72px; resize:vertical; font-size: var(--sra-font-base,12px); }
+
+  /* REPEATING LISTS: reusable compact name/type fields for programs and similar entries. */
   .program-fields { display:grid; grid-template-columns:minmax(150px,.7fr) minmax(220px,1.3fr); gap:10px; align-items:start; }
   .matrix-modes { margin:10px 0 20px; }
   .matrix-modes label { color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); }
@@ -574,7 +606,7 @@
   .panel-magic .repcontrol_add, .panel-matrix .repcontrol_add, .panel-misc .repcontrol_add { font-size:0 !important; }
   .panel-misc .repcontrol_add::after { content:"＋ Add Gear"; font-size: var(--sra-font-base,12px); }
   .panel-magic .repcontrol_add::after { content:"＋ Add Spell"; font-size: var(--sra-font-base,12px); }
-  .panel-matrix .repcontrol_add::after { content:"＋ Add Program / Complex Form"; font-size: var(--sra-font-base,12px); }
+  .panel-matrix .matrix-programs .repcontrol_add::after { content:"＋ Add Program / Complex Form"; font-size: var(--sra-font-base,12px); }
   @media (max-width:650px) {
     .magic-mirror-row, .magic-mirrors .magic-mirror-row { grid-template-columns:minmax(0,1fr) 68px 68px 46px; gap:6px; }
     .magic-mirrors .magic-mirror-row { grid-template-columns:minmax(0,1fr) 52px 60px 60px 46px; }
@@ -584,6 +616,7 @@
     .spell-field-skill { grid-column:1 / -1; }
     .program-fields { grid-template-columns:1fr; }
   }
+
 
   /* Center numeric value fields. */
   .wound-table input:not(.armor-name),
@@ -602,6 +635,8 @@
   .misc-checks { margin-bottom:14px; }
   .misc-checks label { color:var(--ink); font-size: var(--sra-font-base,12px); font-weight: var(--sra-font-bold,700); cursor:pointer; }
   .misc-checks input { accent-color:var(--gold-dark); }
+
+  /* MAIN: generic roll controls and narrative entries. Later rules align their numeric fields with Skills. */
   .generic-roll { flex-wrap:wrap; margin-bottom:20px; padding:10px 12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
   .generic-roll-title { color:var(--ink); font-size: var(--sra-font-label,13px); }
   .generic-roll-field { display:grid; gap:3px; color:var(--muted); font-size:10px; font-weight: var(--sra-font-bold,700); }
@@ -629,6 +664,9 @@
   .list-entry > * { grid-column:2; }
 
   .sheet-hidden { display:none !important; }
+
+
+/* PLATFORM COMPATIBILITY: selectors in this section account for the Roll20 sheet wrapper and native generated controls. Preserve specificity and source order when editing. */
 
 /* Roll20 layout and conditional visibility compatibility. */
 .tab-controls {
@@ -690,7 +728,9 @@
   .matrix-modes, .magic-checks, .misc-checks { gap: 7px 12px; }
 }
 
+
 /* Roll20 layout corrections. */
+
 /* Tabs: float-based row is more resilient to Roll20's sheet label defaults. */
 .charsheet .tabs > .tab-controls,
 .tabs > .tab-controls {
@@ -718,6 +758,7 @@
 .charsheet .tabs > .tab-panels,
 .tabs > .tab-panels { display: block !important; clear: both !important; width: 100% !important; }
 
+
 /* Wound circles are centered over the matching three threshold columns. */
 
 .charsheet .wound-track,
@@ -734,6 +775,7 @@
 .wound-track label { flex: 0 0 auto !important; margin: 0 !important; }
 .charsheet .wound-track span,
 .wound-track span { width: 20px !important; height: 20px !important; }
+
 
 /* Generic Roll: title, both fields and Roll button stay on one line when space permits. */
 .charsheet .generic-roll,
@@ -753,6 +795,7 @@
 .charsheet .generic-roll-button,
 .generic-roll-button { width: auto !important; min-width: 0 !important; white-space: nowrap !important; }
 
+
 /* Hide/Show all is one compact button, not a full-width label. */
 .charsheet .skills-header .skills-toggle-all,
 .skills-header .skills-toggle-all {
@@ -765,6 +808,7 @@
   margin: 0 !important;
   white-space: nowrap !important;
 }
+
 /* The master control changes actual Roll20 checkbox values in the worker.
    Do not add a second pseudo-symbol after the skill name. */
 #skills-toggle-all:checked ~ .skills-list .skill-group .skill-main-row .skill-name::after,
@@ -773,6 +817,7 @@
 }
 #skills-toggle-all:checked ~ .skills-list .specializations,
 #skills-toggle-all:not(:checked) ~ .skills-list .specializations { display: block; }
+
 
 /* Skill group checkboxes remain functional but visually hidden. */
 .charsheet .skill-group-toggle,
@@ -788,8 +833,11 @@
   .charsheet .wound-track span, .wound-track span { width: 17px !important; height: 17px !important; }
 }
 
+
 /* Wound and vehicle threshold alignment. */
+
 /* Match the wound-circle columns exactly to the threshold table columns. */
+
 
 /* Vehicle damage thresholds: each value and its wound-circle block form one column. */
 
@@ -807,8 +855,11 @@
   .charsheet .vehicle-threshold .vt-label, .vehicle-threshold .vt-label { text-align: center !important; }
 }
 
+
 /* === Final Roll20 corrections (2026-11) === */
+
 /* Match the Wounds header tracks to the exact columns of the threshold table. */
+
 
 /* Vehicle thresholds: each value sits above its own compact ring block. */
 
@@ -816,6 +867,7 @@
 .vehicle-threshold .wound-track label { display: inline-flex !important; flex: 0 0 auto !important; margin: 0 !important; }
 .charsheet .vehicle-threshold .wound-track span,
 .vehicle-threshold .wound-track span { display: block !important; width: 17px !important; height: 17px !important; }
+
 
 /* Every repeating item gets its own frame; no empty grid column is reserved for a removed button. */
 .charsheet .list-entry,
@@ -854,7 +906,9 @@
   .charsheet .vehicle-threshold, .vehicle-threshold { grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 5px !important; }
 }
 
+
 /* === Corrective layout and repeating-row rules === */
+
 /* Put the wound circles in the same table columns as their labels: this prevents drift/overlap. */
 
 .charsheet .wound-table, .wound-table {
@@ -908,6 +962,7 @@
 }
 .charsheet .wound-rings-row .visibility-flag, .wound-rings-row .visibility-flag { display:none !important; }
 
+
 /* Vehicle damage groups are three equal columns; each value is directly above its ring block. */
 .charsheet .vehicle-threshold, .vehicle-threshold {
   grid-auto-flow:row !important;
@@ -942,6 +997,7 @@
   max-width:17px !important; height:17px !important; box-sizing:border-box !important;
 }
 
+
 /* Roll20 wraps repeating rows in .repitem; style that generated wrapper, not just the template fieldset. */
 .charsheet .repcontainer > .repitem, .repcontainer > .repitem {
   display:block !important;
@@ -968,10 +1024,13 @@
   .charsheet .wound-table col.wound-col-incap, .wound-table col.wound-col-incap { width:19% !important; }
 }
 
+
 /* conditional extra wound circles override the ring layout. */
 .charsheet .wound-rings-row .wound-track > .visibility-flag:checked + label.wound-extra,
 .wound-rings-row .wound-track > .visibility-flag:checked + label.wound-extra { display:none !important; }
+
 /* Unarmed range selectors use the same styling as repeating weapon selectors. */
+
 
 /* shared identity sizing, including Nuyen. */
 .charsheet .identity .field > input, .identity .field > input,
@@ -980,6 +1039,7 @@
   box-sizing:border-box !important; margin:0 !important;
 }
 .charsheet #nuyen, #nuyen { text-align:right; font-variant-numeric:tabular-nums; }
+
 
 /* Weapon ranges: adjacent controls with a shared border and compact labels. */
 .charsheet .combat-range-block, .combat-range-block { display:flex; gap:0 !important; }
@@ -991,6 +1051,7 @@
 .combat-range-block > .combat-field + .combat-field > input,
 .combat-range-block > .combat-field + .combat-field > select { border-left-width:0; }
 
+
 /* SRA2 chat output: independent of the character sheet layout. */
 .sheet-rolltemplate-sra2 .sheet-sra2-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
 .sheet-rolltemplate-sra2 .sheet-sra2-heading { background: #332a24; color: #fff; font-weight: bold; padding: 9px; }
@@ -999,18 +1060,22 @@
 .sheet-rolltemplate-sra2 .sheet-sra2-total { background: #ead9b5; font-size: 17px; font-weight: bold; }
 .sheet-rolltemplate-sra2 .sheet-sra2-warning { color: #a32121; font-weight: bold; padding: 6px 9px; }
 
+
 /* identify the skill or item in the chat result. */
+
 
 /* center attribute captions and enlarge the numeric values. */
 .charsheet .attribute > .attribute-name, .attribute > .attribute-name {
   width: 100%; padding: 0; margin: 0; text-align: center !important;
 }
 .charsheet .attribute-ring input, .attribute-ring input { font-size: 30px !important; }
+
 /* Keep the Conjuring selector inside its grid track; DP and RR match other mirrors. */
 .charsheet .magic-mirrors .magic-conj-row > .magic-mirror-name, .magic-mirrors .magic-conj-row > .magic-mirror-name { min-width: 0; }
 .charsheet .magic-conj-row .magic-mirror-name select, .magic-conj-row .magic-mirror-name select { flex: 1 1 150px; max-width: 150px; min-width: 0; }
 .charsheet .magic-mirrors .magic-mirror-row > label, .magic-mirrors .magic-mirror-row > label { min-width: 0; width: 100%; margin: 0; padding: 0; }
 .charsheet .magic-mirrors .magic-mirror-row > label > input, .magic-mirrors .magic-mirror-row > label > input { box-sizing: border-box; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+
 /* Threshold report action and chat template. */
 .charsheet button.threshold-button, button.threshold-button { font: inherit; font-weight: 800; padding: 3px 8px; border: 1px solid var(--gold-dark); background: rgba(228,180,0,.20); color: var(--ink); cursor: pointer; }
 .sheet-rolltemplate-thresholds .sheet-threshold-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
@@ -1018,6 +1083,7 @@
 .sheet-rolltemplate-thresholds .sheet-threshold-type { padding: 8px 9px; font-weight: bold; }
 .sheet-rolltemplate-thresholds .sheet-threshold-row { display: grid; grid-template-columns: 1fr 32px 65px; gap: 5px; padding: 7px 9px; border-top: 1px solid #d7c9b9; align-items: center; }
 .sheet-rolltemplate-thresholds .sheet-threshold-row > span:last-child { letter-spacing: 2px; white-space: nowrap; }
+
 
 /* center the numeric input independently of Roll20's input defaults. */
 .charsheet .attribute-ring > input[type="number"], .attribute-ring > input[type="number"] {
@@ -1030,6 +1096,7 @@
 }
 .attribute-ring > input::-webkit-inner-spin-button, .attribute-ring > input::-webkit-outer-spin-button { -webkit-appearance:none !important; margin:0 !important; }
 
+
 /* Vehicle damage thresholds: one horizontal row of three label/value/track groups.
    Keep the report button above the row and allow horizontal scrolling on narrow sheets. */
 .charsheet .vehicle-threshold, .vehicle-threshold {
@@ -1041,6 +1108,7 @@
 .charsheet .vehicle-threshold .vt-value, .vehicle-threshold .vt-value {
   width:28px !important; min-width:28px !important; max-width:28px !important;
 }
+
 
 /* align vehicle controls and use nine direct cells for damage thresholds. */
 
@@ -1062,6 +1130,7 @@
 }
 .vehicle-threshold-line > .vt-label:not(:first-child) { margin-left:8px !important; }
 
+
 /* Vehicle report uses the same visual style as the character report. */
 .sheet-rolltemplate-vehiclethresholds .sheet-threshold-card { border: 1px solid #846c52; background: #f8f4eb; color: #29231e; font-size: 13px; }
 .sheet-rolltemplate-vehiclethresholds .sheet-threshold-heading { background: #332a24; color: #fff; font-weight: bold; padding: 9px; }
@@ -1069,8 +1138,10 @@
 .sheet-rolltemplate-vehiclethresholds .sheet-threshold-row { display: grid; grid-template-columns: 1fr 32px 65px; gap: 5px; padding: 7px 9px; border-top: 1px solid #d7c9b9; align-items: center; }
 .sheet-rolltemplate-vehiclethresholds .sheet-threshold-row > span:last-child { letter-spacing: 2px; white-space: nowrap; }
 
+
 /* weapon metadata in the shared SRA2 chat template. */
 .sheet-rolltemplate-sra2 .sheet-sra2-weapon { padding: 4px 9px 0; font-weight: bold; }
+
 
 /* normalize native Roll20 label and control geometry in repeating rows.
  * Explicit grid rows prevent select margins and inline label defaults from shifting fields. */
@@ -1130,11 +1201,13 @@
 }
 .charsheet .spell-fields > .roll-btn, .spell-fields > .roll-btn { box-sizing:border-box !important; height:28px !important; min-height:28px !important; max-height:28px !important; margin:0 !important; align-self:end !important; }
 
+
 /* Nested weapon range and vehicle stat blocks share the same bottom baseline. */
 .charsheet .combat-fields > .combat-range-block, .combat-fields > .combat-range-block,
 .charsheet .vehicle-fields > .vehicle-stat-block, .vehicle-fields > .vehicle-stat-block {
   align-self:end !important; align-items:end !important; margin:0 !important; padding:0 !important;
 }
+
 
 /* compact overview, independent Edge and device damage tracks. */
 .charsheet .wound-table .wound-rings-row > .wound-th.wounds-title-cell, .wound-table .wound-rings-row > .wound-th.wounds-title-cell { text-align:left !important; }
@@ -1156,13 +1229,10 @@
 .charsheet .vehicle-threshold-line > .wound-track, .vehicle-threshold-line > .wound-track { margin:0 !important; }
 .current-edge { margin:10px 0 14px; }
 .current-edge .wound-track { display:flex !important; flex-wrap:nowrap !important; width:auto !important; gap:5px !important; }
-.charsheet .matrix-values, .matrix-values { display:flex !important; flex-wrap:wrap; align-items:center; gap:12px !important; max-width:none !important; }
-.charsheet .matrix-values > label, .matrix-values > label { width:auto !important; flex:0 0 auto; }
-.charsheet .matrix-values > label input, .matrix-values > label input { text-align:center !important; width:48px !important; }
-.charsheet .matrix-values .device-threshold, .matrix-values .device-threshold { border:0; margin:0; padding:0; max-width:100%; }
 .panel-misc > .section-title { margin-top:16px; }
 @media(max-width:650px) {.charsheet .magic-traits .magic-limits,.magic-traits .magic-limits,
 .charsheet .vehicle-fields:not(.vehicle-skill-row),.vehicle-fields:not(.vehicle-skill-row) { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }  .charsheet .vehicle-fields > .vehicle-stat-block { grid-column:1/-1 !important; } }
+
 
 /* compact vehicle skill row, magic traits and isolated Edge tracker. */
 .charsheet .current-edge, .current-edge { display:flex !important; flex-direction:row !important; justify-content:flex-start !important; align-items:center !important; gap:12px !important; width:100%; }
@@ -1175,11 +1245,12 @@
 .edge-track input:focus-visible + span { outline:2px solid var(--gold-dark); outline-offset:2px; }
 .charsheet .magic-traits .magic-limits, .magic-traits .magic-limits { grid-template-columns:max-content max-content minmax(110px,180px) !important; }
 .charsheet .magic-checks input[type="checkbox"], .magic-checks input[type="checkbox"] { accent-color:var(--gold-dark); }
+
 /* Use identical first-column sizing for the vehicle name and skill. */
 .charsheet .vehicle-fields:not(.vehicle-skill-row), .vehicle-fields:not(.vehicle-skill-row) { grid-template-columns:minmax(0, min(40%, 280px)) minmax(0,1fr) 200px !important; }
 .charsheet .vehicle-fields.vehicle-skill-row, .vehicle-fields.vehicle-skill-row { grid-template-columns: minmax(0, min(40%, 280px)) 52px 52px var(--sra-roll-w,54px) !important; }
+
 /* Matrix damage is a separate line below the device statistics. */
-.charsheet .matrix-values .device-threshold, .matrix-values .device-threshold { flex:0 0 100% !important; width:100% !important; }
 .matrix-damage-title { flex:0 0 auto; font-weight: var(--sra-font-bold,700); white-space:nowrap; }
 @media(max-width:650px) {
  .charsheet .magic-traits .magic-limits, .magic-traits .magic-limits,
@@ -1189,6 +1260,7 @@
  .charsheet .current-edge, .current-edge { overflow-x:auto; }
 }
 
+
 /* semantic-free grid for wound thresholds; no HTML layout tables. */
 .charsheet .wound-table, .wound-table { display:block !important; }
 .wound-table .wound-row { display:grid; grid-template-columns:minmax(0,55fr) repeat(3,minmax(0,15fr)); align-items:center; }
@@ -1196,6 +1268,7 @@
 .wound-table .wound-th:first-child { text-align:left; }
 .wound-table .wound-td:first-child { white-space:normal; overflow-wrap:anywhere; }
 @media (max-width: 700px) { .wound-table .wound-row { grid-template-columns:minmax(0,43fr) repeat(3,minmax(0,19fr)); } }
+
 
 /* narrative chat controls, knowledge list and compact derived values. */
 .charsheet .narrative-row, .narrative-row { display:flex; align-items:center; gap:8px; min-width:0; }
@@ -1211,9 +1284,11 @@
 .matrix-cracking-values { flex-wrap:wrap; margin:12px 0; }
 .matrix-cracking-values label { display:grid; gap:3px; font-size:10px; font-weight:bold; color:#542719; }
 .charsheet .matrix-cracking-values input, .matrix-cracking-values input { min-height: var(--sra-control-h,29px); text-align:center; border:1px solid #d8c9ba; border-radius:3px; margin:0; }
+
 /* Original CSS-only palette inspired by warm paper and golden ink. */
 .charsheet .sheet, .sheet { --gold:#edb900; --gold-dark:#c99600; --paper:#faf8f0; --ink:#542719; }
 .charsheet .section-title, .section-title { color:#542719; border-bottom-color:#edb900; }
+
 
 /* consistent editable and derived control styles, compact headers. */
 .charsheet .sheet, .sheet { --muted:#542719; }
@@ -1226,6 +1301,7 @@
 .sheet :is(input[type="text"],input[type="number"])[readonly] {
   color:#332a24 !important; background:transparent !important; border:1px solid #d8c9ba !important;
 }
+
 /* Preserve the circular attribute controls rather than adding rectangular borders. */
 .charsheet .sheet .attribute-ring input[type="number"]:not([readonly]):not([disabled]), .sheet .attribute-ring input[type="number"]:not([readonly]):not([disabled]) { border:0 !important; background:transparent !important; }
 .charsheet .matrix-cracking-values, .matrix-cracking-values { display:flex !important; flex-flow:row nowrap !important; align-items:end; gap:16px !important; overflow-x:auto; }
@@ -1233,11 +1309,13 @@
 .charsheet .matrix-cracking-values input, .matrix-cracking-values input { width:48px !important; }
 .charsheet .wound-table .wound-rings-row > .wounds-title-cell, .wound-table .wound-rings-row > .wounds-title-cell { height:auto !important; overflow:visible !important; align-self:center; padding:0 0 5px !important; }
 .charsheet .wounds-title-cell .section-title, .wounds-title-cell .section-title { line-height:1.15 !important; border:0 !important; transform:translateY(-2px); }
+
 /* Match the Skills DP/RR columns (70px, 29px controls) in mirrored skill rows. */
 
 .charsheet .matrix-mirrors .magic-mirror-row, .matrix-mirrors .magic-mirror-row { grid-template-columns: minmax(0,1fr) repeat(2, var(--sra-skill-w,70px)) var(--sra-roll-w,54px) !important; }
 .charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"],
 .sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"] { box-sizing:border-box !important; width:100% !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; padding:4px 5px !important; font-size: var(--sra-font-base) !important; text-align:center !important; border-radius:0 !important; margin:0 !important; }
+
 /* Keep the total Essence field aligned with the repeating Amp Essence column.
  * Match the repeating row frame (10px padding + 1px border).
  * Reset native label and input spacing so the right edges of both Essence fields align.
@@ -1247,6 +1325,9 @@
 .charsheet .amps-header > .essence-summary, .amps-header > .essence-summary { grid-column:2/4; margin:0; min-width:0; }
 .charsheet .essence-summary label, .essence-summary label { display:flex !important; flex-direction:row; justify-content:flex-end; gap:var(--sra-grid-gap,10px); align-items:center; width:100% !important; min-width:0; padding:0 !important; margin:0 !important; }
 .charsheet .essence-summary input, .essence-summary input { box-sizing:border-box !important; margin:0 !important; min-width:0 !important; width: var(--sra-amp-w,65px) !important; flex:0 0 var(--sra-amp-w,65px); height: var(--sra-control-h,29px); }
+
+
+/* RISK REDUCTION: editable tracks depend on the ordered radio/pip siblings; mirrors read a hidden state instead of exposing editable radios. */
 
 /* native RR radio controls and attribute-backed display-only mirrors.
  * Keep the original numeric RR attribute keys; the three dots fill cumulatively. */
@@ -1266,8 +1347,10 @@
 .charsheet .sheet .rr-state[value="3"] ~ .rr-pip-2, .sheet .rr-state[value="3"] ~ .rr-pip-2,
 .charsheet .sheet .rr-state[value="3"] ~ .rr-pip-3, .sheet .rr-state[value="3"] ~ .rr-pip-3 { background:#99482e; border-color:#99482e; }
 
+
 /* Readonly inputs remain live Roll20 attribute bindings, but are not interactive. */
 .charsheet .sheet input[readonly], .sheet input[readonly] { pointer-events:none !important; user-select:none !important; cursor:default !important; }
+
 /* Align labels and controls in the Magic limit row and mirrored skill selectors. */
 .charsheet .sheet .magic-limits > label, .sheet .magic-limits > label { display:grid !important; grid-template-rows: auto var(--sra-control-h) !important; align-self:end !important; align-items:end !important; gap: var(--sra-control-gap) !important; margin:0 !important; padding:0 !important; }
 .charsheet .sheet .magic-limits > label > :is(input,select), .sheet .magic-limits > label > :is(input,select) { box-sizing:border-box !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; max-height: var(--sra-control-h) !important; margin:0 !important; align-self:end !important; }
@@ -1281,12 +1364,15 @@
 .charsheet .sheet .rr-edit :is(.rr-radio-2,.rr-pip-2), .sheet .rr-edit :is(.rr-radio-2,.rr-pip-2) { grid-column:3; grid-row:1; align-self:center; margin:0 !important; }
 .charsheet .sheet .rr-edit :is(.rr-radio-3,.rr-pip-3), .sheet .rr-edit :is(.rr-radio-3,.rr-pip-3) { grid-column:4; grid-row:1; align-self:center; margin:0 !important; }
 
+
 /* Display-only labels must not forward pointer clicks to readonly inputs. */
 .charsheet .sheet .display-only, .sheet .display-only { pointer-events:none !important; }
+
 /* Both Corporate RR displays edit a single stored value via action buttons. */
 .charsheet .sheet button.rr-action-pip, .sheet button.rr-action-pip { pointer-events:auto !important; cursor:pointer; min-width:0 !important; min-height:0 !important; box-shadow:none !important; font:inherit; font-size:10px; line-height:11px; text-shadow:none !important; }
 .charsheet .sheet button.rr-action-pip::before, .sheet button.rr-action-pip::before { content:none !important; }
 .charsheet .sheet .matrix-mirrors .magic-mirror-name, .sheet .matrix-mirrors .magic-mirror-name { align-items:center; }
+
 
 /* shared skill column geometry and consistent damage/Edge indicators.
  * Only indent the skill name; never shift the numeric columns of specialization rows. */
@@ -1298,6 +1384,7 @@
   gap:10px; align-items:center; box-sizing:border-box;
   padding:5px 12px !important;
 }
+
 /* Match the one-pixel border on each skill group. */
 .charsheet .sheet .skills-top-head, .sheet .skills-top-head {
   border-left:1px solid transparent; border-right:1px solid transparent;
@@ -1318,10 +1405,12 @@
   box-sizing:border-box; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important;
   margin:0 !important; padding:4px 5px !important; text-align:center !important;
 }
+
 /* Reserve identical space for the reset control and three RR dots. */
 .charsheet .sheet .skill-value > .rr-track, .sheet .skill-value > .rr-track {
   width: var(--sra-skill-w) !important; max-width:100%; justify-content:center !important;
 }
+
 /* Generic roll fields use the same typography and label/control baseline. */
 .charsheet .sheet .generic-roll > .generic-roll-field, .sheet .generic-roll > .generic-roll-field {
   display:grid !important; grid-template-rows: auto var(--sra-control-h) !important;
@@ -1340,12 +1429,14 @@
 }
 .charsheet .sheet .generic-roll-field > .rr-track, .sheet .generic-roll-field > .rr-track { width: var(--sra-skill-w) !important; }
 .charsheet .sheet .generic-roll-button, .sheet .generic-roll-button { height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; margin:0 !important; }
+
 /* Leave a narrow paper-colored ring around the larger selected center.
  * Apply equally to character wounds, vehicles, matrix damage and current Edge. */
 .charsheet .sheet :is(.edge-track,.wound-track) input:checked + span,
 .sheet :is(.edge-track,.wound-track) input:checked + span {
   background:#9b4b31 !important; box-shadow:inset 0 0 0 2px var(--paper,#faf8f0) !important;
 }
+
 /* Keep the compact grid on narrow sheets; reserve enough width for the RR dots. */
 @media(max-width:650px) {
   .charsheet .sheet .skill-row, .sheet .skill-row {
@@ -1358,12 +1449,14 @@
 .sheet-rolltemplate-sra2 .sheet-sra2-minor { color:#805114; }
 .sheet-rolltemplate-sra2 .sheet-sra2-disaster { font-weight:800; }
 
+
 /* contacts and compact Magic mirrors without a DV column. */
 .charsheet .magic-mirrors .magic-mirror-row, .magic-mirrors .magic-mirror-row { grid-template-columns: minmax(0,1fr) repeat(2, var(--sra-skill-w,70px)) var(--sra-roll-w,54px) !important; }
 .panel-contacts .contact-fields { grid-template-columns:minmax(0,2fr) minmax(0,1fr); align-items:start; }
 .panel-contacts .contact-fields .program-description { grid-column:1 / -1; margin-top:0; }
 .panel-contacts .repcontrol_add { font-size:0 !important; }
 .panel-contacts .repcontrol_add::after { content:"＋ Add Contact"; font-size: var(--sra-font-base,12px); }
+
 
 /* editable user-supplied image URLs in Main and repeating rows.
  * Flex wrapping follows the available panel width, not the browser viewport.
@@ -1387,9 +1480,11 @@
 .sheet .sra-weapon-image { margin-top:8px; border-top:1px solid #d8c9ba; padding-top:5px; }
 .sheet .sra-weapon-image summary { cursor:pointer; font-weight: var(--sra-font-bold); color:var(--ink); }
 
+
 /* Keep URL controls available even when no image has been assigned. */
 .sheet .sra-main-portrait .sra-image-tools { width:100%; }
 .sheet .sra-image-url input { box-sizing:border-box; max-width:100%; }
+
 
 /* manually maintained custom skill rows, using native RR controls. */
 .sheet .custom-skills-list { margin-top:20px; }
@@ -1408,6 +1503,9 @@
   .sheet .custom-skill-field:nth-child(6) { grid-column:3; }
 }
 
+
+/* REMINDERS: attribute-backed hidden inputs select the visible messages. Keep zero-state messages out of layout and leave the original editable attributes intact. */
+
 /* Shared initiative and Magic limit reminders; compact selectors. */
 .sheet .initiative-bonuses input[type="hidden"] { display:none !important; }
 .sheet .initiative-edge, .sheet .initiative-action, .sheet .initiative-hot, .sheet .initiative-cold, .sheet .magic-limit, .sheet .essence-reminder, .sheet .vehicle-reminder { display:none; color:var(--ink); font-size: var(--sra-font-base); line-height:1.4; background:#f7e9b2; padding:4px 8px; }
@@ -1422,6 +1520,9 @@
 .sheet .initiative-settings label { display:flex; align-items:center; gap:6px; width:auto; margin:0; font-size: var(--sra-font-sm); font-weight: var(--sra-font-bold); color:var(--ink); }
 .sheet .initiative-settings select { width:48px; margin:0; }
 
+
+/* CONFIG: shared field geometry and documentation. Mirrored settings must remain editable; example macros and URLs must remain selectable. */
+
 /* configuration mirrors and selectable documentation. */
 .sheet .panel-config { color:var(--ink); font-size: var(--sra-font-base); line-height:1.45; }
 .sheet .panel-config .section-title { margin-top:16px; margin-bottom:8px; }
@@ -1433,6 +1534,7 @@
 .sheet .config-select label { flex-wrap:wrap; }
 .sheet .config-select select { width:48px; margin:0; }
 .sheet .config-select p { margin-left:0; }
+
 /* Magic settings reuse the shared control dimensions; tradition needs room for translated labels. */
 .sheet .config-magic-field input[type="number"] { width:var(--sra-skill-w,70px); margin:0; }
 .sheet .config-magic-field select { width:120px; max-width:100%; }
@@ -1448,6 +1550,9 @@
 .sheet .config-macro-row > span { min-width:70px; font-weight: var(--sra-font-bold); }
 .sheet .config-macro-row code { font-size: var(--sra-font-sm); overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
 
+
+/* AMPS REMINDERS: a single derived tier selects the applicable social, healing and magic messages; a death warning excludes all other penalties. */
+
 /* Essence tiers are exclusive; multiple penalties may share one tier. */
 .sheet .essence-tier[value="0"] ~ .essence-death,
 .sheet .essence-tier[value="1"] ~ .essence-social,
@@ -1461,6 +1566,9 @@
 .sheet .essence-tier[value="4"] ~ .essence-magic-one,
 .sheet .essence-tier[value="5"] ~ .essence-magic-one { display:block; }
 
+
+/* RIGGER REMINDERS: derived rig mode and RCC capacity flags select messages; the SIM checkboxes use the Matrix attributes. */
+
 /* Vehicle reminders and mirrored rig settings. Keep the list clear of the last reminder. */
 .sheet .panel-vehicles .vehicles-list { margin-top:6px; }
 .sheet .vehicle-rig-mode[value="2"] ~ .vehicle-rig-hot,
@@ -1471,3 +1579,56 @@
 .sheet .vehicle-modes { margin:12px 0 0; }
 .sheet .vehicle-rcc-setting { margin-top:8px; }
 .sheet .vehicle-rcc-setting input[type="number"] { width:var(--sra-skill-w,70px); margin:0; }
+
+
+/* MATRIX DEVICES: repeating cards use the common form controls and threshold track.
+   Keep Name and Type flexible; only the two numerical fields have fixed widths.
+   The threshold line can scroll horizontally on narrow sheets, like Vehicles. */
+/* Match the native repeating-row control geometry, including Roll20's numeric width defaults. */
+.charsheet .matrix-device-fields, .matrix-device-fields {
+  display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) repeat(2,var(--sra-amp-w,65px));
+  align-items:end; gap:9px;
+}
+.charsheet .matrix-device-fields .vehicle-field, .matrix-device-fields .vehicle-field {
+  display:grid !important; grid-template-rows:auto 31px !important;
+  grid-template-columns:minmax(0,1fr) !important; align-items:end !important;
+  gap:var(--sra-control-gap,4px) !important; margin:0 !important; padding:0 !important;
+  min-width:0 !important; width:100% !important;
+}
+.charsheet .matrix-device-fields .vehicle-field > input, .matrix-device-fields .vehicle-field > input {
+  display:block !important; box-sizing:border-box !important;
+  width:100% !important; min-width:0 !important; max-width:100% !important;
+  height:31px !important; min-height:31px !important; max-height:31px !important;
+  margin:0 !important; align-self:end !important;
+}
+.matrix-device-stat > input { text-align:center; font-weight:var(--sra-font-bold,700); }
+.matrix-device-stat > span { text-align:center; }
+.matrix-devices-list { margin:14px 0; }
+.matrix-devices-list > .list-heading { margin-bottom:10px; }
+.panel-matrix .matrix-devices-list .repcontrol_add::after { content:"＋ Add Matrix Device"; font-size:var(--sra-font-base,12px); }
+@media(max-width:650px) {
+  .charsheet .matrix-device-fields, .matrix-device-fields { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+
+/* COMPACT FIELD HEADINGS: reuse the Skills header typography throughout the sheet.
+   Target captions only, not values, section titles, checkbox labels or chat templates.
+   Explicit span styling avoids Roll20's native label font-size overrides. */
+.charsheet .sheet :is(.amp-field,.combat-field,.vehicle-field,.spell-field,.program-field,.custom-skill-field,.generic-roll-field,.sra-image-url) > span[data-i18n],
+.sheet :is(.amp-field,.combat-field,.vehicle-field,.spell-field,.program-field,.custom-skill-field,.generic-roll-field,.sra-image-url) > span[data-i18n],
+.charsheet .sheet :is(.magic-limits,.matrix-cracking-values) > label > span[data-i18n],
+.sheet :is(.magic-limits,.matrix-cracking-values) > label > span[data-i18n],
+.charsheet .sheet .field > label, .sheet .field > label {
+  font-size:var(--sra-font-sm,11px) !important;
+  font-weight:800 !important; line-height:1.2 !important;
+  color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;
+  margin:0 !important; padding:0 !important;
+  min-width:0; overflow-wrap:anywhere;
+}
+
+/* Keep the same compact heading size on damage columns and thresholds. */
+.charsheet .sheet :is(.wound-th,.vt-label,.matrix-damage-title),
+.sheet :is(.wound-th,.vt-label,.matrix-damage-title) {
+  font-size:var(--sra-font-sm,11px) !important;
+  line-height:1.2 !important;
+}
