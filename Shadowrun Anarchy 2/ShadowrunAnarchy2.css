@@ -1,4 +1,4 @@
-/* Shadowrun Anarchy 2 | Roll20 character sheet | Version 36
+/* Shadowrun Anarchy 2 | Roll20 character sheet | Version 37
  * Layout: base styles, character overview, tabs and panels, repeating rows,
  * responsive rules, Roll20 compatibility overrides and conditional visibility.
  * Native repeating templates must remain hidden by Roll20.
@@ -434,8 +434,8 @@
   }
 
   /* Amps panel and repeating-row layout. */
-  .amps-header { justify-content:space-between; flex-wrap:wrap; margin-bottom:12px; }
-  .amps-list { display:grid; gap:10px; }
+  .amps-header { margin-bottom:6px; }
+  .amps-list { display:grid; gap:10px; padding-top:6px; }
   .amp-entry { display:block; padding:12px; border:1px solid #d7c9b9; background:rgba(255,255,255,.28); }
   .amp-fields { display:grid; align-items:end; }
   .amp-field { display:grid; gap:5px; min-width:0; color:var(--ink); font-size: var(--sra-font-base,12px); font-weight:800; }
@@ -1238,12 +1238,15 @@
 .charsheet .matrix-mirrors .magic-mirror-row, .matrix-mirrors .magic-mirror-row { grid-template-columns: minmax(0,1fr) repeat(2, var(--sra-skill-w,70px)) var(--sra-roll-w,54px) !important; }
 .charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .charsheet .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"],
 .sheet :is(.skill-row,.magic-mirror-row) input[name$="_dp"], .sheet :is(.skill-row,.magic-mirror-row) input[name$="_rr"] { box-sizing:border-box !important; width:100% !important; height: var(--sra-control-h) !important; min-height: var(--sra-control-h) !important; padding:4px 5px !important; font-size: var(--sra-font-base) !important; text-align:center !important; border-radius:0 !important; margin:0 !important; }
-/* Use the same grid and inset as the repeating Amp entry. */
-.charsheet .amps-header, .amps-header { display:grid !important; grid-template-columns: minmax(0,1fr) minmax(95px,22%) repeat(2, var(--sra-amp-w,65px)) !important; gap: var(--sra-grid-gap,10px) !important; padding:0 13px; align-items:center; }
-.amps-header > .list-heading { grid-column:1/3; }
-.charsheet .amps-header > .essence-summary, .amps-header > .essence-summary { grid-column:3; margin:0; min-width:0; }
-.charsheet .essence-summary label, .essence-summary label { display:flex !important; flex-direction:column; gap:2px; align-items:center; margin:0; }
-.charsheet .essence-summary input, .essence-summary input { width: var(--sra-amp-w,65px) !important; height: var(--sra-control-h,29px); }
+/* Keep the total Essence field aligned with the repeating Amp Essence column.
+ * Match the repeating row frame (10px padding + 1px border).
+ * Reset native label and input spacing so the right edges of both Essence fields align.
+ * The header and list each reserve 6px around the optional reminders. */
+.charsheet .amps-header, .amps-header { display:grid !important; grid-template-columns: minmax(0,1fr) minmax(95px,22%) repeat(2, var(--sra-amp-w,65px)) !important; gap: var(--sra-grid-gap,10px) !important; padding:0 11px; align-items:center; }
+.amps-header > .list-heading { grid-column:1; }
+.charsheet .amps-header > .essence-summary, .amps-header > .essence-summary { grid-column:2/4; margin:0; min-width:0; }
+.charsheet .essence-summary label, .essence-summary label { display:flex !important; flex-direction:row; justify-content:flex-end; gap:var(--sra-grid-gap,10px); align-items:center; width:100% !important; min-width:0; padding:0 !important; margin:0 !important; }
+.charsheet .essence-summary input, .essence-summary input { box-sizing:border-box !important; margin:0 !important; min-width:0 !important; width: var(--sra-amp-w,65px) !important; flex:0 0 var(--sra-amp-w,65px); height: var(--sra-control-h,29px); }
 
 /* native RR radio controls and attribute-backed display-only mirrors.
  * Keep the original numeric RR attribute keys; the three dots fill cumulatively. */
@@ -1407,7 +1410,7 @@
 
 /* Shared initiative and Magic limit reminders; compact selectors. */
 .sheet .initiative-bonuses input[type="hidden"] { display:none !important; }
-.sheet .initiative-edge, .sheet .initiative-action, .sheet .initiative-hot, .sheet .initiative-cold, .sheet .magic-limit { display:none; color:var(--ink); font-size: var(--sra-font-base); line-height:1.4; background:#f7e9b2; padding:4px 8px; }
+.sheet .initiative-edge, .sheet .initiative-action, .sheet .initiative-hot, .sheet .initiative-cold, .sheet .magic-limit, .sheet .essence-reminder { display:none; color:var(--ink); font-size: var(--sra-font-base); line-height:1.4; background:#f7e9b2; padding:4px 8px; }
 .sheet .magic-limit-state[value="1"] + .magic-limit,
 .sheet .initiative-edge-state[value="1"] + .initiative-edge,
 .sheet .initiative-edge-state[value="2"] + .initiative-edge,
@@ -1444,3 +1447,16 @@
 .sheet .config-macro-row { display:flex; flex-wrap:wrap; gap:4px 12px; margin:4px 0; }
 .sheet .config-macro-row > span { min-width:70px; font-weight: var(--sra-font-bold); }
 .sheet .config-macro-row code { font-size: var(--sra-font-sm); overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+
+/* Essence tiers are exclusive; multiple penalties may share one tier. */
+.sheet .essence-tier[value="0"] ~ .essence-death,
+.sheet .essence-tier[value="1"] ~ .essence-social,
+.sheet .essence-tier[value="1"] ~ .essence-heal-two,
+.sheet .essence-tier[value="2"] ~ .essence-heal-two,
+.sheet .essence-tier[value="3"] ~ .essence-heal-one,
+.sheet .essence-tier[value="4"] ~ .essence-heal-one,
+.sheet .essence-tier[value="1"] ~ .essence-magic-two,
+.sheet .essence-tier[value="2"] ~ .essence-magic-two,
+.sheet .essence-tier[value="3"] ~ .essence-magic-two,
+.sheet .essence-tier[value="4"] ~ .essence-magic-one,
+.sheet .essence-tier[value="5"] ~ .essence-magic-one { display:block; }

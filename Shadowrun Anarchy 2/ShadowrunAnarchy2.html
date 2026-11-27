@@ -1,4 +1,4 @@
-<!-- Shadowrun Anarchy 2 | Roll20 character sheet | Version 36 -->
+<!-- Shadowrun Anarchy 2 | Roll20 character sheet | Version 37 -->
 <!-- Character sheet layout. Attribute names are persistent Roll20 storage keys.
      Keep native repeating fieldsets, control names and visibility input order intact.
      Sheet workers cannot generate or manipulate the character sheet DOM. -->
@@ -1227,6 +1227,16 @@
 <div class="list-heading"><h2 class="section-title" data-i18n="amps">Amps</h2></div>
 <div class="essence-summary"><label><span data-i18n="essence">Essence</span><input name="attr_total_essence" type="text" readonly="readonly" value="6" tabindex="-1"/></label></div>
 </div>
+<!-- Essence reminders share the computed Essence tier; each penalty is displayed only once. -->
+<div class="initiative-bonuses">
+  <input type="hidden" class="essence-tier" name="attr_essence_tier" value="6"/>
+  <div class="essence-reminder essence-death" data-i18n="essence-death">Character dies.</div>
+  <div class="essence-reminder essence-social" data-i18n="essence-social">Disadvantage on most social Tests.</div>
+  <div class="essence-reminder essence-heal-two" data-i18n="essence-heal-two">Cancel 2 hits on every Test to heal the character.</div>
+  <div class="essence-reminder essence-heal-one" data-i18n="essence-heal-one">Cancel 1 hit on every Test to heal the character.</div>
+  <div class="essence-reminder essence-magic-two" data-i18n="essence-magic-two">Cancel 2 hits on every Test related to magic.</div>
+  <div class="essence-reminder essence-magic-one" data-i18n="essence-magic-one">Cancel 1 hit on every Test related to magic.</div>
+</div>
 <div class="amps-list">
 <!-- Native Roll20 repeating template: amps. Do not force this fieldset to display. -->
 <fieldset class="repeating_amps">
@@ -1695,7 +1705,7 @@
 <div class="config-option"><label><input name="attr_misc_additional_serious_wound" type="checkbox" value="1"/><span data-i18n="additional-serious-wound">additional Serious Wound</span></label><p data-i18n="config-help-misc-additional-serious-wound">Adds a third Serious wound circle. Turning this option off clears that circle.</p></div>
 <h2 class="section-title" data-i18n="config-about">About</h2>
 <div class="config-about"><strong>Shadowrun: Anarchy 2.0</strong> — <span data-i18n="config-subtitle">Community Character Sheet for Roll20</span><dl>
-<dt><span data-i18n="config-version">Version</span></dt><dd>36</dd>
+<dt><span data-i18n="config-version">Version</span></dt><dd>37</dd>
 <dt><span data-i18n="config-developer">Developer</span></dt><dd>daszul (toshi)</dd>
 <dt><span data-i18n="config-license">License</span></dt><dd>MIT</dd>
 <dt><span data-i18n="config-platform">Platform</span></dt><dd>Roll20</dd>
@@ -3034,16 +3044,21 @@ on("sheet:opened change:matrix_firewall", function() {
     });
 });
 // Essence is a derived value; preserve fractional costs and all repeating rows.
+// The exclusive tier is the ceiling of Essence, clamped to 0–6.
+// Update it together with the rounded total because silent writes do not trigger change events.
+function srSetEssence(total) {
+    setAttrs({total_essence: total, essence_tier: Math.max(0, Math.min(6, Math.ceil(total)))}, {silent:true});
+}
 function srUpdateEssence() {
     getSectionIDs("repeating_amps", function(ids) {
         var keys = ids.map(function(id) { return "repeating_amps_" + id + "_essence"; });
-        if (!keys.length) { setAttrs({total_essence: 6}, {silent:true}); return; }
+        if (!keys.length) { srSetEssence(6); return; }
         getAttrs(keys, function(values) {
             var sum = keys.reduce(function(total, key) {
                 var cost = Number(String(values[key] || "0").replace(",", "."));
                 return total + (isFinite(cost) ? cost : 0);
             }, 0);
-            setAttrs({total_essence: Math.round((6 - sum) * 1000000) / 1000000}, {silent:true});
+            srSetEssence(Math.round((6 - sum) * 1000000) / 1000000);
         });
     });
 }
