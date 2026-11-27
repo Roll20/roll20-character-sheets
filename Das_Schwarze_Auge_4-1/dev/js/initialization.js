@@ -202,6 +202,9 @@ function initializeSheet(migrationChain) {
 						attrs[attr] = getDefaultValue(attr);
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
+					// Try to detect the game type
+					/// This might fail in a way that stops further execution of the action listener, so always call last.
+					migrationChain.push("initializeGameType");
 				}
 			} else {
 				debugLog(caller, "'data_version' set, safety stopping initialization and preventing future initialization attempts ...");
