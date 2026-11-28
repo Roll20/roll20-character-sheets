@@ -16,7 +16,8 @@ const cultRankMap = {
     'high priest': 5,
     'spirit lord': 5
 };
-const megMagicSkillIds = ['binding', 'devotion', 'exhort', 'folk_magic', 'invocation', 'meditation', 'path', 'shaping', 'trance'];
+const megMagicSkillIds = ['binding', 'devotion', 'exhort', 'folk_magic', 'invocation', 'meditation', 'path', 'shaping', 'trance',
+    'arcane_casting', 'arcane_knowledge', 'channel', 'piety'];
 /**
  * Imports JSON data from the Mythras Encounter Generator or other sources which use the same data format
  */
@@ -696,6 +697,43 @@ on("clicked:import", function() {
                     newAttrs[`${miracleId}_details`] = 0;
                 });
             }
+
+            /* Import Classic Fantasy Arcane and Divine Magic */
+            [
+                {list: 'arcane_magic_spells', type: 'arcane_magic', skills: ['arcane_casting', 'arcane_knowledge']},
+                {list: 'divine_magic_spells', type: 'divine_magic', skills: ['channel', 'piety']}
+            ].forEach(cf => {
+                if (!Array.isArray(characterData[cf.list]) || characterData[cf.list].length === 0) {
+                    return;
+                }
+                if (debug) {console.log(`Importing ${cf.type}`);}
+                const traditionId = 'repeating_tradition_' + generateRowID();
+                newAttrs[`${traditionId}_id`] = traditionId;
+                newAttrs[`${traditionId}_name`] = getTranslationByKey(cf.type);
+                newAttrs[`${traditionId}_type`] = cf.type;
+                newAttrs[`${traditionId}_details`] = 0;
+                if (characterData["cult_rank"] && characterData["cult_rank"].toLowerCase() in cultRankMap) {
+                    newAttrs[`${traditionId}_tradition_rank`] = cultRankMap[characterData["cult_rank"].toLowerCase()];
+                }
+                cf.skills.forEach((skillId, i) => {
+                    if (magicSkillIds.hasOwnProperty(skillId)) {
+                        const n = i + 1;
+                        const id = magicSkillIds[skillId]['id'];
+                        newAttrs[`${traditionId}_skill${n}_id`] = id;
+                        newAttrs[`${traditionId}_skill${n}_name`] = `@{${id}_name}`;
+                        newAttrs[`${traditionId}_skill${n}_total`] = `@{${id}_total}`;
+                        newAttrs[`${traditionId}_skill${n}_notes`] = `@{${id}_notes}`;
+                    }
+                });
+                characterData[cf.list].forEach(spellName => {
+                    const spellId = 'repeating_ability_' + generateRowID();
+                    newAttrs[`${spellId}_id`] = spellId;
+                    newAttrs[`${spellId}_name`] = spellName;
+                    newAttrs[`${spellId}_type`] = cf.type;
+                    newAttrs[`${spellId}_tradition_id`] = traditionId;
+                    newAttrs[`${spellId}_details`] = 0;
+                });
+            });
 
             /* Import Features */
             /* Example template to work from https://mythras.skoll.xyz/generate_enemies_json/?id=6206&amount=1 */
