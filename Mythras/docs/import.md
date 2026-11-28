@@ -14,3 +14,10 @@ The import function is provided to allow the import of characters from the [Myth
 
 ## Notice
 * It is always recommended to import with a fresh character.  Importing on an existing character will overwrite data and may have unexpected results.
+
+## Classic Fantasy magic
+The import also accepts two optional lists that the Mythras Encounter Generator does not produce, for Classic Fantasy characters written by other tools:
+* `arcane_magic_spells`: spell names. Creates an Arcane Magic tradition using the character's Arcane Casting and Arcane Knowledge skills.
+* `divine_magic_spells`: spell names. Creates a Divine Magic tradition using the character's Channel and Piety skills.
+
+Both use the same plain-string format as `sorcery_spells` and `theism_spells`, for example `"arcane_magic_spells": ["Sleep", "Shield"]`.

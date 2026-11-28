@@ -4,6 +4,10 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+### Added
+- JSON import reads two optional lists, `arcane_magic_spells` and `divine_magic_spells`, for Classic Fantasy characters. Each creates an Arcane Magic or Divine Magic tradition linked to Arcane Casting/Arcane Knowledge or Channel/Piety, with its spells as abilities of that type. Imports without these lists are unchanged.
+
 ## 3.8
 ### Fixed
 - Corrected damage modifier calculations for table values above 50
