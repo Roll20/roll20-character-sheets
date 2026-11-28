@@ -1,0 +1,367 @@
+@import url('https://fonts.googleapis.com/css?family=Nanum+Brush+Script|Noto+Sans+KR:400,500,700,900&display=swap');
+/* Bloodpath (Korean) sheet. Width 800 to 1400px: the official v2 character sheet spread (left page | right page) and the record sheet
+   as two tabs, the enemy sheet picked from the sheet type. Mockup: bloodpath/roll20/mockup.html.
+   Keep this file safe for the Roll20 chat-card pipeline (roll20kit/LESSONS.md): ASCII only (no escaped glyphs either), Google Fonts
+   through the old css address, no data addresses, no at-rules besides the import, chat card rules first. Glyphs live in the HTML.
+   Built by src/build.py (progress, life card and enemy skill row rules are generated at the end). */
+
+/* Chat card (roll template). Ink head with a brush title, accent rule, double ring at the top right
+   (human = teal, vampire and enemy = crimson through the v marker before the card), fanned playing cards, round stamp. */
+.sheet-rolltemplate-bloodpath .sheet-card{--ink:#151515;--sub:#5f5f5f;--line:#c9c9c9;--bar:#151515;--red:#b5121b;--ac:#2a7c82;--cell:#f3f3f3;--cardbg:#ffffff;--mute:#7a7a7a;
+  position:relative;margin-left:-7px;background:var(--cardbg);color:var(--ink);border:1.5px solid var(--ink);overflow:hidden;font:12px/1.5 'Noto Sans KR','Malgun Gothic',Arial,sans-serif;text-align:left;word-break:keep-all;overflow-wrap:anywhere}
+.sheet-rolltemplate-bloodpath .sheet-vm{display:none}
+.sheet-rolltemplate-bloodpath .sheet-vm + .sheet-card{--ac:#b5121b}
+.sheet-rolltemplate-bloodpath.sheet-rolltemplate-darkmode .sheet-card{--ink:#ececec;--sub:#a8a8a8;--line:#474747;--bar:#0e0e0e;--cell:#2a2a2a;--cardbg:#1f1f1f;--mute:#9a9a9a;border-color:#8a8a8a}
+.sheet-rolltemplate-bloodpath .sheet-hd{position:relative;background:var(--bar);color:#ffffff;padding:5px 40px 4px 10px;font:400 22px/1.15 'Nanum Brush Script','Noto Sans KR',sans-serif;letter-spacing:.02em;border-bottom:3px solid var(--ac)}
+.sheet-rolltemplate-bloodpath .sheet-hd::after{content:"";position:absolute;right:-10px;top:-12px;width:42px;height:42px;border-radius:50%;border:5px double var(--ac);opacity:.8}
+.sheet-rolltemplate-bloodpath .sheet-hd small{display:block;font:500 10.5px/1.4 'Noto Sans KR',sans-serif;opacity:.75;letter-spacing:0}
+.sheet-rolltemplate-bloodpath .sheet-bd{position:relative;padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;min-height:20px}
+.sheet-rolltemplate-bloodpath .sheet-hand{display:flex;align-items:center;gap:10px}
+.sheet-rolltemplate-bloodpath .sheet-fan{display:flex;align-items:flex-end;padding:3px 0 0 3px}
+.sheet-rolltemplate-bloodpath .sheet-pc{position:relative;display:inline-block;flex:none;width:30px;height:42px;border:1.3px solid #151515;border-radius:4px;background:#ffffff;color:#151515;box-shadow:1px 1px 0 rgba(0,0,0,.18)}
+.sheet-rolltemplate-bloodpath .sheet-pc + .sheet-pc{margin-left:-8px}
+.sheet-rolltemplate-bloodpath .sheet-pc:nth-child(even){transform:rotate(4deg)}
+.sheet-rolltemplate-bloodpath .sheet-pc.sheet-rd{color:#b5121b;border-color:#b5121b}
+.sheet-rolltemplate-bloodpath .sheet-pc b{position:absolute;left:3px;top:3px;font:900 11px/1 'Noto Sans KR',sans-serif;font-variant-numeric:lining-nums;letter-spacing:-.06em}
+.sheet-rolltemplate-bloodpath .sheet-pc i{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:400 20px/1 'Segoe UI Symbol','Apple Symbols','Noto Sans Symbols 2','DejaVu Sans',sans-serif;font-style:normal}
+.sheet-rolltemplate-bloodpath .sheet-pc.sheet-jk b{font-size:9px;letter-spacing:0}
+.sheet-rolltemplate-bloodpath .sheet-pc.sheet-jk i{font-size:17px;color:#b5121b}
+.sheet-rolltemplate-bloodpath .sheet-calc{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;font:500 11.5px 'Noto Sans KR',sans-serif;color:var(--sub);padding-right:64px}
+.sheet-rolltemplate-bloodpath .sheet-calc b{font:900 15px 'Noto Sans KR',sans-serif;color:var(--ink)}
+.sheet-rolltemplate-bloodpath .sheet-calc .sheet-tot{font:900 28px/1 'Noto Sans KR',sans-serif;color:var(--ac)}
+.sheet-rolltemplate-bloodpath .sheet-stp{position:absolute;right:12px;top:10px;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Nanum Brush Script','Noto Sans KR',sans-serif;color:#ffffff;background:var(--red);transform:rotate(-12deg);
+  box-shadow:0 0 0 3px var(--cardbg),0 0 0 5px var(--red),3px 4px 0 3px rgba(181,18,27,.25)}
+.sheet-rolltemplate-bloodpath .sheet-stp.sheet-ng{background:var(--cardbg);color:var(--mute);box-shadow:0 0 0 2px var(--mute)}
+.sheet-rolltemplate-bloodpath .sheet-kv{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:11.5px;padding-right:56px}
+.sheet-rolltemplate-bloodpath .sheet-kv b{font-weight:700}
+.sheet-rolltemplate-bloodpath .sheet-note{font:500 11px/1.45 'Noto Sans KR',sans-serif;color:var(--ac)}
+.sheet-rolltemplate-bloodpath .sheet-eff{background:var(--cell);padding:6px 7px;font-size:12px;line-height:1.55;white-space:pre-wrap;border-radius:2px}
+
+/* Sheet tokens: white paper, ink bars, the two logo colors (human = teal, vampire and enemy = crimson). Dark mode follows Roll20. */
+.bp{--paper:#ffffff;--ink:#151515;--sub:#5f5f5f;--line:#c9c9c9;--cell:#f3f3f3;--bar:#151515;--bar2:#3a3a3a;--red:#b5121b;--mute:#aaaaaa;
+  --accent:#2a7c82;--soft:#e2f0f0;--chev:#e6e6e6;--chev5:#c9c9c9;--hatch1:#f2f2f2;--hatch2:#fafafa;
+  --sans:'Noto Sans KR','Malgun Gothic',sans-serif;--brush:'Nanum Brush Script','Noto Sans KR',sans-serif}
+.sheet-darkmode .bp{--paper:#1b1b1d;--ink:#ececec;--sub:#a8a8a8;--line:#454545;--cell:#26262a;--bar:#0b0b0c;--bar2:#333336;--mute:#6a6a6a;
+  --accent:#3c9aa0;--soft:#183133;--chev:#2f2f33;--chev5:#47474c;--hatch1:#242426;--hatch2:#2a2a2d}
+.bp .st[value="v"] ~ .main,.bp .st[value="e"] ~ .main{--accent:#b5121b;--soft:#f8e3e4}
+.sheet-darkmode .bp .st[value="v"] ~ .main,.sheet-darkmode .bp .st[value="e"] ~ .main{--accent:#cf3540;--soft:#3a1c22}
+.bp{position:relative;width:100%;min-width:800px;max-width:1400px;background:var(--paper);color:var(--ink);font:13px/1.5 var(--sans);border:1px solid var(--line);text-align:left}
+.bp *{box-sizing:border-box}
+.bp .main{display:flex;flex-direction:column;gap:8px;padding:0 10px 10px}
+
+/* Roll20 base css resets (bootstrap inputs, buttons, labels) */
+.bp input[type=text],.bp input[type=number],.bp textarea,.bp select{display:block;width:100%;height:auto;min-width:0;margin:0;padding:0 4px;background:transparent;color:var(--ink);border:0;border-radius:0;box-shadow:none;font:inherit;line-height:1.4;outline:0}
+.bp input[type=number]{-moz-appearance:textfield}
+.bp input[type=number]::-webkit-inner-spin-button,.bp input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.bp textarea{resize:none}
+body.sheet-darkmode .bp input[type=text],body.sheet-darkmode .bp input[type=number],body.sheet-darkmode .bp textarea,body.sheet-darkmode .bp select{background-color:transparent;color:var(--ink)}
+.bp button[type=roll]::before{content:none;display:none}
+.bp button[type=action],.bp button[type=roll]{min-width:0;height:auto;margin:0;padding:0;background:none;border:0;border-radius:0;box-shadow:none;text-shadow:none;color:inherit;font:inherit;line-height:inherit;cursor:pointer}
+.bp input[type=checkbox],.bp input[type=radio]{margin:0;cursor:pointer}
+.bp label.tab,.bp label.chip,.bp label.su,.bp label.sgk,.bp label.fold,.bp label.dk{width:auto;margin:0;padding:0;font-weight:inherit}
+.bp i{font-style:normal}
+.bp b{font-weight:700}
+.bp :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* sheet type (human / vampire / enemy), tab, advanced, blood pact 2 fold */
+.bp .st[value="h"] ~ .main .v-only,.bp .st:not([value="h"]) ~ .main .h-only{display:none}
+.bp .st[value="e"] ~ .main .pc-only,.bp .st:not([value="e"]) ~ .main .e-only{display:none}
+.bp .pane{display:none;flex-direction:column;gap:8px}
+.bp .tb[value="c"] ~ .main .pane.c,.bp .tb[value="r"] ~ .main .pane.r,.bp .st[value="e"] ~ .main .pane.c{display:flex}
+.bp .st[value="e"] ~ .main .pane.r{display:none}
+.bp .av[value="0"] ~ .main .adv{display:none}
+.bp .tri:not([value="1"]) ~ .main .trio > :not(.fold){display:none}
+.bp .tri[value="1"] ~ .main .fold .arr{transform:rotate(90deg)}
+
+/* shared parts */
+.bp .bx{border:1.5px solid var(--ink);display:flex;flex-direction:column;min-width:0}
+.bp .hb{background:var(--bar);color:#ffffff;font:700 13px/1 var(--sans);padding:5px 8px 4px;display:flex;align-items:center;gap:6px;letter-spacing:.06em}
+.bp .hb small{font:400 10.5px var(--sans);opacity:.8;letter-spacing:0}
+.bp .sp{flex:1}
+.bp .lb{font:700 11.5px/1 var(--sans);white-space:nowrap}
+.bp input[type=checkbox].ck{appearance:none;-webkit-appearance:none;width:13px;height:13px;margin:0;padding:0;border:1.3px solid var(--ink);background-color:var(--paper);flex:none}
+/* checked = V (two gradient strokes) */
+.bp input[type=checkbox].ck:checked{background-image:linear-gradient(to top right,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(to top left,transparent calc(50% - 1px),var(--accent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px));background-size:5px 5px,7px 10px;background-position:0 4px,3px 0;background-repeat:no-repeat}
+.bp button[type=action].bub{position:relative;display:inline-block;flex:none;width:18px;height:13px;margin:0 0 5px;padding:0;border:1.5px solid currentColor;border-radius:5px;background-color:transparent;color:var(--sub);
+  background-image:radial-gradient(circle at 28% 50%,currentColor 1px,transparent 1.5px),radial-gradient(circle at 50% 50%,currentColor 1px,transparent 1.5px),radial-gradient(circle at 72% 50%,currentColor 1px,transparent 1.5px)}
+.bp button[type=action].bub::after{content:"";position:absolute;left:2px;bottom:-6px;width:0;height:0;border-top:5px solid currentColor;border-right:5px solid transparent}
+.bp button[type=action].bub:hover{color:var(--accent)}
+.bp .bt{border:1px solid var(--ink);background:var(--paper);padding:0 8px;font:500 11.5px/20px var(--sans);white-space:nowrap}
+.bp button.bt[type=action],.bp button.bt[type=roll]{border:1px solid var(--ink);background:var(--paper);padding:0 8px;line-height:20px;font-size:11.5px}
+.bp button.bt[type=action]:hover,.bp button.bt[type=roll]:hover{border-color:var(--accent);color:var(--accent)}
+.bp button.bt.dk[type=action]{background:var(--ink);color:var(--paper)}
+.bp button.bt.dk[type=action]:hover{background:var(--accent);border-color:var(--accent);color:#ffffff}
+.bp .seg{display:inline-flex;border:1px solid var(--ink)}
+.bp label.sgk{display:block;cursor:pointer}
+.bp label.sgk input{position:absolute;opacity:0;width:0;height:0}
+.bp label.sgk span{display:block;padding:0 7px;font:500 11.5px/20px var(--sans)}
+.bp label.sgk + label.sgk span{border-left:1px solid var(--ink)}
+.bp label.sgk input:checked + span{background:var(--accent);color:#ffffff}
+.bp label.chip{display:inline-flex;align-items:center;gap:4px;cursor:pointer;font:500 11px var(--sans);color:var(--sub)}
+
+/* head row: character sheet tab (with the sheet type select), record sheet tab, advanced ... current values */
+.bp .top{display:flex;align-items:flex-end;gap:12px;background:var(--bar);color:#ffffff;padding:4px 10px 0;margin:0 -10px}
+.bp .tabs{display:flex;gap:3px}
+.bp label.tab{display:block;cursor:pointer}
+.bp label.tab input{position:absolute;opacity:0;width:0;height:0}
+.bp label.tab > span{display:flex;align-items:center;padding:6px 14px;font:700 12.5px/1 var(--sans);background:var(--bar2);color:#cfcfcf;border-radius:3px 3px 0 0}
+.bp label.tab input:checked + span{background:var(--paper);color:var(--ink)}
+.bp .st[value="e"] ~ .main label.tab > span{background:var(--paper);color:var(--ink)}
+.bp label.tab input:focus-visible + span{outline:2px solid #ffffff;outline-offset:-3px}
+.bp label.tab select{appearance:none;-webkit-appearance:none;width:auto;height:auto;border:0;background-color:transparent;color:inherit;font:500 12px/1 var(--sans);padding:0 13px 0 4px;margin:0;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(-45deg,transparent 50%,currentColor 50%);background-size:4px 4px;background-position:right 4px center,right 0 center;background-repeat:no-repeat}
+body.sheet-darkmode .bp label.tab select{background-color:transparent;color:inherit}
+.bp label.tab select option{color:#151515;background:#ffffff}
+.bp label.hadv{align-self:center;color:#dddddd}
+.bp label.hadv input[type=checkbox].ck{border-color:#bbbbbb;background-color:transparent}
+.bp .hud{margin-left:auto;display:flex;justify-content:flex-end;gap:12px;padding-bottom:6px;font:500 11px var(--sans);color:#cfcfcf;white-space:nowrap}
+.bp .hud .hb1{font:900 15px var(--sans);color:#ffffff}
+.bp .hud .hb1:empty::before,.bp .hud .hm:empty::before{content:"-"}
+
+/* card pad strip */
+.bp .strip{border-bottom:2px solid var(--ink);font-size:11.5px}
+.bp .sr{display:flex;align-items:center;gap:4px;padding:4px 2px;flex-wrap:wrap;min-height:30px}
+.bp .sr + .sr{border-top:1px dotted var(--line)}
+.bp .tl{font:700 11px var(--sans);color:var(--sub);white-space:nowrap}
+.bp .suits{display:inline-flex;border:1px solid var(--ink)}
+.bp label.su{display:block;cursor:pointer}
+.bp label.su input{position:absolute;opacity:0;width:0;height:0}
+.bp label.su span{display:block;width:24px;text-align:center;font:400 15px/20px Georgia,serif;color:var(--ink);background:var(--paper)}
+.bp label.su span.rd{color:var(--red)}
+.bp label.su + label.su span{border-left:1px solid var(--ink)}
+.bp label.su input:checked + span{background:var(--ink);color:var(--paper)}
+.bp label.su input:checked + span.rd{background:var(--red);color:#ffffff}
+.bp .pad{display:inline-flex}
+.bp .pad button[type=action]{min-width:23px;height:22px;border:1px solid var(--line);background:var(--paper);padding:0 3px;font:700 11.5px/1 var(--sans);font-variant-numeric:lining-nums;text-align:center}
+.bp .pad button[type=action] + button[type=action]{border-left:0}
+.bp .pad button[type=action]:hover{background:var(--ink);color:var(--paper)}
+.bp .pad button[type=action].jk{font-size:10.5px;padding:0 5px}
+.bp .hand{display:flex;gap:4px;flex-wrap:wrap;min-height:44px;align-items:center;flex:1}
+.bp .slot{display:contents}
+/* playing card chip: rank top left, big suit in the middle (empty slots hidden). Cards stay white in dark mode. */
+.bp button[type=action].pc{position:relative;display:inline-block;flex:none;width:30px;height:42px;border:1.3px solid #151515;border-radius:4px;background:#ffffff;color:#151515;box-shadow:1px 1px 0 rgba(0,0,0,.18)}
+.bp .pv[value=""] + button[type=action].pc{display:none}
+.bp .pv[value^="h"] + button[type=action].pc,.bp .pv[value^="d"] + button[type=action].pc{color:#b5121b;border-color:#b5121b}
+.bp .pv[value^="j"] + button[type=action].pc .s{color:#b5121b;font-size:17px}
+.bp .pv[value^="j"] + button[type=action].pc .k{font-size:9px;letter-spacing:0}
+.bp button[type=action].pc .k{position:absolute;left:3px;top:3px;font:900 11px/1 var(--sans);font-variant-numeric:lining-nums;letter-spacing:-.06em}
+.bp button[type=action].pc .s{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:400 20px/1 'Segoe UI Symbol','Apple Symbols','Noto Sans Symbols 2','DejaVu Sans',sans-serif}
+.bp .sum{font:700 11.5px var(--sans);white-space:nowrap}
+.bp .sum .sv{font-size:14px}
+.bp .sn[value="0"] + .sum,.bp .sn[value=""] + .sum{display:none}
+
+/* character sheet tab: official v2 left page | right page */
+.bp .spread{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.bp .col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bp .pf{display:grid;grid-template-columns:214px minmax(0,1fr);gap:6px}
+.bp .portrait{position:relative;min-height:120px;margin:4px;border:1px solid var(--line);background:repeating-linear-gradient(45deg,var(--hatch1) 0 8px,var(--hatch2) 8px 16px);overflow:hidden}
+.bp .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+.bp .portrait img:not([src]),.bp .portrait img[src=""]{display:none}
+.bp .free2 textarea{min-height:60px;padding:2px 6px 6px;font-size:12px;line-height:1.55}
+.bp .prof{display:grid;grid-template-columns:auto minmax(0,1fr);grid-auto-rows:minmax(24px,1fr)}
+.bp .prof .k{background:var(--bar);color:#ffffff;font:700 11px/1 var(--sans);padding:0 7px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #444444;white-space:nowrap}
+.bp .prof .v{border-bottom:1px solid var(--line);display:flex;align-items:center;min-width:0}
+.bp .prof .v input[type=text]{height:22px}
+.bp .prof .v.nm input[type=text]{font:700 15px var(--sans)}
+.bp .prof .two{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;align-items:center;width:100%}
+.bp .prof .two b{background:var(--bar);color:#ffffff;font:700 11px/22px var(--sans);padding:0 7px}
+.bp .prof .age{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.bp .prof .age > span{color:var(--sub)}
+.bp .prof > :nth-last-child(-n+2){border-bottom:0}
+
+/* factor, mastery, abilities, sub abilities */
+.bp .fac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1.5px solid var(--ink)}
+.bp .fac > div{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch}
+.bp .fac > div + div{border-left:1px solid var(--line)}
+.bp .fac b{background:var(--bar);color:#ffffff;font:700 11.5px/1 var(--sans);display:flex;align-items:center;padding:0 14px 0 8px;white-space:nowrap;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
+.bp .fac > div > span{display:flex;align-items:center;padding:0 8px;font:700 13px var(--sans)}
+.bp .fac input[type=text]{height:28px;font:700 12.5px var(--sans)}
+.bp .abl{display:grid;grid-template-columns:108px minmax(0,1fr) minmax(0,1fr);border:1.5px solid var(--ink);min-height:64px}
+.bp .abl .ren{display:grid;grid-template-columns:1fr 38px;align-items:center;background:var(--bar);color:#ffffff;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%);padding-right:12px}
+.bp .abl .ren b{font:900 15px/1 var(--sans);text-align:center;letter-spacing:.1em}
+.bp .abl .ren input[type=number]{height:32px;text-align:center;font:900 20px var(--sans);color:#ffffff;border-bottom:1.5px solid var(--accent)}
+body.sheet-darkmode .bp .abl .ren input[type=number]{color:#ffffff}
+.bp .abl .grp{display:grid;grid-template-columns:22px minmax(0,1fr);border-left:1px solid var(--line)}
+.bp .abl .grp > b{background:var(--bar);color:#ffffff;font:700 10.5px/1.1 var(--sans);writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;letter-spacing:.2em}
+.bp .abl .rows{display:grid;grid-auto-rows:1fr}
+.bp .abl .ar{display:grid;grid-template-columns:20px auto minmax(0,1fr);align-items:center;gap:4px;padding:0 6px;border-bottom:1px solid var(--line)}
+.bp .abl .ar:last-child,.bp .st[value="h"] ~ .main .abl .ar:nth-child(2){border-bottom:0}
+.bp .abl .ar .suit{font:400 22px/1 Georgia,serif;text-align:center}
+.bp .abl .ar .suit.rd{color:var(--red)}
+.bp .abl .ar .an{font:900 15px/1 var(--sans)}
+.bp .abl .ar input[type=number]{height:26px;text-align:center;font:900 18px var(--sans);border-bottom:1.5px solid var(--accent);max-width:46px;justify-self:end}
+.bp .abl .ar .lbl{font:700 11.5px var(--sans)}
+
+/* blood pact, scar: name cell + value cell pairs */
+.bp .kv{display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);grid-auto-rows:minmax(23px,auto)}
+.bp .kv > b{background:var(--bar);color:#ffffff;font:700 10px/1 var(--sans);padding:0 6px;display:flex;align-items:center;border-bottom:1px solid #444444;white-space:nowrap}
+.bp .kv > span{border-bottom:1px solid var(--line);display:flex;align-items:center;min-width:0}
+.bp .kv > span input[type=text]{height:22px}
+.bp .kv > .w{grid-column:2/-1}
+.bp .kv textarea{min-height:40px;font-size:12px;padding:3px 5px}
+.bp .kv .agv{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;width:100%}
+.bp .kv .agv i{color:var(--sub)}
+.bp .sec{display:flex;align-items:center;gap:6px;background:var(--bar2);color:#ffffff;font:700 10.5px var(--sans);padding:3px 7px;letter-spacing:.1em}
+.bp label.fold{display:flex;width:100%;cursor:pointer;font-weight:700}
+.bp label.fold input{position:absolute;opacity:0;width:0;height:0}
+.bp .fold .arr{width:0;height:0;border-left:5px solid #ffffff;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+.bp .scar .kv{grid-template-columns:auto minmax(0,1fr)}
+.bp .scar textarea{min-height:44px}
+
+/* tables: blood force, skills, effect memo, blood path strength, enemy skills */
+.bp .th,.bp .tr{display:grid;align-items:stretch}
+.bp .th{font:700 10.5px var(--sans);text-align:center;color:#ffffff;background:var(--bar2)}
+.bp .th span{padding:2px 0}
+.bp .tr{min-height:25px;border-bottom:1px solid var(--line)}
+.bp .rows > .tr:last-child{border-bottom:0}
+.bp .tr > *{border-left:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;min-width:0}
+.bp .tr > :first-child{border-left:0}
+.bp .tr input[type=text]{text-align:center;font-size:11.5px;height:23px}
+.bp .tr .nm input[type=text]{font-weight:700;text-align:left}
+.bp .tr .ef{justify-content:flex-start}
+.bp .tr .ef input[type=text]{text-align:left}
+.bp .tr .ef textarea{font-size:11.5px;line-height:1.4;padding:3px 4px;min-height:23px}
+.bp .tr .no{font:700 11px var(--sans);color:var(--sub)}
+.bp .bl .th,.bp .bl .tr{grid-template-columns:20px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 24px}
+.bp .sk .th,.bp .sk .tr{grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr)) 24px}
+.bp .bl .tr .no,.bp .tbl .tr .bb{grid-row:span 2}
+.bp .bl .tr .ef{grid-column:2/5;grid-row:2}
+.bp .sk .tr .ef{grid-column:1/6;grid-row:2;border-left:0}
+.bp .bl .tr .ef,.bp .sk .tr .ef,.bp .ek .tr .ef{border-top:1px dotted var(--line);min-height:23px}
+/* blood force rows unlock with the blood path strength (2 = row 1, 3 = rows 2 and 3) */
+.bp .blv[value="1"] ~ .main .bl .tr,.bp .blv[value="2"] ~ .main .bl .tr.r2,.bp .blv[value="2"] ~ .main .bl .tr.r3{opacity:.42}
+.bp .memo .th,.bp .memo .tr{grid-template-columns:minmax(0,1fr) 54px 136px}
+.bp .memo .tr .dur{gap:6px;font-size:11px}
+.bp .memo label.dk{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
+
+/* record sheet tab */
+.bp .rc1{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 130px;gap:8px;align-items:stretch}
+.bp .gauge{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;padding:6px 8px}
+.bp .gauge input.now{width:100%;height:30px;text-align:right;font:900 24px/1 var(--sans);border-bottom:1.5px solid var(--ink)}
+.bp .gauge .mx{font:500 11.5px var(--sans);color:var(--sub);white-space:nowrap}
+.bp .gauge .mx .mv{font-weight:700;color:var(--ink)}
+.bp .gauge.ini{grid-template-columns:1fr;flex:1}
+.bp .gauge.ini .now{display:block;text-align:center;color:var(--accent);border-bottom:0;font:900 24px/30px var(--sans);min-height:30px}
+.bp .gauge .mx input[type=number]{display:inline-block;width:34px;height:22px;text-align:center;font:700 13px var(--sans);border-bottom:1px solid var(--line);padding:0}
+.bp textarea.dmemo{border-top:1px solid var(--line);min-height:30px;padding:3px 8px;font-size:12px}
+.bp .bpt .th,.bp .bpt .tr{grid-template-columns:44px 26px 150px minmax(0,1fr) 150px}
+.bp .bpt .tr .no{font:900 15px/1 var(--sans);color:var(--ink)}
+.bp .bpt .tr .fx{font:700 11px var(--sans)}
+.bp .bpt .tr .o{color:var(--sub)}
+.bp .bpt .tr.b1 .no,.bp .bpt .tr.b1 .fx,.bp .blv[value="2"] ~ .main .bpt .tr.b2 .no,.bp .blv[value="2"] ~ .main .bpt .tr.b2 .fx,
+.bp .blv[value="3"] ~ .main .bpt .tr.b2 .no,.bp .blv[value="3"] ~ .main .bpt .tr.b2 .fx,.bp .blv[value="3"] ~ .main .bpt .tr.b3 .no,.bp .blv[value="3"] ~ .main .bpt .tr.b3 .fx{color:var(--accent)}
+.bp .info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bp .kv.kv2c{grid-template-columns:auto minmax(0,1fr)}
+/* info: the badge reads open once the progress reaches the disclosure value (pp. 254-255) */
+.bp .hb .opn{font:700 10.5px/18px var(--sans);padding:0 7px;border-radius:2px;letter-spacing:0;color:#bdbdbd}
+.bp .io[value="on"] + .opn{background:var(--accent);color:#ffffff}
+.bp textarea.imemo{border-top:1px solid var(--line);min-height:64px;padding:4px 8px;font-size:12px;line-height:1.55}
+/* investigation progress 1 to 15 (5, 10, 15 darker), filled up to the value by generated rules */
+.bp .prog{display:flex;gap:3px;padding:6px 8px;align-items:center}
+.bp .prog button[type=action]{flex:1;min-width:0}
+.bp .prog button[type=action] span{display:block;height:24px;padding:0 7px 0 9px;font:700 11.5px/24px var(--sans);text-align:center;background:var(--chev);color:var(--sub);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,0 100%,8px 50%)}
+.bp .prog button[type=action]:first-child span{padding:0 10px 0 6px;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,0 100%)}
+.bp .prog button[type=action]:nth-child(5n) span{background:var(--chev5);color:var(--ink)}
+
+/* enemy sheet (pp. 258-261, 270): both columns end at the same height (the last box takes the rest) */
+.bp .espread{display:grid;grid-template-columns:300px minmax(0,1fr);gap:10px;align-items:stretch}
+.bp .espread > .col > .bx:last-child{flex:1}
+.bp input[type=text].enm{font:900 19px var(--sans);height:36px;padding:0 8px;border-bottom:1px solid var(--line)}
+.bp .life{display:flex;flex-wrap:wrap;gap:3px;padding:0 8px 8px}
+.bp .life button[type=action]{width:18px;height:26px;border:1.3px solid var(--ink);border-radius:3px;background:repeating-linear-gradient(45deg,var(--ink) 0 2px,var(--sub) 2px 4px)}
+.bp .etx textarea{min-height:60px;padding:5px 8px;font-size:12px;line-height:1.55}
+.bp .ek .th,.bp .ek .tr{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr)) 24px}
+.bp .ek .tr .bb{grid-row:span 3}
+.bp .ek .tr .ef{grid-column:1/6;grid-row:2;border-left:0}
+.bp .ek .tr .ov{grid-column:1/6;grid-row:3;border-left:0;border-top:1px dotted var(--line);min-height:21px}
+.bp .ek .tr .ov textarea{font-size:11px;color:var(--sub)}
+.bp .ek .tr .lx{align-self:flex-start;flex:none;padding:4px 0 0 5px;font:500 10px/1.4 var(--sans);color:var(--sub);white-space:nowrap}
+.bp .ek .tr .ov{justify-content:flex-start}
+.bp .pmb{display:inline-flex;gap:3px;align-items:center;font:500 10.5px var(--sans);color:#cccccc;letter-spacing:0}
+.bp .pmb button[type=action]{width:20px;height:18px;border:1px solid #ffffff;background:transparent;color:#ffffff;font:700 13px/1 var(--sans);text-align:center}
+/* generated by build.py: investigation progress, life cards, enemy skill rows */
+.bp .pg[value="1"] ~ .main .prog button[type=action]:nth-child(-n+1) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="2"] ~ .main .prog button[type=action]:nth-child(-n+2) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="3"] ~ .main .prog button[type=action]:nth-child(-n+3) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="4"] ~ .main .prog button[type=action]:nth-child(-n+4) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="5"] ~ .main .prog button[type=action]:nth-child(-n+5) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="6"] ~ .main .prog button[type=action]:nth-child(-n+6) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="7"] ~ .main .prog button[type=action]:nth-child(-n+7) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="8"] ~ .main .prog button[type=action]:nth-child(-n+8) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="9"] ~ .main .prog button[type=action]:nth-child(-n+9) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="10"] ~ .main .prog button[type=action]:nth-child(-n+10) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="11"] ~ .main .prog button[type=action]:nth-child(-n+11) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="12"] ~ .main .prog button[type=action]:nth-child(-n+12) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="13"] ~ .main .prog button[type=action]:nth-child(-n+13) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="14"] ~ .main .prog button[type=action]:nth-child(-n+14) span{background:var(--accent);color:#ffffff}
+.bp .pg[value="15"] ~ .main .prog button[type=action]:nth-child(-n+15) span{background:var(--accent);color:#ffffff}
+.bp .lmv[value="0"] ~ .main .life button[type=action]:nth-child(n+1){display:none}
+.bp .lfv[value="0"] ~ .main .life button[type=action]:nth-child(n+1){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="1"] ~ .main .life button[type=action]:nth-child(n+2){display:none}
+.bp .lfv[value="1"] ~ .main .life button[type=action]:nth-child(n+2){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="2"] ~ .main .life button[type=action]:nth-child(n+3){display:none}
+.bp .lfv[value="2"] ~ .main .life button[type=action]:nth-child(n+3){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="3"] ~ .main .life button[type=action]:nth-child(n+4){display:none}
+.bp .lfv[value="3"] ~ .main .life button[type=action]:nth-child(n+4){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="4"] ~ .main .life button[type=action]:nth-child(n+5){display:none}
+.bp .lfv[value="4"] ~ .main .life button[type=action]:nth-child(n+5){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="5"] ~ .main .life button[type=action]:nth-child(n+6){display:none}
+.bp .lfv[value="5"] ~ .main .life button[type=action]:nth-child(n+6){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="6"] ~ .main .life button[type=action]:nth-child(n+7){display:none}
+.bp .lfv[value="6"] ~ .main .life button[type=action]:nth-child(n+7){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="7"] ~ .main .life button[type=action]:nth-child(n+8){display:none}
+.bp .lfv[value="7"] ~ .main .life button[type=action]:nth-child(n+8){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="8"] ~ .main .life button[type=action]:nth-child(n+9){display:none}
+.bp .lfv[value="8"] ~ .main .life button[type=action]:nth-child(n+9){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="9"] ~ .main .life button[type=action]:nth-child(n+10){display:none}
+.bp .lfv[value="9"] ~ .main .life button[type=action]:nth-child(n+10){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="10"] ~ .main .life button[type=action]:nth-child(n+11){display:none}
+.bp .lfv[value="10"] ~ .main .life button[type=action]:nth-child(n+11){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="11"] ~ .main .life button[type=action]:nth-child(n+12){display:none}
+.bp .lfv[value="11"] ~ .main .life button[type=action]:nth-child(n+12){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="12"] ~ .main .life button[type=action]:nth-child(n+13){display:none}
+.bp .lfv[value="12"] ~ .main .life button[type=action]:nth-child(n+13){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="13"] ~ .main .life button[type=action]:nth-child(n+14){display:none}
+.bp .lfv[value="13"] ~ .main .life button[type=action]:nth-child(n+14){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="14"] ~ .main .life button[type=action]:nth-child(n+15){display:none}
+.bp .lfv[value="14"] ~ .main .life button[type=action]:nth-child(n+15){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="15"] ~ .main .life button[type=action]:nth-child(n+16){display:none}
+.bp .lfv[value="15"] ~ .main .life button[type=action]:nth-child(n+16){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="16"] ~ .main .life button[type=action]:nth-child(n+17){display:none}
+.bp .lfv[value="16"] ~ .main .life button[type=action]:nth-child(n+17){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="17"] ~ .main .life button[type=action]:nth-child(n+18){display:none}
+.bp .lfv[value="17"] ~ .main .life button[type=action]:nth-child(n+18){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="18"] ~ .main .life button[type=action]:nth-child(n+19){display:none}
+.bp .lfv[value="18"] ~ .main .life button[type=action]:nth-child(n+19){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .lmv[value="19"] ~ .main .life button[type=action]:nth-child(n+20){display:none}
+.bp .lfv[value="19"] ~ .main .life button[type=action]:nth-child(n+20){background:var(--paper);border-style:dashed;border-color:var(--mute)}
+.bp .ekn[value="1"] ~ .main .ek .rows > .tr:nth-child(n+2){display:none}
+.bp .ekn[value="2"] ~ .main .ek .rows > .tr:nth-child(n+3){display:none}
+.bp .ekn[value="3"] ~ .main .ek .rows > .tr:nth-child(n+4){display:none}
+.bp .ekn[value="4"] ~ .main .ek .rows > .tr:nth-child(n+5){display:none}
+.bp .ekn[value="5"] ~ .main .ek .rows > .tr:nth-child(n+6){display:none}
+.bp .ekn[value="6"] ~ .main .ek .rows > .tr:nth-child(n+7){display:none}
+.bp .ekn[value="7"] ~ .main .ek .rows > .tr:nth-child(n+8){display:none}
+.bp .ekn[value="8"] ~ .main .ek .rows > .tr:nth-child(n+9){display:none}
+.bp .ekn[value="9"] ~ .main .ek .rows > .tr:nth-child(n+10){display:none}
+.bp .ekn[value="10"] ~ .main .ek .rows > .tr:nth-child(n+11){display:none}
+.bp .ekn[value="11"] ~ .main .ek .rows > .tr:nth-child(n+12){display:none}
+.bp .ekn[value="1"] ~ .main .pmb button[name="act_ekdel"],.bp .ekn[value="12"] ~ .main .pmb button[name="act_ekadd"]{opacity:.35;pointer-events:none}
+
+/* auto height text fields (roll20kit/autogrow.py): the hidden mirror span and the textarea share one grid cell, field-sizing grows it while typing */
+.bp div.auto{position:relative;display:grid;grid-template-columns:minmax(0,1fr);width:100%;min-width:0;flex:1 1 auto;align-self:stretch}
+.bp span.mir{display:block;width:100%;min-width:0;margin:0;padding:0 4px;background:transparent;color:var(--ink);border:0;border-radius:0;box-shadow:none;font:inherit;line-height:1.4;outline:0}
+body.sheet-darkmode .bp span.mir{background-color:transparent;color:var(--ink)}
+.bp .free2 span.mir{min-height:60px;padding:2px 6px 6px;font-size:12px;line-height:1.55}
+.bp .kv span.mir{min-height:40px;font-size:12px;padding:3px 5px}
+.bp .scar span.mir{min-height:44px}
+.bp .tr .ef span.mir{font-size:11.5px;line-height:1.4;padding:3px 4px;min-height:23px}
+.bp span.mir.dmemo{border-top:1px solid var(--line);min-height:30px;padding:3px 8px;font-size:12px}
+.bp span.mir.imemo{border-top:1px solid var(--line);min-height:64px;padding:4px 8px;font-size:12px;line-height:1.55}
+.bp .etx span.mir{min-height:60px;padding:5px 8px;font-size:12px;line-height:1.55}
+.bp .ek .tr .ov span.mir{font-size:11px;color:var(--sub)}
+.bp div.auto > span.mir{grid-area:1/1;display:block;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;pointer-events:none}
+.bp div.auto > span.mir::after{content:"."}
+.bp div.auto > textarea.at{grid-area:1/1;align-self:stretch;position:static;width:100%;height:auto;min-height:0;margin:0;overflow:hidden;resize:none;field-sizing:content}
+.bp div.auto > textarea.at:focus{overflow-y:auto}
+/* end auto height text fields */
